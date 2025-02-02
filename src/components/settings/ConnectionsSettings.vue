@@ -7,8 +7,10 @@
     <div class="card-body">
       <div class="grid grid-cols-1 gap-2 lg:grid-cols-2">
         <div class="flex items-center gap-2">
-          {{ $t('connectionStyle') }}:
-          {{ $t('table') }}
+          <span class="whitespace-nowrap">
+            {{ $t('connectionStyle') }}:
+            {{ $t('table') }}
+          </span>
           <input
             class="toggle"
             type="checkbox"

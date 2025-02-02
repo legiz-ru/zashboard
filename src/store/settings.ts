@@ -39,6 +39,8 @@ export const customBackgroundURL = useStorage('config/custom-background-image', 
 export const dashboardTransparent = useStorage('config/dashboard-transparent', 90)
 export const autoUpgrade = useStorage('config/auto-upgrade', false)
 export const autoUpgradeCore = useStorage('config/auto-upgrade-core', false)
+export const swipeInTabs = useStorage('config/swipe-in-tabs', false)
+
 // overview
 export const splitOverviewPage = useStorage('config/split-overview-page', false)
 export const showIPAndConnectionInfo = useStorage('config/show-ip-and-connection-info', true)
@@ -56,8 +58,8 @@ export const speedtestUrl = useStorage<string>(
   'config/speedtest-url',
   'http://www.gstatic.com/generate_204',
 )
-export const overrideUrlWithConfigIfExists = useStorage('config/override-url-with-config', false)
-export const speedtestTimeout = useStorage<number>('config/speedtest-timeout', 3000)
+export const independentLatencyTest = useStorage('config/independent-latency-test', false)
+export const speedtestTimeout = useStorage<number>('config/speedtest-timeout', 5000)
 export const proxySortType = useStorage<PROXY_SORT_TYPE>(
   'config/proxy-sort-type',
   PROXY_SORT_TYPE.DEFAULT,

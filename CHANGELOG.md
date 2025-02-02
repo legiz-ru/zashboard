@@ -2,6 +2,131 @@
 
 # Changelog
 
+## [1.60.1](https://github.com/Zephyruso/zashboard/compare/v1.60.0...v1.60.1) (2025-01-26)
+
+
+### Bug Fixes
+
+* connections count ([2f36311](https://github.com/Zephyruso/zashboard/commit/2f36311e216b47ee844860b753dbd2c1e2f0724c))
+* rule card & input style ([5498644](https://github.com/Zephyruso/zashboard/commit/549864497bc43ea9ef60a4508a6536b48397db22))
+
+## [1.60.0](https://github.com/Zephyruso/zashboard/compare/v1.59.0...v1.60.0) (2025-01-25)
+
+
+### Features
+
+* label for backend ([7655df3](https://github.com/Zephyruso/zashboard/commit/7655df34f82d722139b8e96e54b7ca602210fe86))
+* make group hidden by manual ([e903d7b](https://github.com/Zephyruso/zashboard/commit/e903d7b838e6d20da14566bf8a54f6f5a74c1ebe))
+* setting for swipe in tabs ([e003184](https://github.com/Zephyruso/zashboard/commit/e003184ea9095679226183f9ab181eb4cd7d8fd0))
+
+
+### Bug Fixes
+
+* icon incorrect ([19db7c8](https://github.com/Zephyruso/zashboard/commit/19db7c85eab1cb9c4f8b5aff6db2f3e75a781648))
+* move proxies settings to modal ([2bdc79c](https://github.com/Zephyruso/zashboard/commit/2bdc79ce105bcdeb0e8b848a6ef239d68f1cad5e))
+* style ([e7a97c1](https://github.com/Zephyruso/zashboard/commit/e7a97c15e688a1fd9de3d4b998116974e2cb9421))
+* style for loadbalance ([51d34f7](https://github.com/Zephyruso/zashboard/commit/51d34f7e6db8d9e9bb946bacbcc84a7f43d1b59c))
+
+## [1.59.0](https://github.com/Zephyruso/zashboard/compare/v1.58.0...v1.59.0) (2025-01-24)
+
+
+### Features
+
+* swipe for tabs ([5ebcf75](https://github.com/Zephyruso/zashboard/commit/5ebcf759ee0403874a84db5502977843487477a5))
+
+
+### Bug Fixes
+
+* ctrls style ([36653fc](https://github.com/Zephyruso/zashboard/commit/36653fc91a17068010754bd3317311e809e6d567))
+* import settings for ios ([a376f3f](https://github.com/Zephyruso/zashboard/commit/a376f3f6672060c8018e5e7ee57b3ca7f0538374))
+* rename quick filter -&gt; hide connections ([477fdef](https://github.com/Zephyruso/zashboard/commit/477fdef1f4142a046cdfa67f8b274cd0e1c5a2b6))
+* truncate connection card ([feda74b](https://github.com/Zephyruso/zashboard/commit/feda74bb58348b3d78deb4485fdffc478d9bfd2d))
+
+## [1.58.0](https://github.com/Zephyruso/zashboard/compare/v1.57.0...v1.58.0) (2025-01-23)
+
+
+### Features
+
+* search for proxies ([f28cc86](https://github.com/Zephyruso/zashboard/commit/f28cc86fa45f48fef339dacbd05ab58755089199))
+* unify style for ctrl component ([740a9f7](https://github.com/Zephyruso/zashboard/commit/740a9f7cc8dbe3fdc7f77d93677593139bd8ff37))
+
+
+### Bug Fixes
+
+* import settings failed ([6757609](https://github.com/Zephyruso/zashboard/commit/6757609295831e06ed91fb178220e5202c817ea2))
+
+## [1.57.0](https://github.com/Zephyruso/zashboard/compare/v1.56.2...v1.57.0) (2025-01-22)
+
+
+### Features
+
+* toggle collapse for all ([652f1da](https://github.com/Zephyruso/zashboard/commit/652f1da0bdb654f4b312ea59a92259e9b5d04d4c))
+
+
+### Bug Fixes
+
+* connection card style ([16c1d88](https://github.com/Zephyruso/zashboard/commit/16c1d882cec3b4eb8ccec89caf9e03dfa87239ef))
+* disable swipe when selection and dialog ([7e4b4d1](https://github.com/Zephyruso/zashboard/commit/7e4b4d142e9ecc533917d3a795686a45368cb7c9))
+
+## [1.56.2](https://github.com/Zephyruso/zashboard/compare/v1.56.1...v1.56.2) (2025-01-21)
+
+
+### Bug Fixes
+
+* rules not display & selector latency test ([6f35379](https://github.com/Zephyruso/zashboard/commit/6f35379c011d0b375cc8f823abcce4f3b6f24b36))
+
+## [1.56.1](https://github.com/Zephyruso/zashboard/compare/v1.56.0...v1.56.1) (2025-01-20)
+
+
+### Bug Fixes
+
+* get latency from now ([4268255](https://github.com/Zephyruso/zashboard/commit/4268255f2cfa1f0b64804397804d07cac5d301e4))
+
+## [1.56.0](https://github.com/Zephyruso/zashboard/compare/v1.55.2...v1.56.0) (2025-01-20)
+
+
+### Features
+
+* independent latency test ([635a168](https://github.com/Zephyruso/zashboard/commit/635a168c04eb2f906c1199015faf1e2b858e9702))
+
+
+### Bug Fixes
+
+* ip check privacy ([2d66a61](https://github.com/Zephyruso/zashboard/commit/2d66a61e58b2182e6120919686946fabb02b8c7b))
+
+## [1.55.2](https://github.com/Zephyruso/zashboard/compare/v1.55.1...v1.55.2) (2025-01-20)
+
+
+### Bug Fixes
+
+* disable swipe when dnd ([b8c3eb9](https://github.com/Zephyruso/zashboard/commit/b8c3eb979e4acb5d577b70532abf92af4dd68205))
+* proxies ctrl style in mobile ([56c69ce](https://github.com/Zephyruso/zashboard/commit/56c69ce2b1a5690cb9a7b0ce0bed84db7b0755f5))
+
+## [1.55.1](https://github.com/Zephyruso/zashboard/compare/v1.55.0...v1.55.1) (2025-01-19)
+
+
+### Bug Fixes
+
+* proxies ctrl style ([90cafdf](https://github.com/Zephyruso/zashboard/commit/90cafdfd2812bd62d92d33b075dc133aaa1bbc03))
+* rule provider & notification style ([c8bb270](https://github.com/Zephyruso/zashboard/commit/c8bb2703b1d102e8a4b33adc277d53b9df2f31ef))
+
+## [1.55.0](https://github.com/Zephyruso/zashboard/compare/v1.54.0...v1.55.0) (2025-01-19)
+
+
+### Features
+
+* latency test for all proxies ([43b04b3](https://github.com/Zephyruso/zashboard/commit/43b04b3944b7a220a1a7616ec79fe5a8ad70ba43))
+* tip for large group latency test ([be7db20](https://github.com/Zephyruso/zashboard/commit/be7db20a9efe35ccbcdfe86e48e0b06ada0f6f05))
+
+
+### Bug Fixes
+
+* catch cors icon ([c15bedb](https://github.com/Zephyruso/zashboard/commit/c15bedba41b1ae2467b69ff1ea3670f96fed5c41))
+* icon shrink for macos ([3a0646f](https://github.com/Zephyruso/zashboard/commit/3a0646f662e450c4812e1b1aa62b230617a439ba))
+* loading with rollup && latency test ([a0aa905](https://github.com/Zephyruso/zashboard/commit/a0aa905b2e16cc0967e9890b90ce76ce8c9c54b5))
+* ru.ts for Total Connections Overview ([#195](https://github.com/Zephyruso/zashboard/issues/195)) ([f9f2bcf](https://github.com/Zephyruso/zashboard/commit/f9f2bcf6332cf24b70cef10d429ae1a9bddd9231))
+* swipe threshold ([9933c6e](https://github.com/Zephyruso/zashboard/commit/9933c6e3f40aa4a7482d3fe866a0cb3874735855))
+
 ## [1.54.0](https://github.com/Zephyruso/zashboard/compare/v1.53.1...v1.54.0) (2025-01-18)
 
 

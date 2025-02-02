@@ -1,10 +1,10 @@
 <template>
-  <div :class="twMerge('card mb-1 gap-1 p-2 text-sm', !rule.payload && 'gap-0')">
+  <div :class="twMerge('card gap-2 p-2 text-sm', !rule.payload && 'gap-0')">
     <div>
       <span class="mr-2 inline-block min-w-4 text-center">{{ index }}.</span>
-      <span class="mr-2 text-base-content/60">{{ rule.type }}:</span>
+      <span class="mr-2 text-primary">{{ rule.type }}</span>
       <span
-        class="mr-2 text-primary"
+        class="mr-2"
         v-if="rule.payload"
       >
         {{ rule.payload }}
@@ -16,16 +16,22 @@
         {{ rule.size }}
       </span>
     </div>
-    <div class="flex items-center gap-1">
-      <ProxyName :name="rule.proxy" />
+    <div class="flex items-center gap-1 text-base-content/80">
+      <ProxyName
+        :name="rule.proxy"
+        class="text-xs"
+      />
       <template v-if="proxyNode?.now">
         <ArrowRightCircleIcon class="h-4 w-4" />
-        <ProxyName :name="proxyNode.now" />
+        <ProxyName
+          :name="proxyNode.now"
+          class="text-xs"
+        />
       </template>
       <span
         v-if="latency !== NOT_CONNECTED"
         :class="latencyColor"
-        class="ml-1"
+        class="ml-1 text-xs"
         >{{ latency }}ms</span
       >
     </div>
@@ -48,6 +54,6 @@ const props = defineProps<{
 }>()
 
 const proxyNode = computed(() => proxyMap.value[props.rule.proxy])
-const latency = computed(() => getLatencyByName(props.rule.proxy))
+const latency = computed(() => getLatencyByName(props.rule.proxy, props.rule.proxy))
 const latencyColor = computed(() => getColorForLatency(Number(latency.value)))
 </script>

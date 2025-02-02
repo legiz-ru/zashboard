@@ -24,8 +24,9 @@
 </template>
 
 <script setup lang="ts">
+import { collapsedBus } from '@/composables/bus'
 import { collapseGroupMap } from '@/store/settings'
-import { computed, nextTick, ref } from 'vue'
+import { computed, nextTick, onUnmounted, ref } from 'vue'
 
 const props = defineProps<{
   name: string
@@ -62,4 +63,14 @@ const handlerTransitionEnd = () => {
     showContent.value = false
   }
 }
+
+const busHandler = ({ open }: { open: boolean }) => {
+  showCollapse.value = open
+}
+
+collapsedBus.on(busHandler)
+
+onUnmounted(() => {
+  collapsedBus.off(busHandler)
+})
 </script>

@@ -32,7 +32,7 @@ import { computed } from 'vue'
 const opts = computed(() => {
   return backendList.value.map((b) => {
     return {
-      label: getUrlFromBackend(b),
+      label: b.label || getUrlFromBackend(b),
       value: b.uuid,
     }
   })

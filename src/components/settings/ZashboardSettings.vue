@@ -57,7 +57,7 @@
             <span class="shrink-0"> {{ $t('customBackgroundURL') }}: </span>
             <div class="join">
               <TextInput
-                class="join-item"
+                class="join-item flex-1"
                 v-model="customBackgroundURL"
                 @update:modelValue="handlerBackgroundURLChange"
               />
@@ -90,6 +90,14 @@
               max="100"
               v-model="dashboardTransparent"
               class="range max-w-64"
+            />
+          </div>
+          <div class="flex items-center gap-2 md:hidden">
+            {{ $t('swipeInTabs') }}:
+            <input
+              type="checkbox"
+              v-model="swipeInTabs"
+              class="toggle"
             />
           </div>
         </div>
@@ -128,12 +136,7 @@
         >
           {{ $t('exportSettings') }}
         </button>
-        <button
-          class="btn btn-sm"
-          @click="importSettings"
-        >
-          {{ $t('importSettings') }}
-        </button>
+        <ImportSettings />
       </div>
     </div>
   </div>
@@ -144,7 +147,7 @@ import { isSingBox, upgradeUIAPI, zashboardVersion } from '@/api'
 import LanguageSelect from '@/components/settings/LanguageSelect.vue'
 import { useSettings } from '@/composables/settings'
 import { FONTS } from '@/config'
-import { exportSettings, importSettings } from '@/helper'
+import { exportSettings } from '@/helper'
 import {
   clearIconFromIndexedDB,
   deleteBase64FromIndexedDB,
@@ -156,11 +159,13 @@ import {
   customBackgroundURL,
   dashboardTransparent,
   font,
+  swipeInTabs,
   theme,
 } from '@/store/settings'
 import { ArrowUpCircleIcon } from '@heroicons/vue/24/outline'
 import { twMerge } from 'tailwind-merge'
 import { ref } from 'vue'
+import ImportSettings from '../common/ImportSettings.vue'
 import TextInput from '../common/TextInput.vue'
 
 const inputFileRef = ref()

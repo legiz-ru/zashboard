@@ -145,36 +145,35 @@ export const renderConnections = computed(() => {
   }
   return connections.value
     .filter((conn) => {
+      const metadatas = [
+        conn.metadata.host,
+        conn.metadata.destinationIP,
+        conn.metadata.destinationPort,
+        conn.metadata.sourceIP,
+        conn.metadata.sourcePort,
+        conn.metadata.sniffHost,
+        conn.metadata.processPath,
+        conn.metadata.type,
+        conn.metadata.network,
+        conn.chains.join(''),
+        conn.rule,
+        conn.rulePayload,
+      ]
+
+      if (sourceIPFilter.value !== null && conn.metadata.sourceIP !== sourceIPFilter.value) {
+        return false
+      }
+
       if (regex) {
-        const quickFilterMatch =
-          regex.test(conn.chains.join('')) ||
-          regex.test(conn.metadata.host) ||
-          regex.test(conn.metadata.destinationIP)
+        const quickFilterMatch = metadatas.some((i) => regex.test(i))
 
         if (quickFilterMatch) {
           return false
         }
       }
 
-      if (sourceIPFilter.value !== null && conn.metadata.sourceIP !== sourceIPFilter.value) {
-        return false
-      }
-
       if (connectionFilter.value) {
-        return [
-          conn.metadata.host,
-          conn.metadata.destinationIP,
-          conn.metadata.destinationPort,
-          conn.metadata.sourceIP,
-          conn.metadata.sourcePort,
-          conn.metadata.sniffHost,
-          conn.metadata.processPath,
-          conn.metadata.type,
-          conn.metadata.network,
-          conn.chains.join(''),
-          conn.rule,
-          conn.rulePayload,
-        ].some((i) => i?.includes(connectionFilter.value))
+        return metadatas.some((i) => i?.includes(connectionFilter.value))
       }
 
       return true

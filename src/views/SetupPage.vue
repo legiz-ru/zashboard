@@ -1,20 +1,15 @@
 <template>
   <div
-    class="flex h-full w-full items-center justify-center bg-base-200/40"
+    class="h-full w-full items-center justify-center overflow-auto bg-base-200/40 sm:flex"
     @keydown.enter="handleSubmit(form)"
   >
-    <div class="absolute right-4 top-4">
-      <button
-        class="btn btn-sm"
-        @click="importSettings"
-      >
-        {{ $t('importSettings') }}
-      </button>
+    <div class="absolute right-4 top-4 max-sm:hidden">
+      <ImportSettings />
     </div>
-    <div class="absolute bottom-4 right-4">
+    <div class="absolute bottom-4 right-4 max-sm:hidden">
       <LanguageSelect />
     </div>
-    <div class="card w-96 max-w-[90%] gap-2 px-6 py-2 sm:gap-4">
+    <div class="card mx-auto w-96 max-w-[90%] gap-2 px-6 py-2 max-sm:my-4">
       <h1 class="text-2xl font-semibold">{{ $t('setup') }}</h1>
       <div class="form-control">
         <label class="label">
@@ -32,9 +27,8 @@
         <label class="label">
           <span class="label-text">{{ $t('host') }}</span>
         </label>
-        <input
-          type="text"
-          class="input input-sm input-bordered w-full"
+        <TextInput
+          class="w-full"
           name="username"
           autocomplete="username"
           v-model="form.host"
@@ -44,15 +38,14 @@
         <label class="label">
           <span class="label-text">{{ $t('port') }}</span>
         </label>
-        <input
-          type="text"
-          class="input input-sm input-bordered w-full"
+        <TextInput
+          class="w-full"
           v-model="form.port"
         />
       </div>
       <div class="form-control">
         <label class="label flex items-center justify-start gap-1">
-          <span class="label-text">{{ $t('secondaryPath') }}</span>
+          <span class="label-text">{{ $t('secondaryPath') }} ({{ $t('optional') }})</span>
           <span
             class="tooltip"
             :data-tip="$t('secondaryPathTip')"
@@ -60,9 +53,8 @@
             <QuestionMarkCircleIcon class="h-4 w-4" />
           </span>
         </label>
-        <input
-          type="text"
-          class="input input-sm input-bordered w-full"
+        <TextInput
+          class="w-full"
           v-model="form.secondaryPath"
         />
       </div>
@@ -74,6 +66,15 @@
           type="password"
           class="input input-sm input-bordered w-full"
           v-model="form.password"
+        />
+      </div>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">{{ $t('label') }} ({{ $t('optional') }})</span>
+        </label>
+        <TextInput
+          class="w-full"
+          v-model="form.label"
         />
       </div>
       <button
@@ -101,7 +102,7 @@
               class="btn btn-sm flex-1"
               @click="selectBackend(element.uuid)"
             >
-              {{ getUrlFromBackend(element) }}
+              {{ element.label || getUrlFromBackend(element) }}
             </button>
             <button
               class="btn btn-circle btn-sm"
@@ -112,17 +113,24 @@
           </div>
         </template>
       </Draggable>
+      <LanguageSelect class="mt-4 sm:hidden" />
+      <div class="absolute right-2 top-2 sm:hidden">
+        <ImportSettings />
+      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+import ImportSettings from '@/components/common/ImportSettings.vue'
+import TextInput from '@/components/common/TextInput.vue'
 import LanguageSelect from '@/components/settings/LanguageSelect.vue'
-import { useTip } from '@/composables/tip'
+import { useNotification } from '@/composables/tip'
 import { ROUTE_NAME } from '@/config'
-import { getUrlFromBackend, importSettings } from '@/helper'
+import { getUrlFromBackend } from '@/helper'
 import router from '@/router'
 import { activeUuid, addBackend, backendList, removeBackend } from '@/store/setup'
+import type { Backend } from '@/types'
 import {
   AdjustmentsVerticalIcon,
   MinusCircleIcon,
@@ -134,28 +142,20 @@ import Draggable from 'vuedraggable'
 const form = reactive({
   protocol: 'http',
   host: '127.0.0.1',
-  port: 9090,
+  port: '9090',
   secondaryPath: '',
   password: '',
+  label: '',
 })
 
-const { showTip } = useTip()
+const { showNotification } = useNotification()
 
 const selectBackend = (uuid: string) => {
   activeUuid.value = uuid
   router.push({ name: ROUTE_NAME.proxies })
 }
 
-const handleSubmit = async (
-  form: {
-    protocol: string
-    host: string
-    port: number
-    secondaryPath: string
-    password: string
-  },
-  quiet = false,
-) => {
+const handleSubmit = async (form: Omit<Backend, 'uuid'>, quiet = false) => {
   const { protocol, host, port, password } = form
 
   if (!protocol || !host || !port) {
@@ -169,7 +169,9 @@ const handleSubmit = async (
     !['::1', '0.0.0.0', '127.0.0.1', 'localhost'].includes(host) &&
     !quiet
   ) {
-    showTip('protocolTips')
+    showNotification({
+      content: 'protocolTips',
+    })
   }
 
   try {
@@ -217,8 +219,9 @@ if (query.has('hostname')) {
         : window.location.protocol.replace(':', ''),
     secondaryPath: (query.get('secondaryPath') as string) || '',
     host: query.get('hostname') as string,
-    port: Number(query.get('port')),
+    port: query.get('port') as string,
     password: query.get('secret') as string,
+    label: query.get('label') as string,
   })
 } else if (backendList.value.length === 0) {
   handleSubmit(form, true)

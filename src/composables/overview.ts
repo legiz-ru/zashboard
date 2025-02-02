@@ -1,16 +1,17 @@
 import { ref } from 'vue'
 
-export const speedtestcnIP = ref({
-  location: '',
-  ip: '',
+type IPInfo = {
+  ip: string[]
+  ipWithPrivacy: string[]
+}
+
+export const ipsbIP = ref<IPInfo>({
+  ip: [],
+  ipWithPrivacy: [],
 })
-export const ipsbIP = ref({
-  location: '',
-  ip: '',
-})
-export const ipipnetIP = ref({
-  location: '',
-  ip: '',
+export const ipipnetIP = ref<IPInfo>({
+  ip: [],
+  ipWithPrivacy: [],
 })
 
 export const baiduLatency = ref('')

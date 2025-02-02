@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex flex-col overflow-x-hidden"
+    class="flex flex-col gap-1 overflow-x-hidden"
     :class="renderRules.length < 200 && 'p-2'"
   >
     <template v-if="rulesTabShow === RULE_TAB_TYPE.PROVIDER">
@@ -27,6 +27,7 @@
     >
       <template v-slot="{ item: rule }: { item: Rule }">
         <RuleCard
+          class="mb-1"
           :key="rule.payload"
           :rule="rule"
           :index="rules.indexOf(rule) + 1"

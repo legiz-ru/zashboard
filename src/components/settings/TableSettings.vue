@@ -39,6 +39,8 @@
       group="list"
       :animation="150"
       :item-key="(id: string) => id"
+      @start="disableSwipe = true"
+      @end="disableSwipe = false"
     >
       <template #item="{ element }">
         <div class="flex h-8 cursor-move items-center rounded bg-neutral px-2 text-neutral-content">
@@ -52,6 +54,8 @@
       group="list"
       :animation="150"
       :item-key="(id: string) => id"
+      @start="disableSwipe = true"
+      @end="disableSwipe = false"
     >
       <template #item="{ element }">
         <div class="flex h-8 cursor-move items-center rounded bg-neutral px-2 text-neutral-content">
@@ -63,6 +67,7 @@
 </template>
 
 <script setup lang="ts">
+import { disableSwipe } from '@/composables/swipe'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY, TABLE_SIZE, TABLE_WIDTH_MODE } from '@/config'
 import { connectionTableColumns, tableSize, tableWidthMode } from '@/store/settings'
 import { ref } from 'vue'

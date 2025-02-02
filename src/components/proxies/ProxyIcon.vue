@@ -16,7 +16,7 @@
 import { getIconFromIndexedDB, saveIconToIndexedDB } from '@/helper/utils'
 import { iconMarginRight, iconSize } from '@/store/settings'
 import DOMPurify from 'dompurify'
-import { computed, onMounted, ref } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 
 const props = defineProps<{
   icon: string
@@ -69,11 +69,17 @@ const loadIcon = async () => {
   }
 }
 
-onMounted(() => {
+const initIcon = () => {
   if (!isDom.value) {
     loadIcon()
   } else {
     cachedIcon.value = props.icon
   }
+}
+
+onMounted(() => {
+  initIcon()
 })
+
+watch(() => props.icon, initIcon)
 </script>

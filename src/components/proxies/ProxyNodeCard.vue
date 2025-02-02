@@ -28,14 +28,16 @@
 
     <div class="flex h-4 w-full items-center justify-between">
       <span
-        :class="`whitespace-nowrap text-xs tracking-tight ${active ? 'text-primary-content' : 'text-base-content/60'}`"
+        :class="`truncate text-xs tracking-tight ${active ? 'text-primary-content' : 'text-base-content/60'}`"
+        @mouseenter="checkTruncation"
       >
         {{ typeDescription }}
       </span>
       <LatencyTag
-        :class="[isSmallCard && '!h-4 !w-8']"
+        :class="[isSmallCard && '!h-4 !w-8', 'shrink-0']"
         :name="node.name"
         :loading="isLatencyTesting"
+        :group-name="groupName"
         @click.stop="handlerLatencyTest"
       />
     </div>
@@ -45,13 +47,7 @@
 <script setup lang="ts">
 import { PROXY_CARD_SIZE } from '@/config'
 import { useTooltip } from '@/helper/tooltip'
-import {
-  getIPv6ByName,
-  proxyGroupLatencyTest,
-  proxyGroupList,
-  proxyLatencyTest,
-  proxyMap,
-} from '@/store/proxies'
+import { getIPv6ByName, getTestUrl, proxyLatencyTest, proxyMap } from '@/store/proxies'
 import { IPv6test, proxyCardSize, truncateProxyName } from '@/store/settings'
 import { twMerge } from 'tailwind-merge'
 import { computed, ref } from 'vue'
@@ -61,6 +57,7 @@ import ProxyIcon from './ProxyIcon.vue'
 const props = defineProps<{
   name: string
   active?: boolean
+  groupName?: string
 }>()
 
 const { showTip } = useTooltip()
@@ -69,7 +66,9 @@ const checkTruncation = (e: Event) => {
   const { scrollWidth, clientWidth } = target
 
   if (scrollWidth > clientWidth) {
-    showTip(e, target.innerText)
+    showTip(e, target.innerText, {
+      delay: [500, 0],
+    })
   }
 }
 
@@ -96,11 +95,7 @@ const handlerLatencyTest = async () => {
 
   isLatencyTesting.value = true
   try {
-    if (proxyGroupList.value.includes(props.name)) {
-      await proxyGroupLatencyTest(props.name)
-    } else {
-      await proxyLatencyTest(props.name)
-    }
+    await proxyLatencyTest(props.name, getTestUrl(props.groupName))
     isLatencyTesting.value = false
   } catch {
     isLatencyTesting.value = false

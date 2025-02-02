@@ -63,8 +63,8 @@
 
 <script setup lang="ts">
 import CommonSidebar from '@/components/sidebar/CommonCtrl.vue'
-import ConnectionCtrl from '@/components/sidebar/ConnectionCtrl.vue'
-import LogsCtrl from '@/components/sidebar/LogsCtrl.vue'
+import ConnectionCtrl from '@/components/sidebar/ConnectionCtrl.tsx'
+import LogsCtrl from '@/components/sidebar/LogsCtrl.tsx'
 import ProxiesCtrl from '@/components/sidebar/ProxiesCtrl.tsx'
 import RulesCtrl from '@/components/sidebar/RulesCtrl.vue'
 import { ROUTE_ICON_MAP, ROUTE_NAME } from '@/config'

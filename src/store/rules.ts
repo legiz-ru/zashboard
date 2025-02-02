@@ -36,6 +36,14 @@ export const fetchRules = async () => {
   const { data: ruleData } = await fetchRulesAPI()
   const { data: providerData } = await fetchRuleProvidersAPI()
 
-  rules.value = ruleData.rules
+  rules.value = ruleData.rules.map((rule) => {
+    const proxy = rule.proxy
+    const proxyName = proxy.startsWith('route(') ? proxy.substring(6, proxy.length - 1) : proxy
+
+    return {
+      ...rule,
+      proxy: proxyName,
+    }
+  })
   ruleProviderList.value = Object.values(providerData.providers)
 }

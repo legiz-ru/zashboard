@@ -6,12 +6,13 @@
       </div>
     </template>
     <VirtualScroller
+      v-else
       :data="renderLogs"
-      :size="64"
+      :size="isMiddleScreen ? 96 : 64"
       class="p-2"
     >
       <template v-slot="{ item }: { item: LogWithSeq }">
-        <div class="card mb-1 block p-2 text-sm">
+        <div class="card mb-1 block break-all p-2 text-sm">
           <span>{{ item.seq }}</span>
           <span class="mx-2 text-primary">
             {{ dayjs(item.time).locale(language).format('HH:mm:ss') }}
@@ -29,6 +30,7 @@
 <script setup lang="ts">
 import VirtualScroller from '@/components/common/VirtualScroller.vue'
 import { LOG_LEVEL } from '@/config'
+import { isMiddleScreen } from '@/helper/utils'
 import { logFilter, logs } from '@/store/logs'
 import { language } from '@/store/settings'
 import type { LogWithSeq } from '@/types'

@@ -18,7 +18,7 @@
           >
             <span class="shrink-0"> {{ $t(portConfig.label) }}: </span>
             <input
-              class="input input-sm input-bordered w-20"
+              class="input input-sm input-bordered w-20 sm:w-24"
               type="number"
               v-model="configs[portConfig.key as keyof Config]"
               @change="

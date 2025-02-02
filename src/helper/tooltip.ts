@@ -16,13 +16,13 @@ export const useTooltip = () => {
       animation: 'scale',
       appendTo: appContent,
       allowHTML: true,
+      showOnCreate: true,
       onHidden: () => {
         tippyInstance?.destroy()
         tippyInstance = null
       },
       ...config,
     })
-    tippyInstance.show()
   }
 
   return {

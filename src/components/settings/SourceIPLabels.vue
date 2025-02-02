@@ -7,9 +7,8 @@
       class="flex items-center gap-2"
     >
       {{ ip }} <ArrowRightCircleIcon class="h-4 w-4" />
-      <input
-        type="text"
-        class="input input-sm input-bordered w-24"
+      <TextInput
+        class="w-24"
         v-model="sourceIPLabelMap[ip]"
       />
       <button
@@ -21,15 +20,13 @@
     </div>
     <div class="flex w-full items-center gap-1">
       <span class="shrink-0">IP :</span>
-      <input
-        type="text"
-        class="input input-sm input-bordered w-36 flex-1 sm:max-w-44"
+      <TextInput
+        class="w-36 flex-1 sm:max-w-44"
         v-model="newLabelForIP.ip"
       />
       <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
-      <input
-        type="text"
-        class="input input-sm input-bordered w-24 sm:w-32"
+      <TextInput
+        class="w-24 sm:w-32"
         v-model="newLabelForIP.label"
       />
       <button
@@ -46,6 +43,7 @@
 import { sourceIPLabelMap } from '@/store/settings'
 import { ArrowRightCircleIcon, MinusCircleIcon, PlusIcon } from '@heroicons/vue/24/outline'
 import { computed, reactive } from 'vue'
+import TextInput from '../common/TextInput.vue'
 
 const sourceIPs = computed(() => {
   return Object.keys(sourceIPLabelMap.value)

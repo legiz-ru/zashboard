@@ -4,13 +4,13 @@ import { useMediaQuery } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { computed, onMounted, ref, watch } from 'vue'
 import { RouterView } from 'vue-router'
-import { useTip } from './composables/tip'
+import { useNotification } from './composables/tip'
 import { FONTS } from './config'
 import { getBase64FromIndexedDB, LOCAL_IMAGE } from './helper/utils'
 import { customBackgroundURL, dashboardTransparent, font, theme } from './store/settings'
 
 const app = ref<HTMLElement>()
-const { tipContent, tipShowModel } = useTip()
+const { tipContent, tipShowModel, tipType } = useNotification()
 const fontClassMap = {
   [FONTS.MI_SANS]: 'font-MiSans',
   [FONTS.SARASA_UI]: 'font-SarasaUI',
@@ -79,16 +79,19 @@ onMounted(() => {
   >
     <RouterView />
     <div
-      class="toast-sm toast toast-start toast-top z-50 max-w-64 whitespace-normal text-sm"
+      class="toast-sm toast toast-start toast-top z-50 max-w-64 text-sm"
       v-if="tipShowModel"
     >
-      <div class="breaks-all alert alert-warning flex w-72 whitespace-normal p-2">
+      <div
+        class="breaks-all alert flex whitespace-normal p-2"
+        :class="tipType"
+      >
         <a
           href="https://github.com/Zephyruso/zashboard/blob/main/README.md"
           target="_blank"
           class="flex-1"
         >
-          {{ $t(tipContent) }}
+          {{ tipContent }}
         </a>
         <button
           class="btn btn-circle btn-ghost btn-sm"

@@ -1,10 +1,11 @@
 export type Backend = {
   host: string
-  port: number
+  port: string
   secondaryPath: string
   password: string
   protocol: string
   uuid: string
+  label?: string
 }
 
 export type Config = {

@@ -5,42 +5,29 @@
     </div>
     <div class="card-body">
       <div class="grid grid-cols-1 gap-2 lg:grid-cols-2">
-        <div class="flex items-center gap-2">
-          {{ $t('automaticDisconnection') }}:
-          <input
-            class="toggle"
-            type="checkbox"
-            v-model="automaticDisconnection"
-          />
-        </div>
-        <div class="flex items-center gap-2">
-          {{ $t('ipv6Test') }}:
-          <input
-            class="toggle"
-            type="checkbox"
-            v-model="IPv6test"
-          />
-        </div>
         <div class="flex w-full items-center gap-2">
           <span> {{ $t('speedtestUrl') }}: </span>
-          <input
-            type="text"
-            class="input input-sm input-bordered w-36 flex-1 sm:max-w-80"
+          <TextInput
+            class="w-36 flex-1 sm:max-w-80"
             v-model="speedtestUrl"
           />
         </div>
         <div class="flex w-full items-center gap-2">
-          <span> {{ $t('overrideUrlWithConfig') }}: </span>
+          <span> {{ $t('independentLatencyTest') }}: </span>
           <input
             class="toggle"
             type="checkbox"
-            v-model="overrideUrlWithConfigIfExists"
+            v-model="independentLatencyTest"
+          />
+          <QuestionMarkCircleIcon
+            class="h-4 w-4"
+            @mouseenter="independentLatencyTestTip"
           />
         </div>
         <div class="flex w-full items-center gap-2">
           <span> {{ $t('speedtestTimeout') }}: </span>
           <input
-            type="text"
+            type="number"
             class="input input-sm input-bordered w-20"
             v-model="speedtestTimeout"
           />
@@ -63,6 +50,14 @@
             v-model="mediumLatency"
           />
           ms
+        </div>
+        <div class="flex items-center gap-2">
+          {{ $t('ipv6Test') }}:
+          <input
+            class="toggle"
+            type="checkbox"
+            v-model="IPv6test"
+          />
         </div>
       </div>
       <div class="divider"></div>
@@ -131,14 +126,6 @@
             />
           </div>
         </template>
-        <div class="flex items-center gap-2">
-          {{ $t('showHiddenGroup') }}:
-          <input
-            class="toggle"
-            type="checkbox"
-            v-model="showHiddenGroup"
-          />
-        </div>
         <div
           v-if="isSingBox"
           class="flex items-center gap-2"
@@ -158,25 +145,33 @@
 <script setup lang="ts">
 import { isSingBox } from '@/api'
 import { PROXY_CARD_SIZE, PROXY_PREVIEW_TYPE } from '@/config'
+import { useTooltip } from '@/helper/tooltip'
 import { proxyMap } from '@/store/proxies'
 import {
-  automaticDisconnection,
   iconMarginRight,
   iconSize,
+  independentLatencyTest,
   IPv6test,
   lowLatency,
   mediumLatency,
-  overrideUrlWithConfigIfExists,
   proxyCardSize,
   proxyPreviewType,
   showGlobalProxy,
-  showHiddenGroup,
   speedtestTimeout,
   speedtestUrl,
   truncateProxyName,
   twoColumnProxyGroup,
 } from '@/store/settings'
+import { QuestionMarkCircleIcon } from '@heroicons/vue/24/outline'
 import { computed } from 'vue'
+import { useI18n } from 'vue-i18n'
+import TextInput from '../common/TextInput.vue'
+
+const { showTip } = useTooltip()
+const { t } = useI18n()
+const independentLatencyTestTip = (e: Event) => {
+  return showTip(e, t('independentLatencyTestTip'))
+}
 
 const hasIcon = computed(() => {
   return Object.values(proxyMap.value).some((proxy) => !!proxy.icon)

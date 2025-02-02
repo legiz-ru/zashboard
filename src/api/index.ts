@@ -1,4 +1,4 @@
-import { useTip } from '@/composables/tip'
+import { useNotification } from '@/composables/tip'
 import { ROUTE_NAME } from '@/config'
 import { getUrlFromBackend } from '@/helper'
 import router from '@/router'
@@ -22,9 +22,9 @@ axios.interceptors.response.use(null, (error) => {
     activeUuid.value = null
     router.push({ name: ROUTE_NAME.setup })
     nextTick(() => {
-      const { showTip } = useTip()
+      const { showNotification } = useNotification()
 
-      showTip('unauthorizedTip')
+      showNotification({ content: 'unauthorizedTip' })
     })
   } else if (error.status === 404) {
     activeUuid.value = null
@@ -256,10 +256,6 @@ export const fetchBackendUpdateAvailableAPI = async () => {
   if (channel === 'alpha') return await check('/releases/tags/Prerelease-Alpha', versionNumber)
 
   return false
-}
-
-export const getIPFromSpeedtestcnAPI = () => {
-  return fetch('https://api-v3.speedtest.cn/ip')
 }
 
 export type GlobalIPType = {

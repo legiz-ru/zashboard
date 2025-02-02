@@ -1,12 +1,15 @@
 <template>
-  <div class="flex items-center gap-1 break-all">
+  <div
+    class="flex items-center gap-1 break-all"
+    :class="size === 'large' ? 'text-lg font-medium' : 'text-sm'"
+  >
     <ProxyIcon
       v-if="icon"
       :icon="icon"
       :size="size"
       :class="size === 'large' && '-mt-[2px]'"
     />
-    <span :class="size === 'large' ? 'text-lg font-medium' : 'text-sm'">{{ name }}</span>
+    {{ name }}
   </div>
 </template>
 

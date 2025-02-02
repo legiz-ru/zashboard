@@ -25,6 +25,8 @@
         :animation="150"
         group="list"
         ghostClass="ghost"
+        @start="disableSwipe = true"
+        @end="disableSwipe = false"
         :item-key="(id: string) => id"
       >
         <template #item="{ element }">
@@ -43,6 +45,8 @@
       :animation="150"
       group="list"
       ghostClass="ghost"
+      @start="disableSwipe = true"
+      @end="disableSwipe = false"
       :item-key="(id: string) => id"
     >
       <template #item="{ element }">
@@ -55,6 +59,7 @@
 </template>
 
 <script setup lang="ts">
+import { disableSwipe } from '@/composables/swipe'
 import { CONNECTIONS_TABLE_ACCESSOR_KEY } from '@/config'
 import { connectionCardLines } from '@/store/settings'
 import { MinusCircleIcon, PlusCircleIcon } from '@heroicons/vue/24/outline'

@@ -62,6 +62,7 @@ import { computed } from 'vue'
 const props = defineProps<{
   nodes: string[]
   now?: string
+  groupName?: string
 }>()
 
 const { showTip } = useTooltip()
@@ -95,7 +96,7 @@ const showDots = computed(() => {
 const nodesLatency = computed(() =>
   props.nodes.map((name) => {
     return {
-      latency: getLatencyByName(name),
+      latency: getLatencyByName(name, props.groupName),
       name: name,
     }
   }),

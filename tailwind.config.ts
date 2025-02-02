@@ -15,7 +15,7 @@ export default {
     },
     extend: {
       colors: {
-        ['low-latency']: 'rgb(52, 189, 109)',
+        ['low-latency']: 'oklch(0.648 0.15 160)',
         ['medium-latency']: 'rgb(250, 210, 75)',
         ['high-latency']: 'rgb(244, 96, 108)',
       },

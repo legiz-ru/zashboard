@@ -2,8 +2,6 @@
   <div class="join w-96 max-sm:w-full">
     <TextInput
       v-model="form.name"
-      type="text"
-      name="name"
       placeholder="Domain Name"
     />
     <select

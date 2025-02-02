@@ -4,36 +4,36 @@
       class="tooltip tooltip-bottom text-left text-sm"
       data-tip="ipip.net"
     >
-      {{ $t('chinaIP') }} : {{ ipipnetIP.location }}
+      {{ $t('chinaIP') }} :
+      {{ showPrivacy ? ipipnetIP.ipWithPrivacy[0] : ipipnetIP.ip[0] }}
       <span
         class="text-xs"
-        v-if="ipipnetIP.ip"
+        v-if="ipipnetIP.ip[1]"
       >
-        <template v-if="showIP"> ({{ ipipnetIP.ip }}) </template>
-        <template v-else> (***.***.***.***) </template>
+        ({{ showPrivacy ? ipipnetIP.ipWithPrivacy[1] : ipipnetIP.ip[1] }})
       </span>
     </div>
     <div
       class="tooltip tooltip-bottom text-left text-sm"
       data-tip="api.ip.sb"
     >
-      {{ $t('globalIP') }} : {{ ipsbIP.location }}
+      {{ $t('globalIP') }} :
+      {{ showPrivacy ? ipsbIP.ipWithPrivacy[0] : ipsbIP.ip[0] }}
       <span
         class="text-xs"
-        v-if="ipsbIP.ip"
+        v-if="ipsbIP.ip[1]"
       >
-        <template v-if="showIP"> ({{ ipsbIP.ip }}) </template>
-        <template v-else> (***.***.***.***) </template>
+        ({{ showPrivacy ? ipsbIP.ipWithPrivacy[1] : ipsbIP.ip[1] }})
       </span>
     </div>
     <div class="absolute bottom-2 right-2 flex items-center gap-2">
       <button
         class="btn btn-circle btn-sm flex items-center justify-center"
-        @click="showIP = !showIP"
-        @mouseenter="handlerShowIPTip"
+        @click="showPrivacy = !showPrivacy"
+        @mouseenter="handlerShowPrivacyTip"
       >
         <EyeIcon
-          v-if="showIP"
+          v-if="showPrivacy"
           class="h-4 w-4"
         />
         <EyeSlashIcon
@@ -61,29 +61,29 @@ import { onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 const { t } = useI18n()
-const showIP = ref(false)
+const showPrivacy = ref(false)
 const { showTip } = useTooltip()
-const handlerShowIPTip = (e: Event) => {
+const handlerShowPrivacyTip = (e: Event) => {
   showTip(e, t('ipScreenshotTip'))
 }
 
 const getIPs = () => {
   getIPFromIpsbAPI().then((res) => {
     ipsbIP.value = {
-      location: `${res.country} ${res.asn_organization}`,
-      ip: res.ip,
+      ipWithPrivacy: [`${res.country} ${res.asn_organization}`, res.ip],
+      ip: [`${res.country} ${res.asn_organization}`, '***.***.***.***'],
     }
   })
   getIPFromIpipnetAPI().then((res) => {
     ipipnetIP.value = {
-      location: res.data.location.join(' '),
-      ip: res.data.ip,
+      ipWithPrivacy: [res.data.location.join(' '), res.data.ip],
+      ip: [`${res.data.location[0]} ** ** **`, '***.***.***.***'],
     }
   })
 }
 
 onMounted(() => {
-  if (autoIPCheck.value && [ipsbIP, ipipnetIP].some((item) => item.value.ip === '')) {
+  if (autoIPCheck.value && [ipsbIP, ipipnetIP].some((item) => item.value.ip.length === 0)) {
     getIPs()
   }
 })

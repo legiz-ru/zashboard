@@ -2,7 +2,7 @@
   <div
     :class="
       twMerge(
-        'flex h-5 w-10 items-center justify-center rounded-xl bg-base-100 text-xs hover:bg-base-200',
+        'latency-tag flex h-5 w-10 items-center justify-center rounded-xl bg-base-100 text-xs md:hover:bg-base-200',
         color,
       )
     "
@@ -11,18 +11,16 @@
       v-if="loading"
       class="loading loading-dots loading-xs text-base-content/80"
     ></span>
-    <template v-else>
-      <BoltIcon
-        v-if="latency === NOT_CONNECTED || !latency"
-        class="h-3 w-3 text-base-content"
-      />
-      <div
-        v-show="latency !== NOT_CONNECTED"
-        ref="latencyRef"
-      >
-        {{ latency }}
-      </div>
-    </template>
+    <BoltIcon
+      v-else-if="latency === NOT_CONNECTED || !latency"
+      class="h-3 w-3 text-base-content"
+    />
+    <div
+      v-show="latency !== NOT_CONNECTED && !loading"
+      ref="latencyRef"
+    >
+      {{ latency }}
+    </div>
   </div>
 </template>
 
@@ -38,10 +36,10 @@ import { computed, nextTick, onMounted, onUnmounted, ref, watch } from 'vue'
 const props = defineProps<{
   name?: string
   loading?: boolean
+  groupName?: string
 }>()
 const latencyRef = ref()
-const latency = computed(() => getLatencyByName(props.name ?? ''))
-
+const latency = computed(() => getLatencyByName(props.name ?? '', props.groupName))
 let countUp: CountUp | null = null
 
 onMounted(() => {

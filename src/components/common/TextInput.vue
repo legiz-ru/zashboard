@@ -1,12 +1,22 @@
 <template>
-  <div class="relative w-full flex-1">
+  <div class="relative">
+    <XMarkIcon
+      v-if="beforeClose"
+      class="absolute right-2 top-1/2 z-10 h-3 w-3 -translate-y-1/2 cursor-pointer"
+      @click="clearInput"
+    />
     <input
       v-model="inputValue"
       type="text"
       class="input input-sm join-item input-bordered w-full"
+      :placeholder="placeholder || ''"
+      @touchstart.stop
+      @touchmove.stop
+      @touchend.stop
     />
     <XMarkIcon
-      class="absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 cursor-pointer"
+      v-if="!beforeClose"
+      class="absolute right-2 top-1/2 z-10 h-3 w-3 -translate-y-1/2 cursor-pointer"
       @click="clearInput"
     />
   </div>
@@ -14,24 +24,13 @@
 
 <script lang="ts" setup>
 import { XMarkIcon } from '@heroicons/vue/24/outline'
-import { computed } from 'vue'
 
-const props = defineProps({
-  label: {
-    type: String,
-    required: false,
-  },
-  modelValue: {
-    type: String,
-    required: true,
-  },
-})
-const emit = defineEmits(['update:modelValue'])
-const inputValue = computed({
-  get: () => props.modelValue,
-  set: (value) => emit('update:modelValue', value),
-})
+defineProps<{
+  placeholder?: string
+  beforeClose?: boolean
+}>()
 
+const inputValue = defineModel<string>()
 const clearInput = () => {
   inputValue.value = ''
 }

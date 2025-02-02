@@ -9,7 +9,7 @@
           {{ $t('overview') }}
         </div>
         <div
-          :class="`card-body grid grid-cols-1 gap-2 lg:grid-cols-2 ${showIPAndConnectionInfo && 'xl:grid-cols-3'}`"
+          :class="`card-body grid grid-cols-1 gap-2 lg:grid-cols-2 ${showIPAndConnectionInfo ? 'xl:grid-cols-3' : '2xl:grid-cols-4'}`"
         >
           <StatisticsStats type="settings" />
           <template v-if="showIPAndConnectionInfo">
@@ -78,24 +78,6 @@
         </div>
       </div>
     </div>
-
-    <!-- logs -->
-    <div class="card card-compact">
-      <div class="card-title px-4 pt-4">
-        {{ $t('logs') }}
-      </div>
-      <div class="card-body">
-        <div class="flex items-center gap-2">
-          {{ $t('logRetentionLimit') }}:
-          <input
-            class="input input-sm input-bordered w-20"
-            type="number"
-            max="9999"
-            v-model="logRetentionLimit"
-          />
-        </div>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -113,7 +95,6 @@ import ZashboardSettings from '@/components/settings/ZashboardSettings.vue'
 import {
   autoConnectionCheck,
   autoIPCheck,
-  logRetentionLimit,
   showIPAndConnectionInfo,
   showStatisticsWhenSidebarCollapsed,
   splitOverviewPage,

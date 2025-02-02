@@ -24,7 +24,6 @@ export enum FONTS {
 }
 
 export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
-  Details = 'details',
   Close = 'close',
   Type = 'type',
   Process = 'process',
@@ -40,6 +39,7 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   SourcePort = 'sourcePort',
   SniffHost = 'sniffHost',
   Destination = 'destination',
+  Details = 'details',
 }
 
 export enum TABLE_WIDTH_MODE {
@@ -90,8 +90,8 @@ export enum SORT_DIRECTION {
 }
 
 export enum CONNECTION_TAB_TYPE {
-  ACTIVE = 'active',
-  CLOSED = 'closed',
+  ACTIVE = 'activeConnections',
+  CLOSED = 'closedConnections',
 }
 
 export enum LOG_LEVEL {
@@ -135,4 +135,17 @@ export enum PROXY_CARD_SIZE {
 export enum PROXY_CHAIN_DIRECTION {
   NORMAL = 'normal',
   REVERSE = 'reverse',
+}
+
+export enum PROXY_TYPE {
+  Direct = 'direct',
+  Reject = 'reject',
+  RejectDrop = 'rejectdrop',
+  Compatible = 'compatible',
+  Pass = 'pass',
+  Dns = 'dns',
+  Selector = 'selector',
+  Fallback = 'fallback',
+  URLTest = 'urltest',
+  LoadBalance = 'loadbalance',
 }
