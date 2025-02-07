@@ -43,7 +43,9 @@
       @end="disableSwipe = false"
     >
       <template #item="{ element }">
-        <div class="flex h-8 cursor-move items-center rounded bg-neutral px-2 text-neutral-content">
+        <div
+          class="flex h-8 cursor-move items-center rounded bg-neutral px-2 font-bold text-neutral-content"
+        >
           {{ $t(element) }}
         </div>
       </template>

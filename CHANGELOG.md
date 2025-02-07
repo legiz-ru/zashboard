@@ -2,6 +2,45 @@
 
 # Changelog
 
+## [1.61.1](https://github.com/Zephyruso/zashboard/compare/v1.61.0...v1.61.1) (2025-02-07)
+
+
+### Bug Fixes
+
+* filter log by time ([0af9828](https://github.com/Zephyruso/zashboard/commit/0af9828c8110340f13dfdd29871adbf8cd90717d))
+* tip position & timeout ([fe8730b](https://github.com/Zephyruso/zashboard/commit/fe8730bb51f780285f2c0c18381e1925ad32410a))
+* two columns style for md screen ([3561fdf](https://github.com/Zephyruso/zashboard/commit/3561fdfb74a2a3ac43ab0fc99d2ed9695d7249aa))
+
+## [1.61.0](https://github.com/Zephyruso/zashboard/compare/v1.60.3...v1.61.0) (2025-02-07)
+
+
+### Features
+
+* display ip asn info in connection details ([bcb96ec](https://github.com/Zephyruso/zashboard/commit/bcb96ecc42d90b89c1b1d4847b4c8dc1315b5b25))
+* update geo button ([144aecc](https://github.com/Zephyruso/zashboard/commit/144aecc922318b9c312dd55cfd1614b551b10889))
+
+
+### Bug Fixes
+
+* hide group btn style ([b10804b](https://github.com/Zephyruso/zashboard/commit/b10804b74f3716ee450e2bb180d4bc22908dd234))
+
+## [1.60.3](https://github.com/Zephyruso/zashboard/compare/v1.60.2...v1.60.3) (2025-02-06)
+
+
+### Bug Fixes
+
+* hide proxy group btn position ([bce1642](https://github.com/Zephyruso/zashboard/commit/bce1642cbe4ff5a093ee9ffa192a4ec245e1761f))
+
+## [1.60.2](https://github.com/Zephyruso/zashboard/compare/v1.60.1...v1.60.2) (2025-02-05)
+
+
+### Bug Fixes
+
+* autocomplete for setup ([18417b5](https://github.com/Zephyruso/zashboard/commit/18417b5e844ba3bac40f8c592f62371927c16826))
+* hide connections ([8065ebd](https://github.com/Zephyruso/zashboard/commit/8065ebdbd5d4da1b23e2caa8d215c6ea57a0ede7))
+* regex search for logs ([3d1d1b9](https://github.com/Zephyruso/zashboard/commit/3d1d1b98a4119b1c5e600e04ab5e9dcd1a899363))
+* rule card style for sing-box 1.11.0 ([669cf5a](https://github.com/Zephyruso/zashboard/commit/669cf5abf270e69ff59ef66aa237812d0aa3c819))
+
 ## [1.60.1](https://github.com/Zephyruso/zashboard/compare/v1.60.0...v1.60.1) (2025-01-26)
 
 

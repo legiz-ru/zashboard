@@ -238,7 +238,7 @@ watch(allIcons, async (values) => {
   })
 })
 
-const { showNotification } = useNotification()
+const { showNotification } = useNotification(2000)
 const latencyTip = (finished: number, total: number) => {
   showNotification({
     content: 'testFinishedTip',

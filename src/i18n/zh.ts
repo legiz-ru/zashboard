@@ -70,6 +70,7 @@ const zh: LANG_MESSAGE = {
   automaticDisconnection: '切换节点时自动断开连接',
   backend: '后端',
   upgradeCore: '更新核心',
+  updateGeoDatabase: '更新GEO数据库',
   tunMode: 'Tun 模式',
   truncateProxyName: '截断代理名称',
   sourceIPLabels: '源IP标签',
@@ -143,7 +144,7 @@ const zh: LANG_MESSAGE = {
   independentLatencyTestTip:
     '开启独立延迟测试会在测速中尽可能的使用配置文件中的url覆盖面板设置的url，并展示根据策略组设置的url获取的延迟。',
   search: '搜索',
-  all: '全部',
+  allSourceIP: '全部源IP',
   importing: '正在导入',
   hideConnection: '隐藏连接',
   hideConnectionRegex: '隐藏连接正则',
@@ -153,6 +154,7 @@ const zh: LANG_MESSAGE = {
   optional: '可选',
   hiddenGroupTip: '代理组已隐藏，可在代理页弹窗菜单中打开“显示隐藏代理组”后找回',
   swipeInTabs: '滑动切换页面内的标签页',
+  connectionIP: '连接IP',
 }
 
 export default zh

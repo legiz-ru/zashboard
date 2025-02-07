@@ -2,7 +2,7 @@
   <CollapseCard :name="proxyGroup.name">
     <template v-slot:title>
       <div
-        class="relative flex items-center gap-2 pr-6"
+        class="relative flex items-center gap-2"
         @contextmenu.prevent.stop="handlerLatencyTest"
       >
         <div class="flex flex-1 items-center gap-1">
@@ -10,9 +10,23 @@
             :name="proxyGroup.name"
             size="large"
           />
-          <span class="flex-1 text-xs text-base-content/60"
+          <span class="text-xs text-base-content/60"
             >: {{ proxyGroup.type }} ({{ sortedProxies?.length }})</span
           >
+          <button
+            v-if="showHiddenGroup"
+            class="btn btn-circle btn-xs z-10 ml-1"
+            @click.stop="handlerGroupToggle"
+          >
+            <XMarkIcon
+              v-if="!hiddenGroupMap[proxyGroup.name]"
+              class="h-3 w-3"
+            />
+            <PlusCircleIcon
+              v-else
+              class="h-3 w-3"
+            />
+          </button>
         </div>
         <LatencyTag
           :class="twMerge('z-10 bg-base-200/40 hover:shadow')"
@@ -21,19 +35,6 @@
           :group-name="proxyGroup.name"
           @click.stop="handlerLatencyTest"
         />
-        <button
-          class="btn btn-circle btn-ghost btn-xs absolute -right-4 -top-4 z-10 flex items-center text-base-content/20 hover:text-base-content/80"
-          @click.stop="handlerGroupToggle"
-        >
-          <XMarkIcon
-            v-if="!hiddenGroupMap[proxyGroup.name]"
-            class="h-3 w-3"
-          />
-          <PlusCircleIcon
-            v-else
-            class="h-3 w-3"
-          />
-        </button>
       </div>
       <div
         class="flex items-center gap-2 text-base-content/80"
@@ -83,6 +84,7 @@ import { PROXY_TYPE } from '@/config'
 import { prettyBytesHelper, sortAndFilterProxyNodes } from '@/helper'
 import { activeConnections } from '@/store/connections'
 import { hiddenGroupMap, proxyGroupLatencyTest, proxyMap, selectProxy } from '@/store/proxies'
+import { showHiddenGroup } from '@/store/settings'
 import {
   ArrowRightCircleIcon,
   CheckCircleIcon,

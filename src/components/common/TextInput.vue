@@ -10,6 +10,8 @@
       type="text"
       class="input input-sm join-item input-bordered w-full"
       :placeholder="placeholder || ''"
+      :name="name || ''"
+      :autocomplete="autocomplete || ''"
       @touchstart.stop
       @touchmove.stop
       @touchend.stop
@@ -28,6 +30,8 @@ import { XMarkIcon } from '@heroicons/vue/24/outline'
 defineProps<{
   placeholder?: string
   beforeClose?: boolean
+  name?: string
+  autocomplete?: string
 }>()
 
 const inputValue = defineModel<string>()

@@ -79,7 +79,7 @@ onMounted(() => {
   >
     <RouterView />
     <div
-      class="toast-sm toast toast-start toast-top z-50 max-w-64 text-sm"
+      class="toast-sm toast toast-end top-8 z-50 max-w-64 text-sm"
       v-if="tipShowModel"
     >
       <div

@@ -1,5 +1,5 @@
 <template>
-  <div :class="`collapse collapse-arrow ${showCollapse ? 'collapse-open' : 'collapse-close'}`">
+  <div :class="`collapse ${showCollapse ? 'collapse-open' : 'collapse-close'}`">
     <div
       class="collapse-title cursor-pointer select-none pr-4"
       @click="showCollapse = !showCollapse"

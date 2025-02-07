@@ -61,7 +61,7 @@
       </template>
 
       <div
-        class="grid max-w-screen-md grid-cols-2 gap-2 sm:grid-cols-4"
+        class="grid max-w-screen-lg grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5"
         v-if="version"
       >
         <template v-if="!isSingBox">
@@ -94,6 +94,12 @@
           >
             {{ $t('reloadConfigs') }}
           </button>
+          <button
+            :class="twMerge('btn btn-sm', isGeoUpdating ? 'animate-pulse' : '')"
+            @click="handlerClickUpdateGeo"
+          >
+            {{ $t('updateGeoDatabase') }}
+          </button>
         </template>
         <button
           class="btn btn-sm"
@@ -115,6 +121,7 @@ import {
   isSingBox,
   reloadConfigsAPI,
   restartCoreAPI,
+  updateGeoDataAPI,
   upgradeCoreAPI,
   version,
 } from '@/api'
@@ -196,6 +203,19 @@ const handlerClickReloadConfigs = async () => {
     isConfigReloading.value = false
   } catch {
     isConfigReloading.value = false
+  }
+}
+
+const isGeoUpdating = ref(false)
+const handlerClickUpdateGeo = async () => {
+  if (isGeoUpdating.value) return
+  isGeoUpdating.value = true
+  try {
+    await updateGeoDataAPI()
+    reloadAll()
+    isGeoUpdating.value = false
+  } catch {
+    isGeoUpdating.value = false
   }
 }
 

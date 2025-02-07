@@ -4,7 +4,7 @@
     class="join-item select select-bordered select-sm"
     v-model="sourceIPFilter"
   >
-    <option :value="null">{{ $t('all') }}</option>
+    <option :value="null">{{ $t('allSourceIP') }}</option>
     <option
       v-if="sourceIPOpts.every((i) => i.value !== sourceIPFilter) && sourceIPFilter !== null"
       :value="sourceIPFilter"

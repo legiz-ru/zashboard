@@ -1,6 +1,12 @@
 <template>
   <div class="overflow-x-hidden p-2">
-    <template v-if="isLargeScreen && twoColumnProxyGroup && renderGroups.length > 1">
+    <template
+      v-if="
+        (isSidebarCollapsed ? !isMiddleScreen : isLargeScreen) &&
+        twoColumnProxyGroup &&
+        renderGroups.length > 1
+      "
+    >
       <div class="grid grid-cols-2 gap-1">
         <div
           v-for="idx in [0, 1]"
@@ -35,9 +41,9 @@ import ProxyGroup from '@/components/proxies/ProxyGroup.vue'
 import ProxyProvider from '@/components/proxies/ProxyProvider.vue'
 import { useProxies } from '@/composables/proxies'
 import { PROXY_TAB_TYPE } from '@/config'
-import { isLargeScreen } from '@/helper/utils'
+import { isLargeScreen, isMiddleScreen } from '@/helper/utils'
 import { fetchProxies } from '@/store/proxies'
-import { twoColumnProxyGroup } from '@/store/settings'
+import { isSidebarCollapsed, twoColumnProxyGroup } from '@/store/settings'
 import { computed } from 'vue'
 
 const { proxiesTabShow, renderGroups } = useProxies()

@@ -2,9 +2,10 @@ import { fetchLogsAPI } from '@/api'
 import { LOG_LEVEL } from '@/config'
 import type { Log, LogWithSeq } from '@/types'
 import { useStorage } from '@vueuse/core'
+import dayjs from 'dayjs'
 import { throttle } from 'lodash'
 import { ref, watch } from 'vue'
-import { logRetentionLimit, sourceIPLabelMap } from './settings'
+import { language, logRetentionLimit, sourceIPLabelMap } from './settings'
 
 export const logs = ref<LogWithSeq[]>([])
 export const logFilter = ref('')
@@ -64,7 +65,7 @@ export const initLogs = () => {
 
     logsTemp.unshift({
       ...data,
-      time: new Date().valueOf(),
+      time: dayjs().locale(language.value).format('HH:mm:ss'),
       seq: idx++,
     })
 

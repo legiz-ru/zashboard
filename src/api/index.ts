@@ -142,6 +142,10 @@ export const upgradeUIAPI = () => {
   return axios.post('/upgrade/ui')
 }
 
+export const updateGeoDataAPI = () => {
+  return axios.post('/configs/geo')
+}
+
 export const upgradeCoreAPI = () => {
   return axios.post('/upgrade')
 }

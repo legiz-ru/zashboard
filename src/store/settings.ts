@@ -11,7 +11,7 @@ import {
 } from '@/config'
 import { isMiddleScreen } from '@/helper/utils'
 import { useStorage } from '@vueuse/core'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 
 // global
 export const theme = useStorage<string>('config/theme', 'default')
@@ -75,7 +75,7 @@ export const proxyCardSize = useStorage<PROXY_CARD_SIZE>(
   'config/proxy-card-size',
   PROXY_CARD_SIZE.LARGE,
 )
-export const showHiddenGroup = useStorage('config/show-hidden-group', false)
+export const showHiddenGroup = ref(false)
 export const iconSize = useStorage('config/icon-size', 14)
 export const iconMarginRight = useStorage('config/icon-margin-right', 6)
 

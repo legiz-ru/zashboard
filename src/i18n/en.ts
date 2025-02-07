@@ -69,6 +69,7 @@ const en = {
   backend: 'Backend',
   tunMode: 'Tun Mode',
   upgradeCore: 'Upgrade Core',
+  updateGeoDatabase: 'Update Geo Database',
   truncateProxyName: 'Truncate Proxy Name',
   sourceIPLabels: 'Source IP Labels',
   proxyPreviewType: 'Proxy Preview Type',
@@ -141,7 +142,7 @@ const en = {
   independentLatencyTestTip:
     "Enabling Independent Latency Test will attempt to use the URLs specified in the configuration file instead of the zashboard's URL settings during the latency test. Latency will be displayed independently based on the URLs set in the policy groups.",
   search: 'Search',
-  all: 'All',
+  allSourceIP: 'All Source IPs',
   importing: 'Importing',
   hideConnection: 'Hide Connection',
   hideConnectionRegex: 'Hide Connection Regex',
@@ -153,6 +154,7 @@ const en = {
   hiddenGroupTip:
     'The proxy group has been hidden. You can retrieve it by enabling "Show Hidden Groups" in the popup menu',
   swipeInTabs: 'Swipe To Switch Between Tabs In Page',
+  connectionIP: 'Connection IP',
 }
 
 export type LANG_MESSAGE = typeof en

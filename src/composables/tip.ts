@@ -8,7 +8,7 @@ const t = i18n.global.t
 
 let timmer = -1
 
-export const useNotification = () => {
+export const useNotification = (timeout = 5000) => {
   const showNotification = ({
     content,
     params = {},
@@ -25,7 +25,7 @@ export const useNotification = () => {
     timmer = setTimeout(() => {
       tipShowModel.value = false
       timmer = -1
-    }, 5000)
+    }, timeout)
   }
 
   return {
