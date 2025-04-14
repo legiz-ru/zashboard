@@ -1,30 +1,30 @@
 <template>
-  <div class="card w-full flex-row items-center gap-2 p-1 px-2 text-sm">
-    <div class="flex flex-1 flex-col sm:flex-row">
-      <div class="flex flex-1 items-center gap-2">
-        <span>{{ index }}.</span>
-        <span>{{ ruleProvider.name }}</span>
-        <span class="badge badge-sm bg-base-200">
-          {{ ruleProvider.ruleCount }}
-        </span>
-      </div>
-      <div class="flex gap-3 text-base-content/80">
-        <span>{{ ruleProvider.behavior }}</span>
-        <span>{{ ruleProvider.vehicleType }}</span>
-        <span>{{ $t('updated') }} {{ fromNow(ruleProvider.updatedAt) }}</span>
-      </div>
+  <div class="card w-full gap-2 p-2 text-sm">
+    <div class="flex flex-1 items-center gap-2">
+      <span>{{ index }}.</span>
+      <span class="text-main">{{ ruleProvider.name }}</span>
+      <span class="badge badge-sm bg-base-200">
+        {{ ruleProvider.ruleCount }}
+      </span>
     </div>
-    <button
-      :class="twMerge('btn btn-circle btn-sm', isUpdating ? 'animate-spin' : '')"
-      @click="updateRuleProviderClickHandler"
-    >
-      <ArrowPathIcon class="h-4 w-4" />
-    </button>
+    <div class="text-base-content/80 flex h-4 items-center gap-2 text-xs">
+      <span>{{ ruleProvider.behavior }}</span>
+      <span>{{ ruleProvider.vehicleType }}</span>
+      <span>{{ $t('updated') }} {{ fromNow(ruleProvider.updatedAt) }}</span>
+      <button
+        v-if="ruleProvider.vehicleType !== 'Inline'"
+        :class="twMerge('btn btn-circle btn-xs', isUpdating ? 'animate-spin' : '')"
+        @click="updateRuleProviderClickHandler"
+      >
+        <ArrowPathIcon class="h-4 w-4" />
+      </button>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
 import { updateRuleProviderAPI } from '@/api'
+import { useBounceOnVisible } from '@/composables/bouncein'
 import { fromNow } from '@/helper'
 import { fetchRules } from '@/store/rules'
 import type { RuleProvider } from '@/types'
@@ -45,4 +45,6 @@ const updateRuleProviderClickHandler = async () => {
   fetchRules()
   isUpdating.value = false
 }
+
+useBounceOnVisible()
 </script>

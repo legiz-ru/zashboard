@@ -6,6 +6,7 @@ export type Backend = {
   protocol: string
   uuid: string
   label?: string
+  disableUpgradeCore?: boolean
 }
 
 export type Config = {
@@ -46,6 +47,7 @@ export type Proxy = {
   udp: boolean
   xudp?: boolean
   now: string
+  fixed?: string
   icon: string
   hidden?: boolean
   testUrl?: string
@@ -138,4 +140,10 @@ export type DNSQuery = {
     name: string
     type: number
   }[]
+}
+
+export type SourceIPLabel = {
+  key: string
+  label: string
+  id: string
 }

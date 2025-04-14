@@ -3,7 +3,7 @@
     ref="cardRef"
     :class="
       twMerge(
-        'flex cursor-pointer flex-col items-start gap-[2px] rounded-md bg-base-200',
+        'bg-base-200 flex cursor-pointer flex-col items-start gap-[2px] rounded-md',
         active ? 'bg-primary text-primary-content' : 'sm:hover:bg-base-300',
         isSmallCard ? 'p-1' : 'p-2',
       )
@@ -12,7 +12,7 @@
   >
     <div class="flex w-full flex-1 items-center gap-1">
       <ProxyIcon
-        v-if="node.icon"
+        v-if="node?.icon"
         class="shrink-0"
         size="small"
         :icon="node.icon"
@@ -26,7 +26,7 @@
       </span>
     </div>
 
-    <div class="flex h-4 w-full items-center justify-between">
+    <div class="flex h-4 w-full items-center justify-between select-none">
       <span
         :class="`truncate text-xs tracking-tight ${active ? 'text-primary-content' : 'text-base-content/60'}`"
         @mouseenter="checkTruncation"
@@ -34,7 +34,7 @@
         {{ typeDescription }}
       </span>
       <LatencyTag
-        :class="[isSmallCard && '!h-4 !w-8', 'shrink-0']"
+        :class="[isSmallCard && 'h-4! w-8!', 'shrink-0']"
         :name="node.name"
         :loading="isLatencyTesting"
         :group-name="groupName"
@@ -45,7 +45,7 @@
 </template>
 
 <script setup lang="ts">
-import { PROXY_CARD_SIZE } from '@/config'
+import { PROXY_CARD_SIZE } from '@/constant'
 import { useTooltip } from '@/helper/tooltip'
 import { getIPv6ByName, getTestUrl, proxyLatencyTest, proxyMap } from '@/store/proxies'
 import { IPv6test, proxyCardSize, truncateProxyName } from '@/store/settings'
@@ -67,7 +67,9 @@ const checkTruncation = (e: Event) => {
 
   if (scrollWidth > clientWidth) {
     showTip(e, target.innerText, {
-      delay: [500, 0],
+      delay: [1000, 0],
+      trigger: 'mouseenter',
+      touch: ['hold', 500],
     })
   }
 }

@@ -1,10 +1,10 @@
 <template>
   <div
-    class="card carousel carousel-vertical h-28 shrink-0 overflow-x-hidden text-sm hover:scrollbar-thin"
+    class="card not-hover:scrollbar-hidden max-h-56 min-h-28 flex-2 shrink-0 overflow-x-hidden overflow-y-auto text-sm"
   >
-    <SpeedCharts class="carousel-item box-border" />
-    <MemoryCharts class="carousel-item box-border" />
-    <ConnectionsCharts class="carousel-item box-border" />
+    <SpeedCharts class="h-28 shrink-0" />
+    <MemoryCharts class="h-28 shrink-0" />
+    <ConnectionsCharts class="h-28 shrink-0" />
   </div>
 </template>
 

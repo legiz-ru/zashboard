@@ -21,16 +21,16 @@ const props = defineProps<{
 
 const classMap = {
   overview: {
-    list: 'grid grid-cols-2 gap-2 rounded-lg bg-base-200/40 px-4 py-2 lg:grid-cols-6',
-    item: 'flex h-14 flex-col items-start justify-center gap-2 lg:h-24 lg:items-center',
-    label: 'text-sm lg:text-lg lg:font-bold',
-    value: 'text-xl',
+    list: 'grid grid-cols-2 gap-2 rounded-lg bg-base-200/50 px-4 py-2 lg:grid-cols-6',
+    item: 'flex h-12 flex-col items-start justify-center lg:gap-2 lg:h-24 lg:items-center',
+    label: 'text-sm lg:text-lg lg:font-bold max-lg:text-base-content/70',
+    value: 'text-lg lg:text-xl',
   },
   settings: {
-    list: 'grid w-full grid-cols-3 gap-1 rounded-lg bg-base-200/40 p-3',
+    list: 'grid w-full grid-cols-3 gap-1 rounded-lg bg-base-200/30 p-3',
     item: 'flex flex-col items-start',
-    label: 'text-sm text-base-content/70',
-    value: 'text-sm',
+    label: 'text-xs text-base-content/70',
+    value: 'text-base',
   },
   ctrl: {
     list: 'grid w-full grid-cols-2 gap-1 rounded-lg',

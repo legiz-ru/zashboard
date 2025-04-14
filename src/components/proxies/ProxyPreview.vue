@@ -1,28 +1,29 @@
 <template>
   <div
-    class="flex flex-wrap gap-1 pt-2"
-    v-if="showDots"
+    ref="previewRef"
+    class="flex flex-wrap"
+    :class="[showDots ? 'gap-1 pt-3' : 'gap-2 pt-4 pb-1']"
   >
-    <div
-      v-for="node in nodesLatency"
-      :key="node.name"
-      class="flex h-4 w-4 items-center justify-center rounded-full transition hover:scale-110"
-      :class="getBgColor(node.latency)"
-      ref="dotsRef"
-      @mouseenter="(e) => makeTippy(e, node)"
-      @click.stop="$emit('nodeclick', node.name)"
-    >
+    <template v-if="showDots">
       <div
-        class="h-2 w-2 rounded-full bg-white"
-        v-if="now === node.name"
-      ></div>
-    </div>
-  </div>
-  <div
-    class="flex items-center gap-2 py-2"
-    v-else
-  >
-    <div class="flex flex-1 items-center justify-center overflow-hidden rounded-2xl [&>*]:h-2">
+        v-for="node in nodesLatency"
+        :key="node.name"
+        class="flex h-4 w-4 items-center justify-center rounded-full transition hover:scale-110"
+        :class="getBgColor(node.latency)"
+        ref="dotsRef"
+        @mouseenter="(e) => makeTippy(e, node)"
+        @click.stop="$emit('nodeclick', node.name)"
+      >
+        <div
+          class="h-2 w-2 rounded-full bg-white"
+          v-if="now === node.name"
+        ></div>
+      </div>
+    </template>
+    <div
+      v-else
+      class="flex flex-1 items-center justify-center overflow-hidden rounded-2xl *:h-2"
+    >
       <div
         :class="getBgColor(lowLatency - 1)"
         :style="{
@@ -52,12 +53,13 @@
 </template>
 
 <script setup lang="ts">
-import { NOT_CONNECTED, PROXY_PREVIEW_TYPE } from '@/config'
+import { NOT_CONNECTED, PROXY_PREVIEW_TYPE } from '@/constant'
 import { getColorForLatency } from '@/helper'
 import { useTooltip } from '@/helper/tooltip'
 import { getLatencyByName } from '@/store/proxies'
 import { lowLatency, mediumLatency, proxyPreviewType } from '@/store/settings'
-import { computed } from 'vue'
+import { useElementSize } from '@vueuse/core'
+import { computed, ref } from 'vue'
 
 const props = defineProps<{
   nodes: string[]
@@ -66,6 +68,12 @@ const props = defineProps<{
 }>()
 
 const { showTip } = useTooltip()
+const previewRef = ref<HTMLElement | null>(null)
+const { width } = useElementSize(previewRef)
+
+const widthEnough = computed(() => {
+  return width.value > 20 * props.nodes.length
+})
 
 const makeTippy = (e: Event, node: { name: string; latency: number }) => {
   const tag = document.createElement('div')
@@ -89,7 +97,7 @@ const makeTippy = (e: Event, node: { name: string; latency: number }) => {
 const showDots = computed(() => {
   return (
     proxyPreviewType.value === PROXY_PREVIEW_TYPE.DOTS ||
-    (proxyPreviewType.value === PROXY_PREVIEW_TYPE.AUTO && props.nodes.length < 20)
+    (proxyPreviewType.value === PROXY_PREVIEW_TYPE.AUTO && widthEnough.value)
   )
 })
 
@@ -103,7 +111,7 @@ const nodesLatency = computed(() =>
 )
 const getBgColor = (latency: number) => {
   if (latency === NOT_CONNECTED) {
-    return 'bg-gray-500'
+    return 'bg-base-content/60'
   } else if (latency < lowLatency.value) {
     return 'bg-low-latency'
   } else if (latency < mediumLatency.value) {

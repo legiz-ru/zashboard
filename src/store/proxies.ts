@@ -7,18 +7,18 @@ import {
   isSingBox,
   selectProxyAPI,
 } from '@/api'
-import { useNotification } from '@/composables/tip'
-import { IPV6_TEST_URL, NOT_CONNECTED, PROXY_TYPE } from '@/config'
+import { useNotification } from '@/composables/notification'
+import { IPV6_TEST_URL, NOT_CONNECTED, PROXY_TYPE, TEST_URL } from '@/constant'
 import { isProxyGroup } from '@/helper'
-import { deleteIconFromIndexedDB, getAllIconKeys } from '@/helper/utils'
 import type { Proxy, ProxyProvider } from '@/types'
 import { useStorage } from '@vueuse/core'
-import { compact, debounce, difference, last } from 'lodash'
+import { debounce, last } from 'lodash'
 import pLimit from 'p-limit'
-import { computed, ref, watch } from 'vue'
+import { ref } from 'vue'
 import { activeConnections } from './connections'
 import {
   automaticDisconnection,
+  iconReflectList,
   independentLatencyTest,
   IPv6test,
   speedtestTimeout,
@@ -33,25 +33,37 @@ export const hiddenGroupMap = useStorage<Record<string, boolean>>('config/hidden
 export const proxyProviederList = ref<ProxyProvider[]>([])
 
 export const getTestUrl = (groupName?: string) => {
+  const defaultUrl = speedtestUrl.value || TEST_URL
+
   if (!groupName) {
-    return speedtestUrl.value
+    return defaultUrl
   }
 
   const proxyNode = proxyMap.value[groupName]
 
-  return independentLatencyTest.value ? proxyNode.testUrl || speedtestUrl.value : speedtestUrl.value
+  if (independentLatencyTest.value && proxyNode.testUrl) {
+    return proxyNode.testUrl
+  }
+
+  return defaultUrl
 }
 
 export const getLatencyByName = (proxyName: string, groupName?: string) => {
+  const history = getHistoryByName(proxyName, groupName)
+
+  return getLatencyFromHistory(history)
+}
+
+export const getHistoryByName = (proxyName: string, groupName?: string) => {
   if (independentLatencyTest.value && !isSingBox.value) {
     const proxyNode = proxyMap.value[proxyName]
 
-    return getLatencyFromHistory(proxyNode?.extra?.[getTestUrl(groupName)]?.history)
+    return proxyNode?.extra?.[getTestUrl(groupName)]?.history
   }
 
   const nowNode = proxyMap.value[getNowProxyNodeName(proxyName)]
 
-  return getLatencyFromHistory(nowNode?.history)
+  return nowNode?.history
 }
 
 export const getIPv6ByName = (proxyName: string) => {
@@ -62,24 +74,38 @@ export const fetchProxies = async () => {
   const { data: proxyData } = await fetchProxiesAPI()
   const { data: providerData } = await fetchProxyProviderAPI()
   const sortIndex = proxyData.proxies[GLOBAL].all ?? []
+  const allProviderProxies: Record<string, Proxy> = {}
+  const providers = Object.values(providerData.providers).filter(
+    (provider) => provider.name !== 'default' && provider.vehicleType !== 'Compatible',
+  )
 
-  proxyMap.value = proxyData.proxies
+  for (const provider of providers) {
+    for (const proxy of provider.proxies) {
+      allProviderProxies[proxy.name] = proxy
+    }
+  }
+
+  proxyMap.value = {
+    ...allProviderProxies,
+    ...proxyData.proxies,
+  }
   proxyGroupList.value = Object.values(proxyData.proxies)
     .filter((proxy) => proxy.all?.length && proxy.name !== GLOBAL)
     .sort((prev, next) => sortIndex.indexOf(prev.name) - sortIndex.indexOf(next.name))
     .map((proxy) => proxy.name)
 
-  Object.entries(proxyData.proxies).map(([name, proxy]) => {
+  proxyProviederList.value = providers
+
+  Object.entries(proxyMap.value).map(([name, proxy]) => {
+    const iconReflect = iconReflectList.value.find((icon) => icon.name === name)
+
+    if (iconReflect) {
+      proxyMap.value[name].icon = iconReflect.icon
+    }
     if (IPv6test.value && getIPv6FromExtra(proxy)) {
       IPv6Map.value[name] = true
     }
-    if (proxy.hidden && !(name in hiddenGroupMap.value)) {
-      hiddenGroupMap.value[name] = true
-    }
   })
-  proxyProviederList.value = Object.values(providerData.providers).filter(
-    (provider) => provider.name !== 'default' && provider.vehicleType !== 'Compatible',
-  )
 }
 
 export const selectProxy = async (proxyGroup: string, name: string) => {
@@ -206,7 +232,7 @@ const getIPv6FromExtra = (proxy: Proxy) => {
   return (last(ipv6History)?.delay ?? NOT_CONNECTED) > NOT_CONNECTED
 }
 
-const getNowProxyNodeName = (name: string) => {
+export const getNowProxyNodeName = (name: string) => {
   let node = proxyMap.value[name]
 
   if (!name || !node) {
@@ -226,25 +252,16 @@ const getNowProxyNodeName = (name: string) => {
   return node.name
 }
 
-const allIcons = computed(() => {
-  return compact(Object.values(proxyMap.value).map((proxy) => proxy.icon))
-})
-
-watch(allIcons, async (values) => {
-  const allCachedIcons = await getAllIconKeys()
-
-  difference(allCachedIcons, values).forEach((icon) => {
-    deleteIconFromIndexedDB(icon)
-  })
-})
-
-const { showNotification } = useNotification(2000)
+const { showNotification } = useNotification()
 const latencyTip = (finished: number, total: number) => {
+  const isFinished = finished === total
+
   showNotification({
     content: 'testFinishedTip',
     params: {
       number: `${finished}/${total}`,
     },
-    type: finished === total ? 'alert-success' : 'alert-warning',
+    type: isFinished ? 'alert-success' : 'alert-warning',
+    timeout: isFinished ? 2000 : 0,
   })
 }

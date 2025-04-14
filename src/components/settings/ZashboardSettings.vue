@@ -1,133 +1,198 @@
 <template>
   <!-- dashboard -->
-  <div class="card card-compact">
-    <div class="card-title px-4 pt-4 text-primary">
+  <div class="card">
+    <div class="card-title px-4 pt-4">
       <div class="indicator">
         <span
           v-if="isUIUpdateAvailable"
-          class="indicator-item flex"
+          class="indicator-item top-1 -right-1 flex"
         >
-          <span class="badge badge-xs absolute animate-ping bg-secondary"></span>
-          <span class="badge badge-xs bg-secondary"></span>
+          <span class="bg-secondary absolute h-2 w-2 animate-ping rounded-full"></span>
+          <span class="bg-secondary h-2 w-2 rounded-full"></span>
         </span>
         <a
           href="https://github.com/Zephyruso/zashboard"
           target="_blank"
-          >zashboard v{{ zashboardVersion }}</a
         >
+          <span> zashboard </span>
+          <span class="text-sm font-normal">
+            {{ zashboardVersion }}
+          </span>
+        </a>
       </div>
+      <button
+        class="btn btn-sm absolute top-2 right-2"
+        @click="refreshPages"
+        v-if="isPWA"
+      >
+        {{ $t('refresh') }}
+        <ArrowPathIcon class="h-4 w-4" />
+      </button>
     </div>
     <div class="card-body gap-4">
-      <div class="grid grid-cols-1 gap-2 xl:grid-cols-2">
-        <div class="flex flex-col gap-2">
-          <div class="flex items-center gap-2">
-            {{ $t('theme') }}:
+      <div class="grid grid-cols-1 gap-2 lg:grid-cols-2">
+        <LanguageSelect />
+        <div class="flex items-center gap-2">
+          {{ $t('autoSwitchTheme') }}
+          <input
+            type="checkbox"
+            v-model="autoTheme"
+            class="toggle"
+          />
+        </div>
+        <div class="flex items-center gap-2">
+          {{ $t('defaultTheme') }}
+          <div class="join">
             <select
-              class="select select-bordered select-sm w-48"
-              v-model="theme"
+              class="select select-sm join-item w-48"
+              v-model="defaultTheme"
             >
               <option
                 v-for="opt in themes"
                 :key="opt"
                 :value="opt"
               >
-                {{ opt === 'default' ? $t('autoSwitch') : opt }}
-              </option>
-            </select>
-          </div>
-          <LanguageSelect />
-          <div class="flex items-center gap-2">
-            {{ $t('fonts') }}:
-            <select
-              class="select select-bordered select-sm w-48"
-              v-model="font"
-            >
-              <option
-                v-for="opt in Object.values(FONTS)"
-                :key="opt"
-                :value="opt"
-              >
                 {{ opt }}
               </option>
             </select>
+            <button
+              class="btn btn-sm join-item"
+              @click="customThemeModal = !customThemeModal"
+            >
+              <PlusIcon class="h-4 w-4" />
+            </button>
           </div>
+          <CustomTheme v-model:value="customThemeModal" />
         </div>
-        <div class="flex flex-col gap-2">
-          <div class="flex flex-col gap-2 sm:flex-row sm:items-center">
-            <span class="shrink-0"> {{ $t('customBackgroundURL') }}: </span>
-            <div class="join">
-              <TextInput
-                class="join-item flex-1"
-                v-model="customBackgroundURL"
-                @update:modelValue="handlerBackgroundURLChange"
-              />
-              <button
-                class="btn join-item btn-sm"
-                @click="handlerClickUpload"
-              >
-                <ArrowUpCircleIcon class="h-4 w-4" />
-              </button>
-            </div>
-            <input
-              ref="inputFileRef"
-              type="file"
-              accept="image/*"
-              class="hidden"
-              @change="handlerFileChange"
+        <div
+          class="flex items-center gap-2"
+          v-if="autoTheme"
+        >
+          {{ $t('darkTheme') }}
+          <select
+            class="select select-sm w-48"
+            v-model="darkTheme"
+          >
+            <option
+              v-for="opt in themes"
+              :key="opt"
+              :value="opt"
+            >
+              {{ opt }}
+            </option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          {{ $t('fonts') }}
+          <select
+            class="select select-sm w-48"
+            v-model="font"
+          >
+            <option
+              v-for="opt in Object.values(FONTS)"
+              :key="opt"
+              :value="opt"
+            >
+              {{ opt }}
+            </option>
+          </select>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="shrink-0"> {{ $t('customBackgroundURL') }} </span>
+          <div class="join">
+            <TextInput
+              class="join-item max-w-64 flex-1"
+              v-model="customBackgroundURL"
+              :clearable="true"
+              @update:modelValue="handlerBackgroundURLChange"
             />
+            <button
+              class="btn join-item btn-sm"
+              @click="handlerClickUpload"
+            >
+              <ArrowUpCircleIcon class="h-4 w-4" />
+            </button>
           </div>
-          <div
-            class="flex items-center gap-2"
-            v-if="customBackgroundURL"
+          <input
+            ref="inputFileRef"
+            type="file"
+            accept="image/*"
+            class="hidden"
+            @change="handlerFileChange"
+          />
+        </div>
+        <div
+          class="flex items-center gap-2"
+          v-if="customBackgroundURL"
+        >
+          {{ $t('transparent') }}
+          <input
+            type="range"
+            min="0"
+            max="100"
+            v-model="dashboardTransparent"
+            class="range max-w-64"
             @touchstart.stop
             @touchmove.stop
             @touchend.stop
-          >
-            {{ $t('transparent') }}:
-            <input
-              type="range"
-              min="0"
-              max="100"
-              v-model="dashboardTransparent"
-              class="range max-w-64"
-            />
-          </div>
-          <div class="flex items-center gap-2 md:hidden">
-            {{ $t('swipeInTabs') }}:
-            <input
-              type="checkbox"
-              v-model="swipeInTabs"
-              class="toggle"
-            />
-          </div>
+          />
+        </div>
+        <div class="flex items-center gap-2 md:hidden">
+          {{ $t('swipeInTabs') }}
+          <input
+            type="checkbox"
+            v-model="swipeInTabs"
+            class="toggle"
+          />
+        </div>
+        <div class="flex items-center gap-2 md:hidden">
+          {{ $t('disablePullToRefresh') }}
+          <input
+            type="checkbox"
+            v-model="disablePullToRefresh"
+            class="toggle"
+          />
+          <QuestionMarkCircleIcon
+            class="h-4 w-4 cursor-pointer"
+            @mouseenter="showTip($event, $t('disablePullToRefreshTip'))"
+          />
+        </div>
+        <div
+          class="flex items-center gap-2"
+          v-if="isSingBox"
+        >
+          {{ $t('displayAllFeatures') }}
+          <input
+            type="checkbox"
+            v-model="displayAllFeatures"
+            class="toggle"
+          />
+          <QuestionMarkCircleIcon
+            class="h-4 w-4 cursor-pointer"
+            @mouseenter="showTip($event, $t('displayAllFeaturesTip'))"
+          />
         </div>
       </div>
-
       <div
         class="flex items-center gap-2"
-        v-if="!isSingBox"
+        v-if="!isSingBox || displayAllFeatures"
       >
-        {{ $t('autoUpgrade') }}:
+        {{ $t('autoUpgrade') }}
         <input
           class="toggle"
           type="checkbox"
           v-model="autoUpgrade"
         />
       </div>
-      <div class="grid max-w-screen-md grid-cols-2 gap-2 sm:grid-cols-4">
-        <template v-if="!isSingBox">
+      <div class="grid max-w-3xl grid-cols-2 gap-2 sm:grid-cols-4">
+        <template v-if="!isSingBox || displayAllFeatures">
           <button
             :class="twMerge('btn btn-primary btn-sm', isUIUpgrading ? 'animate-pulse' : '')"
             @click="handlerClickUpgradeUI"
           >
             {{ $t('upgradeUI') }}
           </button>
-          <button
-            class="btn btn-sm"
-            @click="clearIconCache"
-          >
-            {{ $t('clearIconCache') }}
-          </button>
+          <div class="sm:hidden"></div>
         </template>
 
         <button
@@ -146,27 +211,43 @@
 import { isSingBox, upgradeUIAPI, zashboardVersion } from '@/api'
 import LanguageSelect from '@/components/settings/LanguageSelect.vue'
 import { useSettings } from '@/composables/settings'
-import { FONTS } from '@/config'
+import { ALL_THEME, FONTS } from '@/constant'
 import { exportSettings } from '@/helper'
+import { useTooltip } from '@/helper/tooltip'
 import {
-  clearIconFromIndexedDB,
   deleteBase64FromIndexedDB,
+  isPWA,
   LOCAL_IMAGE,
   saveBase64ToIndexedDB,
 } from '@/helper/utils'
 import {
+  autoTheme,
   autoUpgrade,
   customBackgroundURL,
+  customThemes,
+  darkTheme,
   dashboardTransparent,
+  defaultTheme,
+  disablePullToRefresh,
+  displayAllFeatures,
   font,
   swipeInTabs,
-  theme,
 } from '@/store/settings'
-import { ArrowUpCircleIcon } from '@heroicons/vue/24/outline'
+import {
+  ArrowPathIcon,
+  ArrowUpCircleIcon,
+  PlusIcon,
+  QuestionMarkCircleIcon,
+} from '@heroicons/vue/24/outline'
 import { twMerge } from 'tailwind-merge'
-import { ref } from 'vue'
+import { computed, ref } from 'vue'
 import ImportSettings from '../common/ImportSettings.vue'
 import TextInput from '../common/TextInput.vue'
+import CustomTheme from './CustomTheme.vue'
+
+const customThemeModal = ref(false)
+
+const { showTip } = useTooltip()
 
 const inputFileRef = ref()
 const handlerClickUpload = () => {
@@ -204,43 +285,20 @@ const handlerClickUpgradeUI = async () => {
   }
 }
 
-const clearIconCache = async () => {
-  clearIconFromIndexedDB()
-}
+const themes = computed(() => {
+  if (customThemes.value.length) {
+    return [...ALL_THEME, ...customThemes.value.map((theme) => theme.name)]
+  }
 
-const themes = [
-  'default',
-  'light',
-  'dark',
-  'cupcake',
-  'bumblebee',
-  'emerald',
-  'corporate',
-  'synthwave',
-  'retro',
-  'cyberpunk',
-  'valentine',
-  'halloween',
-  'garden',
-  'forest',
-  'aqua',
-  'lofi',
-  'pastel',
-  'fantasy',
-  'wireframe',
-  'black',
-  'luxury',
-  'dracula',
-  'cmyk',
-  'autumn',
-  'business',
-  'acid',
-  'lemonade',
-  'night',
-  'coffee',
-  'winter',
-  'dim',
-  'nord',
-  'sunset',
-]
+  return ALL_THEME
+})
+
+const refreshPages = async () => {
+  const registrations = await navigator.serviceWorker.getRegistrations()
+
+  for (const registration of registrations) {
+    registration.unregister()
+  }
+  window.location.reload()
+}
 </script>

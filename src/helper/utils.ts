@@ -1,7 +1,16 @@
+import { MIN_PROXY_CARD_WIDTH, PROXY_CARD_SIZE } from '@/constant'
 import { useMediaQuery } from '@vueuse/core'
 
-export const isLargeScreen = useMediaQuery('(min-width: 1024px)')
+export const isPreferredDark = useMediaQuery('(prefers-color-scheme: dark)')
 export const isMiddleScreen = useMediaQuery('(max-width: 768px)')
+export const isLargeScreen = useMediaQuery('(max-width: 1024px)')
+export const isPWA = (() => {
+  return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone
+})()
+
+export const getMinCardWidth = (size: PROXY_CARD_SIZE) => {
+  return size === PROXY_CARD_SIZE.LARGE ? MIN_PROXY_CARD_WIDTH.LARGE : MIN_PROXY_CARD_WIDTH.SMALL
+}
 
 const BACKGROUND_IMAGE = 'background-image'
 export const LOCAL_IMAGE = 'local-image'
@@ -104,11 +113,3 @@ const backgroundDB = useIndexedDB('base64')
 export const saveBase64ToIndexedDB = (val: string) => backgroundDB.put(BACKGROUND_IMAGE, val)
 export const getBase64FromIndexedDB = () => backgroundDB.get(BACKGROUND_IMAGE)
 export const deleteBase64FromIndexedDB = () => backgroundDB.clear()
-
-const iconDB = useIndexedDB('iconCache')
-
-export const saveIconToIndexedDB = iconDB.put
-export const getIconFromIndexedDB = (key: string) => iconDB.get(key)
-export const clearIconFromIndexedDB = () => iconDB.clear()
-export const getAllIconKeys = () => iconDB.getAllKeys()
-export const deleteIconFromIndexedDB = (key: string) => iconDB.del(key)

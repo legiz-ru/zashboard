@@ -28,6 +28,6 @@ import { useConnectionCard } from '@/store/settings'
 }
 .vjs-tree-node.is-highlight,
 .vjs-tree-node:hover {
-  @apply !bg-base-200;
+  background-color: var(--color-base-200);
 }
 </style>

@@ -10,7 +10,7 @@
       class="relative w-full"
     >
       <div
-        class="absolute left-0 top-0 w-full"
+        class="absolute top-0 left-0 w-full"
         :style="{
           transform: `translateY(${virtualRows[0]?.start ?? 0}px)`,
         }"
@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 import { useVirtualizer } from '@tanstack/vue-virtual'
-import { computed, ref } from 'vue'
+import { computed, nextTick, ref } from 'vue'
 
 const parentRef = ref<HTMLElement | null>(null)
 const props = withDefaults(
@@ -52,7 +52,7 @@ const virutalOptions = computed(() => {
     count: props.data.length,
     getScrollElement: () => parentRef.value,
     estimateSize: () => props.size,
-    overscan: 36,
+    overscan: 24,
   }
 })
 
@@ -66,7 +66,9 @@ const measureElement = (el: Element) => {
     return
   }
 
-  rowVirtualizer.value.measureElement(el)
+  nextTick(() => {
+    rowVirtualizer.value.measureElement(el)
+  })
 
   return undefined
 }

@@ -1,24 +1,32 @@
 import { updateProxyProviderAPI } from '@/api'
 import { collapsedBus } from '@/composables/bus'
 import { proxiesFilter, useProxies } from '@/composables/proxies'
-import { PROXY_SORT_TYPE, PROXY_TAB_TYPE } from '@/config'
-import { isMiddleScreen } from '@/helper/utils'
+import { PROXY_SORT_TYPE, PROXY_TAB_TYPE } from '@/constant'
+import { getMinCardWidth, isMiddleScreen } from '@/helper/utils'
 import { configs, updateConfigs } from '@/store/config'
-import { allProxiesLatencyTest, fetchProxies, proxyProviederList } from '@/store/proxies'
+import {
+  allProxiesLatencyTest,
+  fetchProxies,
+  proxyGroupList,
+  proxyProviederList,
+} from '@/store/proxies'
 import {
   automaticDisconnection,
   collapseGroupMap,
   hideUnavailableProxies,
+  manageHiddenGroup,
+  minProxyCardWidth,
+  proxyCardSize,
   proxySortType,
-  showHiddenGroup,
+  twoColumnProxyGroup,
 } from '@/store/settings'
 import {
+  ArrowPathIcon,
   BoltIcon,
   ChevronDownIcon,
   ChevronUpIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/outline'
-import { twMerge } from 'tailwind-merge'
 import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DialogWrapper from '../common/DialogWrapper.vue'
@@ -90,46 +98,69 @@ export default defineComponent({
       })
     }
 
+    const handlerResetProxyCardWidth = () => {
+      minProxyCardWidth.value = getMinCardWidth(proxyCardSize.value)
+    }
+
+    const tabsWithNumbers = computed(() => {
+      return Object.values(PROXY_TAB_TYPE).map((type) => {
+        return {
+          type,
+          count:
+            type === PROXY_TAB_TYPE.PROXIES
+              ? proxyGroupList.value.length
+              : proxyProviederList.value.length,
+        }
+      })
+    })
     return () => {
       const tabs = (
         <div
           role="tablist"
-          class="tabs-boxed tabs tabs-sm"
+          class="tabs-box tabs tabs-xs"
         >
-          {Object.values(PROXY_TAB_TYPE).map((type) => {
+          {tabsWithNumbers.value.map(({ type, count }) => {
             return (
               <a
                 role="tab"
                 key={type}
-                class={['tab', proxiesTabShow.value === type && 'tab-active']}
+                class={[
+                  'tab',
+                  proxiesTabShow.value === type && 'tab-active',
+                  !props.horizontal && 'flex-1',
+                ]}
                 onClick={() => (proxiesTabShow.value = type)}
               >
-                {t(type)}
+                {t(type)} ({count})
               </a>
             )
           })}
         </div>
       )
-      const upgradeAll = (
-        <>
-          {proxiesTabShow.value === PROXY_TAB_TYPE.PROVIDER && (
-            <button
-              class={twMerge('btn btn-sm')}
-              onClick={handlerClickUpdateAllProviders}
-            >
-              {isUpgrading.value ? (
-                <span class="loading loading-dots loading-md"></span>
-              ) : (
-                t('updateAllProviders')
-              )}
-            </button>
+      const upgradeAll = proxiesTabShow.value === PROXY_TAB_TYPE.PROVIDER && (
+        <button
+          class="btn btn-sm"
+          onClick={handlerClickUpdateAllProviders}
+        >
+          {isUpgrading.value ? (
+            <span class="loading loading-dots loading-md"></span>
+          ) : (
+            t('updateAllProviders')
           )}
-        </>
+        </button>
       )
-      const modeSelect = (
+      const upgradeAllIcon = proxiesTabShow.value === PROXY_TAB_TYPE.PROVIDER && (
+        <button
+          class="btn btn-circle btn-sm"
+          onClick={handlerClickUpdateAllProviders}
+        >
+          <ArrowPathIcon class={['h-4 w-4', isUpgrading.value && 'animate-spin']} />
+        </button>
+      )
+      const modeSelect = configs.value && (
         <select
           class={[
-            'select select-bordered select-sm min-w-24',
+            'select select-sm min-w-24',
             props.horizontal ? 'inline-block max-md:flex-1 md:min-w-40' : 'w-0 flex-1',
           ]}
           v-model={configs.value.mode}
@@ -141,7 +172,9 @@ export default defineComponent({
                 key={mode}
                 value={mode}
               >
-                {t(mode.toLowerCase()) || mode}
+                {['global', 'rule', 'direct'].includes(mode.toLowerCase())
+                  ? t(mode.toLowerCase())
+                  : mode}
               </option>
             )
           })}
@@ -149,7 +182,7 @@ export default defineComponent({
       )
       const sort = (
         <select
-          class={['select select-bordered select-sm']}
+          class={['select select-sm']}
           v-model={proxySortType.value}
         >
           {Object.values(PROXY_SORT_TYPE).map((type) => {
@@ -167,7 +200,7 @@ export default defineComponent({
 
       const latencyTestAll = (
         <button
-          class={twMerge('btn btn-circle btn-sm')}
+          class="btn btn-circle btn-sm"
           onClick={handlerClickLatencyTestAll}
         >
           {isAllLatencyTesting.value ? (
@@ -180,7 +213,12 @@ export default defineComponent({
 
       const toggleCollapseAll = (
         <button
-          class={twMerge('btn btn-circle btn-sm')}
+          class={[
+            'btn btn-circle btn-sm',
+            twoColumnProxyGroup.value &&
+              proxiesTabShow.value === PROXY_TAB_TYPE.PROXIES &&
+              'max-sm:hidden',
+          ]}
           onClick={handlerClickToggleCollapse}
         >
           {hasNotCollapsed.value ? (
@@ -193,16 +231,17 @@ export default defineComponent({
 
       const searchInput = (
         <TextInput
-          class="w-80"
+          class={props.horizontal && !isMiddleScreen.value ? 'w-32 max-w-80 flex-1' : 'w-80'}
           v-model={proxiesFilter.value}
           placeholder={t('search')}
+          clearable={true}
         />
       )
 
       const settingsModal = (
         <>
           <button
-            class={twMerge('btn btn-circle btn-sm')}
+            class="btn btn-circle btn-sm"
             onClick={() => (settingsModel.value = true)}
           >
             <WrenchScrewdriverIcon class="h-4 w-4" />
@@ -222,11 +261,11 @@ export default defineComponent({
                 />
               </div>
               <div class="flex items-center gap-2">
-                {t('showHiddenGroup')}
+                {t('manageHiddenGroup')}
                 <input
                   class="toggle"
                   type="checkbox"
-                  v-model={showHiddenGroup.value}
+                  v-model={manageHiddenGroup.value}
                 />
               </div>
               <div class="flex items-center gap-2">
@@ -236,6 +275,22 @@ export default defineComponent({
                   type="checkbox"
                   v-model={automaticDisconnection.value}
                 />
+              </div>
+              <div class="flex items-center gap-2">
+                {t('minProxyCardWidth')}
+                <div class="join">
+                  <input
+                    class="input input-sm join-item w-20"
+                    type="number"
+                    v-model={minProxyCardWidth.value}
+                  />
+                  <button
+                    class="btn join-item btn-sm"
+                    onClick={handlerResetProxyCardWidth}
+                  >
+                    {t('reset')}
+                  </button>
+                </div>
               </div>
             </div>
           </DialogWrapper>
@@ -249,7 +304,7 @@ export default defineComponent({
               {hasProviders.value && (
                 <div class="flex gap-2">
                   {tabs}
-                  {upgradeAll}
+                  {upgradeAllIcon}
                 </div>
               )}
               <div class="flex w-full gap-2">
@@ -263,12 +318,11 @@ export default defineComponent({
           )
         }
         return (
-          <div class="flex flex-wrap gap-2 p-2">
+          <div class="flex gap-2 p-2">
             {hasProviders.value && tabs}
-            {upgradeAll}
             {modeSelect}
-            {searchInput}
-            <div class="flex-1"></div>
+            <div class="flex flex-1">{searchInput}</div>
+            {upgradeAllIcon}
             {settingsModal}
             {toggleCollapseAll}
             {latencyTestAll}

@@ -1,22 +1,22 @@
 <template>
   <div :class="`collapse ${showCollapse ? 'collapse-open' : 'collapse-close'}`">
     <div
-      class="collapse-title cursor-pointer select-none pr-4"
+      class="collapse-title cursor-pointer pr-4 select-none"
       @click="showCollapse = !showCollapse"
     >
       <slot name="title"></slot>
       <slot
-        v-if="showPreview"
+        v-if="!showCollapse"
         name="preview"
       ></slot>
     </div>
     <div
       class="collapse-content flex flex-col gap-2 max-sm:px-2"
-      @transitionstart="handlerTransitionStart"
       @transitionend="handlerTransitionEnd"
     >
       <slot
         v-if="showContent"
+        :show-full-content="showFullContent"
         name="content"
       ></slot>
     </div>
@@ -26,7 +26,7 @@
 <script setup lang="ts">
 import { collapsedBus } from '@/composables/bus'
 import { collapseGroupMap } from '@/store/settings'
-import { computed, nextTick, onUnmounted, ref } from 'vue'
+import { computed, onUnmounted, ref } from 'vue'
 
 const props = defineProps<{
   name: string
@@ -38,28 +38,21 @@ const showCollapse = computed({
   },
   set(value) {
     if (value) {
-      showPreview.value = false
+      showFullContent.value = false
       showContent.value = true
-      nextTick(() => {
-        collapseGroupMap.value[props.name] = true
-      })
-    } else {
-      collapseGroupMap.value[props.name] = false
     }
+
+    collapseGroupMap.value[props.name] = value
   },
 })
 
 const showContent = ref(showCollapse.value)
-const showPreview = ref(!showCollapse.value)
-const handlerTransitionStart = () => {
-  if (!showCollapse.value) {
-    setTimeout(() => {
-      showPreview.value = !showCollapse.value
-    }, 50)
-  }
-}
+const showFullContent = ref(showCollapse.value)
+
 const handlerTransitionEnd = () => {
-  if (!showCollapse.value) {
+  if (showCollapse.value) {
+    showFullContent.value = true
+  } else {
     showContent.value = false
   }
 }

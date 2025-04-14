@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { useNotification } from '@/composables/tip'
+import { useNotification } from '@/composables/notification'
 import { i18n } from '@/i18n'
 import { ref } from 'vue'
 

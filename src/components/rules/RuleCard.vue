@@ -1,51 +1,63 @@
 <template>
-  <div :class="twMerge('card gap-2 p-2 text-sm', !rule.payload && 'gap-0')">
-    <div>
-      <span class="mr-2 inline-block min-w-4 text-center">{{ index }}.</span>
-      <span class="mr-2 text-primary">{{ rule.type }}</span>
+  <div class="card gap-2 p-2 text-sm">
+    <div class="min-h-6">
+      <span>{{ index }}.</span>
+      <span class="ml-2 capitalize">{{ rule.type }}</span>
       <span
-        class="mr-2"
+        class="text-main ml-2"
         v-if="rule.payload"
       >
         {{ rule.payload }}
       </span>
       <span
-        v-if="typeof rule.size === 'number' && rule.size !== -1"
-        class="badge badge-sm bg-base-200"
+        v-if="typeof size === 'number' && size !== -1"
+        class="badge badge-sm bg-base-200 ml-2"
       >
-        {{ rule.size }}
+        {{ size }}
       </span>
+      <button
+        v-if="isUpdateableRuleSet"
+        :class="twMerge('btn btn-circle btn-xs ml-2', isUpdating ? 'animate-spin' : '')"
+        @click="updateRuleProviderClickHandler"
+      >
+        <ArrowPathIcon class="h-4 w-4" />
+      </button>
     </div>
-    <div class="flex items-center gap-1 text-base-content/80">
+    <div class="text-base-content/80 flex items-center gap-1">
       <ProxyName
         :name="rule.proxy"
         class="text-xs"
       />
-      <template v-if="proxyNode?.now">
+      <template v-if="proxyNode?.now && displayNowNodeInRule">
         <ArrowRightCircleIcon class="h-4 w-4" />
         <ProxyName
-          :name="proxyNode.now"
+          :name="getNowProxyNodeName(rule.proxy)"
           class="text-xs"
         />
       </template>
       <span
-        v-if="latency !== NOT_CONNECTED"
+        v-if="latency !== NOT_CONNECTED && displayLatencyInRule"
         :class="latencyColor"
         class="ml-1 text-xs"
-        >{{ latency }}ms</span
       >
+        {{ latency }}
+      </span>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { NOT_CONNECTED } from '@/config'
+import { updateRuleProviderAPI } from '@/api'
+import { useBounceOnVisible } from '@/composables/bouncein'
+import { NOT_CONNECTED } from '@/constant'
 import { getColorForLatency } from '@/helper'
-import { getLatencyByName, proxyMap } from '@/store/proxies'
+import { getLatencyByName, getNowProxyNodeName, proxyMap } from '@/store/proxies'
+import { fetchRules, ruleProviderList } from '@/store/rules'
+import { displayLatencyInRule, displayNowNodeInRule } from '@/store/settings'
 import type { Rule } from '@/types'
-import { ArrowRightCircleIcon } from '@heroicons/vue/24/outline'
+import { ArrowPathIcon, ArrowRightCircleIcon } from '@heroicons/vue/24/outline'
 import { twMerge } from 'tailwind-merge'
-import { computed } from 'vue'
+import { computed, ref } from 'vue'
 import ProxyName from '../proxies/ProxyName.vue'
 
 const props = defineProps<{
@@ -56,4 +68,38 @@ const props = defineProps<{
 const proxyNode = computed(() => proxyMap.value[props.rule.proxy])
 const latency = computed(() => getLatencyByName(props.rule.proxy, props.rule.proxy))
 const latencyColor = computed(() => getColorForLatency(Number(latency.value)))
+
+const size = computed(() => {
+  if (props.rule.type === 'RuleSet') {
+    return ruleProviderList.value.find((provider) => provider.name === props.rule.payload)
+      ?.ruleCount
+  }
+
+  return props.rule.size
+})
+
+const isUpdating = ref(false)
+const isUpdateableRuleSet = computed(() => {
+  if (props.rule.type !== 'RuleSet') {
+    return false
+  }
+
+  const provider = ruleProviderList.value.find((provider) => provider.name === props.rule.payload)
+
+  if (!provider) {
+    return false
+  }
+  return provider.vehicleType !== 'Inline'
+})
+
+const updateRuleProviderClickHandler = async () => {
+  if (isUpdating.value) return
+
+  isUpdating.value = true
+  await updateRuleProviderAPI(props.rule.payload)
+  fetchRules()
+  isUpdating.value = false
+}
+
+useBounceOnVisible()
 </script>

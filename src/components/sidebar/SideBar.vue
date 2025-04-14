@@ -1,26 +1,21 @@
 <template>
-  <div class="drawer-side z-30 bg-base-200 max-md:hidden">
-    <label
-      for="sidebar"
-      aria-label="close sidebar"
-      class="drawer-overlay"
-    ></label>
-    <div
-      :class="
-        twMerge(
-          'scrollbar-hidden flex h-full flex-col gap-2 overflow-x-hidden p-2 text-base-content !transition-all duration-500',
-          isSidebarCollapsed ? 'w-18 px-0' : 'w-[21rem]',
-        )
-      "
-    >
-      <ul class="menu flex-1">
+  <div
+    class="bg-base-200 text-base-content scrollbar-hidden h-full overflow-x-hidden p-2 transition-all"
+    :class="isSidebarCollapsed ? 'w-18 px-0' : 'w-[21rem]'"
+  >
+    <div :class="twMerge('flex h-full flex-col gap-2', isSidebarCollapsed ? 'w-18' : 'w-xs')">
+      <ul class="menu w-full flex-1">
         <li
           v-for="r in renderRoutes"
           :key="r"
           @mouseenter="(e) => mouseenterHandler(e, r)"
         >
           <a
-            :class="r === route.name ? 'active' : 'inactive'"
+            :class="[
+              r === route.name ? 'menu-active' : '',
+              isSidebarCollapsed && 'justify-center',
+              'py-2',
+            ]"
             @click="() => router.push({ name: r })"
           >
             <component
@@ -48,7 +43,13 @@
         </div>
       </template>
       <template v-else>
-        <OverviewCarousel v-if="route.name !== ROUTE_NAME.overview" />
+        <OverviewCarousel
+          v-if="
+            route.name !== ROUTE_NAME.overview &&
+            !(route.name === ROUTE_NAME.settings && !splitOverviewPage)
+          "
+          class="w-xs"
+        />
         <div class="card">
           <component
             v-if="sidebarComp"
@@ -66,12 +67,16 @@ import CommonSidebar from '@/components/sidebar/CommonCtrl.vue'
 import ConnectionCtrl from '@/components/sidebar/ConnectionCtrl.tsx'
 import LogsCtrl from '@/components/sidebar/LogsCtrl.tsx'
 import ProxiesCtrl from '@/components/sidebar/ProxiesCtrl.tsx'
-import RulesCtrl from '@/components/sidebar/RulesCtrl.vue'
-import { ROUTE_ICON_MAP, ROUTE_NAME } from '@/config'
+import RulesCtrl from '@/components/sidebar/RulesCtrl.tsx'
+import { ROUTE_ICON_MAP, ROUTE_NAME } from '@/constant'
 import { renderRoutes } from '@/helper'
 import { useTooltip } from '@/helper/tooltip'
 import router from '@/router'
-import { isSidebarCollapsed, showStatisticsWhenSidebarCollapsed } from '@/store/settings'
+import {
+  isSidebarCollapsed,
+  showStatisticsWhenSidebarCollapsed,
+  splitOverviewPage,
+} from '@/store/settings'
 import { ArrowRightCircleIcon } from '@heroicons/vue/24/outline'
 import { twMerge } from 'tailwind-merge'
 import { computed } from 'vue'

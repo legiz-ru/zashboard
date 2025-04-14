@@ -1,12 +1,11 @@
 <template>
   <CollapseCard :name="proxyProvider.name">
     <template v-slot:title>
-      <div class="flex items-center gap-2">
-        <div class="text-lg font-medium sm:text-xl">
+      <div class="flex items-center justify-between gap-2">
+        <div class="text-xl font-medium">
           {{ proxyProvider.name }}
-          <span class="text-sm"> ({{ sortedProxies.length }}) </span>
+          <span class="text-base-content/60 text-sm font-normal"> ({{ proxiesCount }}) </span>
         </div>
-        <div class="flex-1" />
         <div class="flex gap-2">
           <button
             :class="twMerge('btn btn-circle btn-sm z-30')"
@@ -22,6 +21,7 @@
             />
           </button>
           <button
+            v-if="proxyProvider.vehicleType !== 'Inline'"
             :class="twMerge('btn btn-circle btn-sm z-30', isUpdating ? 'animate-spin' : '')"
             @click.stop="updateProviderClickHandler"
           >
@@ -29,32 +29,29 @@
           </button>
         </div>
       </div>
-      <progress
-        class="progress text-slate-500"
-        v-if="subscriptionInfo"
-        :value="subscriptionInfo.percentage"
-        max="100"
-      />
-      <div class="flex flex-col text-base-content/80 sm:flex-row sm:gap-4">
-        <template v-if="subscriptionInfo">
-          <div class="text-sm">
-            {{ subscriptionInfo.used }} / {{ subscriptionInfo.total }} (
-            {{ subscriptionInfo.percentage }}% )
+      <div
+        class="text-base-content/60 flex items-end justify-between text-sm max-sm:flex-col max-sm:items-start"
+      >
+        <div>
+          <div v-if="subscriptionInfo">
+            {{ subscriptionInfo.expireStr }}
           </div>
-          <div class="text-sm">
-            {{ subscriptionInfo.expirePrefix() }}: {{ subscriptionInfo.expireStr() }}
+          <div v-if="subscriptionInfo">
+            {{ subscriptionInfo.usageStr }}
           </div>
-        </template>
-        <div class="text-sm">{{ $t('updated') }} {{ fromNow(proxyProvider.updatedAt) }}</div>
+        </div>
+        <div>{{ $t('updated') }} {{ fromNow(proxyProvider.updatedAt) }}</div>
       </div>
     </template>
     <template v-slot:preview>
-      <ProxyPreview :nodes="sortedProxies" />
+      <ProxyPreview :nodes="renderProxies" />
     </template>
-    <template v-slot:content>
+    <template v-slot:content="{ showFullContent }">
       <ProxyNodeGrid>
         <ProxyNodeCard
-          v-for="node in sortedProxies"
+          v-for="node in showFullContent
+            ? renderProxies
+            : renderProxies.slice(0, twoColumnProxyGroup ? 48 : 96)"
           :key="node"
           :name="node"
         />
@@ -65,9 +62,11 @@
 
 <script setup lang="ts">
 import { proxyProviderHealthCheckAPI, updateProxyProviderAPI } from '@/api'
-import { fromNow, prettyBytesHelper, sortAndFilterProxyNodes } from '@/helper'
+import { useBounceOnVisible } from '@/composables/bouncein'
+import { useRenderProxies } from '@/composables/renderProxies'
+import { fromNow, prettyBytesHelper } from '@/helper'
 import { fetchProxies, proxyProviederList } from '@/store/proxies'
-import type { SubscriptionInfo } from '@/types'
+import { twoColumnProxyGroup } from '@/store/settings'
 import { ArrowPathIcon, BoltIcon } from '@heroicons/vue/24/outline'
 import dayjs from 'dayjs'
 import { toFinite } from 'lodash'
@@ -83,51 +82,37 @@ const props = defineProps<{
   name: string
 }>()
 
-const getSubscriptionsInfo = (subscriptionInfo: SubscriptionInfo) => {
-  const { Download = 0, Upload = 0, Total = 0, Expire = 0 } = subscriptionInfo
-
-  if (Download === 0 && Upload === 0 && Total === 0 && Expire === 0) {
-    return null
-  }
-
-  const total = prettyBytesHelper(Total, { binary: true })
-  const used = prettyBytesHelper(Download + Upload, { binary: true })
-  const percentage = toFinite((((Download + Upload) / Total) * 100).toFixed(2))
-
-  const expirePrefix = () => {
-    const { t } = useI18n()
-
-    return t('expire')
-  }
-
-  const expireStr = () => {
-    const { t } = useI18n()
-
-    if (Expire === 0) {
-      return t('noExpire')
-    }
-
-    return dayjs(Expire * 1000).format('YYYY-MM-DD')
-  }
-
-  return {
-    total,
-    used,
-    percentage,
-    expirePrefix,
-    expireStr,
-  }
-}
-
 const proxyProvider = computed(
   () => proxyProviederList.value.find((group) => group.name === props.name)!,
 )
-const sortedProxies = computed(() => {
-  return sortAndFilterProxyNodes(proxyProvider.value.proxies.map((node) => node.name))
-})
+const allProxies = computed(() => proxyProvider.value.proxies.map((node) => node.name) ?? [])
+const { renderProxies, proxiesCount } = useRenderProxies(allProxies)
+
 const subscriptionInfo = computed(() => {
-  if (proxyProvider.value.subscriptionInfo) {
-    return getSubscriptionsInfo(proxyProvider.value.subscriptionInfo)
+  const info = proxyProvider.value.subscriptionInfo
+
+  if (info) {
+    const { Download = 0, Upload = 0, Total = 0, Expire = 0 } = info
+
+    if (Download === 0 && Upload === 0 && Total === 0 && Expire === 0) {
+      return null
+    }
+
+    const { t } = useI18n()
+    const total = prettyBytesHelper(Total, { binary: true })
+    const used = prettyBytesHelper(Download + Upload, { binary: true })
+    const percentage = toFinite((((Download + Upload) / Total) * 100).toFixed(2))
+    const expireStr =
+      Expire === 0
+        ? `${t('expire')}: ${t('noExpire')}`
+        : `${t('expire')}: ${dayjs(Expire * 1000).format('YYYY-MM-DD')}`
+
+    const usageStr = `${used} / ${total} ( ${percentage}% )`
+
+    return {
+      expireStr,
+      usageStr,
+    }
   }
 
   return null
@@ -161,4 +146,6 @@ const updateProviderClickHandler = async () => {
     isUpdating.value = false
   }
 }
+
+useBounceOnVisible()
 </script>

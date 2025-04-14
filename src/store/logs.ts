@@ -1,11 +1,11 @@
 import { fetchLogsAPI } from '@/api'
-import { LOG_LEVEL } from '@/config'
+import { LOG_LEVEL } from '@/constant'
 import type { Log, LogWithSeq } from '@/types'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
 import { throttle } from 'lodash'
 import { ref, watch } from 'vue'
-import { language, logRetentionLimit, sourceIPLabelMap } from './settings'
+import { logRetentionLimit, sourceIPLabelList } from './settings'
 
 export const logs = ref<LogWithSeq[]>([])
 export const logFilter = ref('')
@@ -23,16 +23,16 @@ const sliceLogs = throttle(() => {
 const ipSourceMatchs: [RegExp, string][] = []
 const restructMatchs = () => {
   ipSourceMatchs.length = 0
-  for (const ip in sourceIPLabelMap.value) {
-    if (ip.startsWith('/')) continue
-    const regex = new RegExp(ip + ':', 'ig')
+  for (const { key, label } of sourceIPLabelList.value) {
+    if (key.startsWith('/')) continue
+    const regex = new RegExp(key + ':', 'ig')
 
-    ipSourceMatchs.push([regex, `${ip} (${sourceIPLabelMap.value[ip]}) :`])
+    ipSourceMatchs.push([regex, `${key} (${label}) :`])
   }
 }
 
 watch(
-  sourceIPLabelMap,
+  sourceIPLabelList,
   () => {
     restructMatchs()
   },
@@ -65,7 +65,7 @@ export const initLogs = () => {
 
     logsTemp.unshift({
       ...data,
-      time: dayjs().locale(language.value).format('HH:mm:ss'),
+      time: dayjs().format('HH:mm:ss'),
       seq: idx++,
     })
 

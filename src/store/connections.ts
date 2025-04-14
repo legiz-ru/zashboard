@@ -1,5 +1,6 @@
 import { fetchConnectionsAPI } from '@/api'
-import { CONNECTION_TAB_TYPE, SORT_DIRECTION, SORT_TYPE } from '@/config'
+import { CONNECTION_TAB_TYPE, SORT_DIRECTION, SORT_TYPE } from '@/constant'
+import { getChainsStringFromConnection } from '@/helper'
 import type { Connection, ConnectionRawMessage } from '@/types'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -93,7 +94,7 @@ const sortFunctionMap: Record<SORT_TYPE, (a: Connection, b: Connection) => numbe
     return a.rule.localeCompare(b.rule)
   },
   [SORT_TYPE.CHAINS]: (a: Connection, b: Connection) => {
-    return a.chains.join('').localeCompare(b.chains.join(''))
+    return getChainsStringFromConnection(a).localeCompare(getChainsStringFromConnection(b))
   },
   [SORT_TYPE.DOWNLOAD]: (a: Connection, b: Connection) => {
     return a.download - b.download
@@ -129,7 +130,7 @@ export const connectionSortDirection = useStorage<SORT_DIRECTION>(
   SORT_DIRECTION.ASC,
 )
 export const connectionFilter = ref('')
-export const sourceIPFilter = ref(null)
+export const sourceIPFilter = ref<string[] | null>(null)
 export const isPaused = ref(false)
 
 export const connections = computed(() => {
@@ -160,7 +161,10 @@ export const renderConnections = computed(() => {
         conn.rulePayload,
       ]
 
-      if (sourceIPFilter.value !== null && conn.metadata.sourceIP !== sourceIPFilter.value) {
+      if (
+        sourceIPFilter.value !== null &&
+        sourceIPFilter.value.every((i) => i !== conn.metadata.sourceIP)
+      ) {
         return false
       }
 
@@ -179,7 +183,7 @@ export const renderConnections = computed(() => {
       return true
     })
     .sort((a, b) => {
-      if (isDesc.value) {
+      if (useConnectionCard.value && isDesc.value) {
         ;[a, b] = [b, a]
       }
       const sortResult = useConnectionCard.value

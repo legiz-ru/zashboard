@@ -12,16 +12,7 @@
       class="p-2"
     >
       <template v-slot="{ item }: { item: LogWithSeq }">
-        <div class="card mb-1 block break-all p-2 text-sm">
-          <span>{{ item.seq }}</span>
-          <span class="mx-2 text-primary">
-            {{ item.time }}
-          </span>
-          <span :class="textColorMapForType[item.type as keyof typeof textColorMapForType]">
-            {{ item.type }}
-          </span>
-          <span class="ml-2">{{ item.payload }}</span>
-        </div>
+        <LogsCard :log="item"></LogsCard>
       </template>
     </VirtualScroller>
   </div>
@@ -29,18 +20,11 @@
 
 <script setup lang="ts">
 import VirtualScroller from '@/components/common/VirtualScroller.vue'
-import { LOG_LEVEL } from '@/config'
+import LogsCard from '@/components/logs/LogsCard.vue'
 import { isMiddleScreen } from '@/helper/utils'
 import { logFilter, logs } from '@/store/logs'
 import type { LogWithSeq } from '@/types'
 import { computed } from 'vue'
-
-const textColorMapForType = {
-  [LOG_LEVEL.Error]: 'text-error',
-  [LOG_LEVEL.Warning]: 'text-warning',
-  [LOG_LEVEL.Info]: 'text-info',
-  [LOG_LEVEL.Debug]: 'text-accent',
-}
 
 const renderLogs = computed(() => {
   if (logFilter.value) {

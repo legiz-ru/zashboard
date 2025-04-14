@@ -1,31 +1,31 @@
 <template>
   <div
-    class="h-full w-full items-center justify-center overflow-auto bg-base-200/40 sm:flex"
+    class="bg-base-200/50 h-full w-full items-center justify-center overflow-auto sm:flex"
     @keydown.enter="handleSubmit(form)"
   >
-    <div class="absolute right-4 top-4 max-sm:hidden">
+    <div class="absolute top-4 right-4 max-sm:hidden">
       <ImportSettings />
     </div>
-    <div class="absolute bottom-4 right-4 max-sm:hidden">
+    <div class="absolute right-4 bottom-4 max-sm:hidden">
       <LanguageSelect />
     </div>
-    <div class="card mx-auto w-96 max-w-[90%] gap-2 px-6 py-2 max-sm:my-4">
+    <div class="card mx-auto w-96 max-w-[90%] gap-3 px-6 py-2 max-sm:my-4">
       <h1 class="text-2xl font-semibold">{{ $t('setup') }}</h1>
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">{{ $t('protocol') }}</span>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm">
+          <span>{{ $t('protocol') }}</span>
         </label>
         <select
-          class="select select-bordered select-sm w-full"
+          class="select select-sm w-full"
           v-model="form.protocol"
         >
           <option value="http">HTTP</option>
           <option value="https">HTTPS</option>
         </select>
       </div>
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">{{ $t('host') }}</span>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm">
+          <span>{{ $t('host') }}</span>
         </label>
         <TextInput
           class="w-full"
@@ -34,18 +34,18 @@
           v-model="form.host"
         />
       </div>
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">{{ $t('port') }}</span>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm">
+          <span>{{ $t('port') }}</span>
         </label>
         <TextInput
           class="w-full"
           v-model="form.port"
         />
       </div>
-      <div class="form-control">
-        <label class="label flex items-center justify-start gap-1">
-          <span class="label-text">{{ $t('secondaryPath') }} ({{ $t('optional') }})</span>
+      <div class="flex flex-col gap-1">
+        <label class="flex items-center gap-1 text-sm">
+          <span>{{ $t('secondaryPath') }} ({{ $t('optional') }})</span>
           <span
             class="tooltip"
             :data-tip="$t('secondaryPathTip')"
@@ -58,19 +58,19 @@
           v-model="form.secondaryPath"
         />
       </div>
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">{{ $t('password') }}</span>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm">
+          <span>{{ $t('password') }}</span>
         </label>
         <input
           type="password"
-          class="input input-sm input-bordered w-full"
+          class="input input-sm w-full"
           v-model="form.password"
         />
       </div>
-      <div class="form-control">
-        <label class="label">
-          <span class="label-text">{{ $t('label') }} ({{ $t('optional') }})</span>
+      <div class="flex flex-col gap-1">
+        <label class="text-sm">
+          <span>{{ $t('label') }} ({{ $t('optional') }})</span>
         </label>
         <TextInput
           class="w-full"
@@ -95,8 +95,8 @@
             :key="element.uuid"
             class="flex items-center gap-2"
           >
-            <button class="btn btn-sm cursor-grab">
-              <AdjustmentsVerticalIcon class="h-4 w-4" />
+            <button class="btn btn-circle btn-ghost btn-sm">
+              <ChevronUpDownIcon class="h-4 w-4 cursor-grab" />
             </button>
             <button
               class="btn btn-sm flex-1"
@@ -105,16 +105,16 @@
               {{ element.label || getUrlFromBackend(element) }}
             </button>
             <button
-              class="btn btn-circle btn-sm"
+              class="btn btn-circle btn-ghost btn-sm"
               @click="() => removeBackend(element.uuid)"
             >
-              <MinusCircleIcon class="h-4 w-4" />
+              <TrashIcon class="h-4 w-4" />
             </button>
           </div>
         </template>
       </Draggable>
       <LanguageSelect class="mt-4 sm:hidden" />
-      <div class="absolute right-2 top-2 sm:hidden">
+      <div class="absolute top-2 right-2 sm:hidden">
         <ImportSettings />
       </div>
     </div>
@@ -125,17 +125,13 @@
 import ImportSettings from '@/components/common/ImportSettings.vue'
 import TextInput from '@/components/common/TextInput.vue'
 import LanguageSelect from '@/components/settings/LanguageSelect.vue'
-import { useNotification } from '@/composables/tip'
-import { ROUTE_NAME } from '@/config'
+import { useNotification } from '@/composables/notification'
+import { ROUTE_NAME } from '@/constant'
 import { getUrlFromBackend } from '@/helper'
 import router from '@/router'
 import { activeUuid, addBackend, backendList, removeBackend } from '@/store/setup'
 import type { Backend } from '@/types'
-import {
-  AdjustmentsVerticalIcon,
-  MinusCircleIcon,
-  QuestionMarkCircleIcon,
-} from '@heroicons/vue/24/outline'
+import { ChevronUpDownIcon, QuestionMarkCircleIcon, TrashIcon } from '@heroicons/vue/24/outline'
 import { reactive } from 'vue'
 import Draggable from 'vuedraggable'
 
@@ -217,11 +213,13 @@ if (query.has('hostname')) {
       : query.get('https')
         ? 'https'
         : window.location.protocol.replace(':', ''),
-    secondaryPath: (query.get('secondaryPath') as string) || '',
+    secondaryPath: query.get('secondaryPath') || '',
     host: query.get('hostname') as string,
     port: query.get('port') as string,
-    password: query.get('secret') as string,
-    label: query.get('label') as string,
+    password: query.get('secret') || '',
+    label: query.get('label') || '',
+    disableUpgradeCore:
+      query.get('disableUpgradeCore') === '1' || query.get('disableUpgradeCore') === 'core',
   })
 } else if (backendList.value.length === 0) {
   handleSubmit(form, true)

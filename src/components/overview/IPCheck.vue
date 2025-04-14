@@ -1,5 +1,5 @@
 <template>
-  <div class="relative flex h-28 flex-col gap-1 rounded-lg bg-base-200/40 p-2">
+  <div class="bg-base-200/50 relative flex h-28 flex-col gap-1 rounded-lg p-2">
     <div
       class="tooltip tooltip-bottom text-left text-sm"
       data-tip="ipip.net"
@@ -26,7 +26,7 @@
         ({{ showPrivacy ? ipsbIP.ipWithPrivacy[1] : ipsbIP.ip[1] }})
       </span>
     </div>
-    <div class="absolute bottom-2 right-2 flex items-center gap-2">
+    <div class="absolute right-2 bottom-2 flex items-center gap-2">
       <button
         class="btn btn-circle btn-sm flex items-center justify-center"
         @click="showPrivacy = !showPrivacy"

@@ -1,4 +1,4 @@
-FROM docker.io/node:alpine AS builder
+FROM --platform=linux/amd64 docker.io/node:alpine AS builder
 
 ENV HUSKY=0
 WORKDIR /build

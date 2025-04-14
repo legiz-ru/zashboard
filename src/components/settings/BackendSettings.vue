@@ -1,24 +1,43 @@
 <template>
   <!-- backend -->
-  <div class="card card-compact">
+  <div class="card">
     <div class="card-title px-4 pt-4">
-      {{ $t('backend') }}
+      <div class="indicator">
+        <span
+          v-if="isCoreUpdateAvailable"
+          class="indicator-item top-1 -right-1 flex"
+        >
+          <span class="bg-secondary absolute h-2 w-2 animate-ping rounded-full"></span>
+          <span class="bg-secondary h-2 w-2 rounded-full"></span>
+        </span>
+        <a
+          class="flex cursor-pointer items-center gap-2"
+          :href="
+            isSingBox
+              ? 'https://github.com/sagernet/sing-box'
+              : 'https://github.com/metacubex/mihomo'
+          "
+          target="_blank"
+        >
+          {{ $t('backend') }}
+          <BackendVersion class="text-sm font-normal" />
+        </a>
+      </div>
     </div>
     <div class="card-body gap-4">
       <BackendSwitch />
-      <BackendVersion />
 
-      <template v-if="!isSingBox && configs">
+      <template v-if="(!isSingBox || displayAllFeatures) && configs">
         <div class="divider"></div>
-        <div class="grid max-w-screen-md grid-cols-2 gap-2 lg:grid-cols-3">
+        <div class="grid max-w-3xl grid-cols-2 gap-2 lg:grid-cols-3">
           <div
             class="flex items-center gap-2"
             v-for="portConfig in portList"
             :key="portConfig.key"
           >
-            <span class="shrink-0"> {{ $t(portConfig.label) }}: </span>
+            <span class="shrink-0"> {{ $t(portConfig.label) }} </span>
             <input
-              class="input input-sm input-bordered w-20 sm:w-24"
+              class="input input-sm w-20 sm:w-24"
               type="number"
               v-model="configs[portConfig.key as keyof Config]"
               @change="
@@ -27,12 +46,12 @@
             />
           </div>
         </div>
-        <div class="grid max-w-screen-md grid-cols-2 gap-2 lg:grid-cols-3">
+        <div class="grid max-w-3xl grid-cols-2 gap-2 lg:grid-cols-4">
           <div
             class="flex items-center gap-2"
             v-if="configs?.tun"
           >
-            {{ $t('tunMode') }}:
+            {{ $t('tunMode') }}
             <input
               class="toggle"
               type="checkbox"
@@ -41,7 +60,7 @@
             />
           </div>
           <div class="flex items-center gap-2">
-            {{ $t('allowLan') }}:
+            {{ $t('allowLan') }}
             <input
               class="toggle"
               type="checkbox"
@@ -49,39 +68,43 @@
               @change="handlerAllowLanChange"
             />
           </div>
-          <div class="flex items-center gap-2">
-            {{ $t('autoUpgrade') }}:
-            <input
-              class="toggle"
-              type="checkbox"
-              v-model="autoUpgradeCore"
-            />
-          </div>
+          <template v-if="!activeBackend?.disableUpgradeCore">
+            <div class="flex items-center gap-2">
+              {{ $t('checkUpgrade') }}
+              <input
+                class="toggle"
+                type="checkbox"
+                v-model="checkUpgradeCore"
+                @change="handlerCheckUpgradeCoreChange"
+              />
+            </div>
+            <div
+              class="flex items-center gap-2"
+              v-if="checkUpgradeCore"
+            >
+              {{ $t('autoUpgrade') }}
+              <input
+                class="toggle"
+                type="checkbox"
+                v-model="autoUpgradeCore"
+              />
+            </div>
+          </template>
         </div>
       </template>
 
       <div
-        class="grid max-w-screen-lg grid-cols-2 gap-2 md:grid-cols-3 xl:grid-cols-5"
+        class="grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-5"
         v-if="version"
       >
-        <template v-if="!isSingBox">
-          <div class="indicator w-full">
-            <span
-              v-if="isCoreUpdateAvailable"
-              class="indicator-item flex"
-            >
-              <span class="badge badge-xs absolute animate-ping bg-secondary"></span>
-              <span class="badge badge-xs bg-secondary"></span>
-            </span>
-            <button
-              :class="
-                twMerge('btn btn-primary btn-sm flex-1', isCoreUpgrading ? 'animate-pulse' : '')
-              "
-              @click="handlerClickUpgradeCore"
-            >
-              {{ $t('upgradeCore') }}
-            </button>
-          </div>
+        <template v-if="!isSingBox || displayAllFeatures">
+          <button
+            v-if="!activeBackend?.disableUpgradeCore"
+            :class="twMerge('btn btn-primary btn-sm', isCoreUpgrading ? 'animate-pulse' : '')"
+            @click="handlerClickUpgradeCore"
+          >
+            {{ $t('upgradeCore') }}
+          </button>
           <button
             :class="twMerge('btn btn-sm', isCoreRestarting ? 'animate-pulse' : '')"
             @click="handlerClickRestartCore"
@@ -131,7 +154,8 @@ import DnsQuery from '@/components/settings/DnsQuery.vue'
 import { configs, fetchConfigs, updateConfigs } from '@/store/config'
 import { fetchProxies } from '@/store/proxies'
 import { fetchRules } from '@/store/rules'
-import { autoUpgradeCore } from '@/store/settings'
+import { autoUpgradeCore, checkUpgradeCore, displayAllFeatures } from '@/store/settings'
+import { activeBackend } from '@/store/setup'
 import type { Config } from '@/types'
 import { twMerge } from 'tailwind-merge'
 import { ref } from 'vue'
@@ -216,6 +240,13 @@ const handlerClickUpdateGeo = async () => {
     isGeoUpdating.value = false
   } catch {
     isGeoUpdating.value = false
+  }
+}
+
+const handlerCheckUpgradeCoreChange = () => {
+  if (!checkUpgradeCore.value) {
+    autoUpgradeCore.value = false
+    isCoreUpdateAvailable.value = false
   }
 }
 

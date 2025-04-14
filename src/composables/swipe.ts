@@ -1,4 +1,4 @@
-import { CONNECTION_TAB_TYPE, PROXY_TAB_TYPE, ROUTE_NAME, RULE_TAB_TYPE } from '@/config'
+import { CONNECTION_TAB_TYPE, PROXY_TAB_TYPE, ROUTE_NAME, RULE_TAB_TYPE } from '@/constant'
 import { renderRoutes } from '@/helper'
 import { connectionTabShow } from '@/store/connections'
 import { proxyProviederList } from '@/store/proxies'
@@ -87,8 +87,19 @@ export const useSwipeRouter = () => {
     ]?.[1]?.()
   }
 
+  const isInputActive = () => {
+    const activeEl = document.activeElement
+    return activeEl && (activeEl.tagName === 'INPUT' || activeEl.tagName === 'TEXTAREA')
+  }
+
   watch(direction, () => {
-    if (disableSwipe.value || window.getSelection()?.toString()?.length) return
+    if (
+      document.querySelector('dialog:modal') ||
+      isInputActive() ||
+      window.getSelection()?.toString()?.length ||
+      disableSwipe.value
+    )
+      return
     if (direction.value === 'right') {
       getPrevRouteName()
     } else if (direction.value === 'left') {

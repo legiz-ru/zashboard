@@ -2,6 +2,375 @@
 
 # Changelog
 
+## [1.78.0](https://github.com/Zephyruso/zashboard/compare/v1.77.0...v1.78.0) (2025-04-13)
+
+
+### Features
+
+* reF1nd sing-box ([16c4f47](https://github.com/Zephyruso/zashboard/commit/16c4f47ba6a19d7196c4774d96c4de4917adedce))
+* update rule provider in rules ([1a9605c](https://github.com/Zephyruso/zashboard/commit/1a9605c89d4c99e67cff76e460ab9118b862e385))
+
+## [1.77.0](https://github.com/Zephyruso/zashboard/compare/v1.76.3...v1.77.0) (2025-04-11)
+
+
+### Features
+
+* bouncein animation for mobile ([a1e9d38](https://github.com/Zephyruso/zashboard/commit/a1e9d38b3f98d28ee0a100635e5c4e79aa0c660f))
+
+
+### Bug Fixes
+
+* chart performance ([ca7b861](https://github.com/Zephyruso/zashboard/commit/ca7b861fea8e03fc8d9ba94863d561fb1dd52c8c))
+
+## [1.76.3](https://github.com/Zephyruso/zashboard/compare/v1.76.2...v1.76.3) (2025-04-10)
+
+
+### Bug Fixes
+
+* merge same sourceip label options ([43a8576](https://github.com/Zephyruso/zashboard/commit/43a8576eddab71f5c7590a166b9a84dc738bea1a))
+* performance for page switch ([f25b5bc](https://github.com/Zephyruso/zashboard/commit/f25b5bc12e46e4482da48597ad967ddbaa5293ee))
+* swipe animation performance ([9837522](https://github.com/Zephyruso/zashboard/commit/98375229e1db1efb8d8047e2f592ca56950fee53))
+
+## [1.76.2](https://github.com/Zephyruso/zashboard/compare/v1.76.1...v1.76.2) (2025-04-02)
+
+
+### Bug Fixes
+
+* hidden group icon status ([89d459a](https://github.com/Zephyruso/zashboard/commit/89d459ab56c718de2d0cc3440bf71c13493abaaf))
+* make disable pull to refresh optional ([56e2273](https://github.com/Zephyruso/zashboard/commit/56e2273da856510f95b95aba19b208798366183e))
+
+## [1.76.1](https://github.com/Zephyruso/zashboard/compare/v1.76.0...v1.76.1) (2025-03-30)
+
+
+### Bug Fixes
+
+* catch icon settings empty ([1e95227](https://github.com/Zephyruso/zashboard/commit/1e95227f34c3b076db09c310a3d7b6e210d5b071))
+* chart style in sidebar ([88e4b17](https://github.com/Zephyruso/zashboard/commit/88e4b176cd28d636a542d2dda820396638ee00c5))
+
+## [1.76.0](https://github.com/Zephyruso/zashboard/compare/v1.75.2...v1.76.0) (2025-03-26)
+
+
+### Features
+
+* custom icon for sing-box ([6db29e2](https://github.com/Zephyruso/zashboard/commit/6db29e2b7a2cc885a3ae67fd301bf18df1922996))
+
+
+### Bug Fixes
+
+* outline style ([c840ab2](https://github.com/Zephyruso/zashboard/commit/c840ab2d71ff8f4f118ac98dc7d00bff3b400e71))
+
+## [1.75.2](https://github.com/Zephyruso/zashboard/compare/v1.75.1...v1.75.2) (2025-03-24)
+
+
+### Bug Fixes
+
+* collapse animation performance ([9c72e96](https://github.com/Zephyruso/zashboard/commit/9c72e961725a15196188edb3731c8c48d6944237))
+* missing collapse all btn in mobile ([3e7ee22](https://github.com/Zephyruso/zashboard/commit/3e7ee224f0646820f6f3635c37d8b05a95644457))
+* region for details ([eaf8cf1](https://github.com/Zephyruso/zashboard/commit/eaf8cf1127bafaa6dfa83d9d90f60ae972489e3c))
+
+## [1.75.1](https://github.com/Zephyruso/zashboard/compare/v1.75.0...v1.75.1) (2025-03-21)
+
+
+### Bug Fixes
+
+* long rule for sing-box in table ([164f98f](https://github.com/Zephyruso/zashboard/commit/164f98ff6a54fec9a8e10563f72f496094bd26ce))
+* setup page style ([5305893](https://github.com/Zephyruso/zashboard/commit/5305893312e0a35f4c8d859df9146be97039a465))
+
+## [1.75.0](https://github.com/Zephyruso/zashboard/compare/v1.74.0...v1.75.0) (2025-03-19)
+
+
+### Features
+
+* city location for connection details ([44eb86d](https://github.com/Zephyruso/zashboard/commit/44eb86d11f24afc1a5eca138b0688cca7a4078f0))
+* using the existing theme to reset custom theme ([daadc8f](https://github.com/Zephyruso/zashboard/commit/daadc8f6ba43cf66841aff80280bd42a447633e3))
+
+
+### Bug Fixes
+
+* long host style in connection table ([9428cc5](https://github.com/Zephyruso/zashboard/commit/9428cc505d0d46200042b21e5164f56d58f449e2))
+
+## [1.74.0](https://github.com/Zephyruso/zashboard/compare/v1.73.1...v1.74.0) (2025-03-18)
+
+
+### Features
+
+* add custom theme ([4679ddd](https://github.com/Zephyruso/zashboard/commit/4679dddb900271386e430e7bc691bbf06fb44180))
+
+
+### Bug Fixes
+
+* highlight text for dark theme ([902af5c](https://github.com/Zephyruso/zashboard/commit/902af5cff064d9f3b29329383be43b48f1d6d089))
+
+## [1.73.1](https://github.com/Zephyruso/zashboard/compare/v1.73.0...v1.73.1) (2025-03-17)
+
+
+### Bug Fixes
+
+* make daisyui v5 theme as default ([e0bc078](https://github.com/Zephyruso/zashboard/commit/e0bc07881ce62258534e40874513455864c6a987))
+* proxy chains sort ([3415c3f](https://github.com/Zephyruso/zashboard/commit/3415c3f89b29df6f2bdefca7e66e5aba8be482db))
+* style for connection details ([17d3504](https://github.com/Zephyruso/zashboard/commit/17d3504eac86856d24cb8e7b3312c1d299d42f96))
+
+## [1.73.0](https://github.com/Zephyruso/zashboard/compare/v1.72.3...v1.73.0) (2025-03-14)
+
+
+### Features
+
+* support all sing-box log level ([864997c](https://github.com/Zephyruso/zashboard/commit/864997c21efd1f14c8abe3cd76247529f0c4cb7c))
+
+
+### Bug Fixes
+
+* catch testurl is empty ([a40c7e3](https://github.com/Zephyruso/zashboard/commit/a40c7e312d5d9e1ca7a2e9d32ad1a5e870e75578))
+* remove openai cdn test ([78bfe09](https://github.com/Zephyruso/zashboard/commit/78bfe0945bb09fa9f9d5f30227b6e1a4c3fdda93))
+* remove redirect to setup when api 404 ([50ca346](https://github.com/Zephyruso/zashboard/commit/50ca346b806491c12fa066ffca1bc75353a6310e))
+
+## [1.72.3](https://github.com/Zephyruso/zashboard/compare/v1.72.2...v1.72.3) (2025-03-12)
+
+
+### Bug Fixes
+
+* prevent selecting a selected node ([b7fd831](https://github.com/Zephyruso/zashboard/commit/b7fd8316420574da51b591bfac55a5afc085f1aa))
+
+## [1.72.2](https://github.com/Zephyruso/zashboard/compare/v1.72.1...v1.72.2) (2025-03-10)
+
+
+### Bug Fixes
+
+* animation for swipe page ([f25078c](https://github.com/Zephyruso/zashboard/commit/f25078cad670cc4dcae709a8fe095d79722768c1))
+* i18n for remote destination ([788fef0](https://github.com/Zephyruso/zashboard/commit/788fef0fa8c0a979c4d290032a2c507826868474))
+
+## [1.72.1](https://github.com/Zephyruso/zashboard/compare/v1.72.0...v1.72.1) (2025-03-07)
+
+
+### Bug Fixes
+
+* connection & proxies ctrl style for iPad ([9c02345](https://github.com/Zephyruso/zashboard/commit/9c023451662e1922de4d7f0128a338c694cabda8))
+* separate destination and proxy node IP column ([51a502e](https://github.com/Zephyruso/zashboard/commit/51a502e942d63be1fab9fbb0b81c94714f97237c))
+
+## [1.72.0](https://github.com/Zephyruso/zashboard/compare/v1.71.0...v1.72.0) (2025-03-06)
+
+
+### Features
+
+* policy fixed now tip ([f1fab79](https://github.com/Zephyruso/zashboard/commit/f1fab79c191a727bb1e134ffa6795827299cefd3))
+
+
+### Bug Fixes
+
+* remove CNAME in dist ([5e1c4d3](https://github.com/Zephyruso/zashboard/commit/5e1c4d31884c56327f38fb91925d69d025e4be3c))
+* sort desc first for speeds ([f3030bc](https://github.com/Zephyruso/zashboard/commit/f3030bcc567a12324cfdcfdc6b08b3c32d9603de))
+* url https params ([c53165a](https://github.com/Zephyruso/zashboard/commit/c53165a3f1bf1695457a2970912da6513b5b6903))
+
+## [1.71.0](https://github.com/Zephyruso/zashboard/compare/v1.70.2...v1.71.0) (2025-03-05)
+
+
+### Features
+
+* daisyuiv5-theme ([eec8209](https://github.com/Zephyruso/zashboard/commit/eec8209f23f6dab9ab1247d66286870bb9604052))
+* link to backend github ([ae6a3e0](https://github.com/Zephyruso/zashboard/commit/ae6a3e05e97acabc6f61f751775ce85ceee6a594))
+* setting for auto theme ([1aabb78](https://github.com/Zephyruso/zashboard/commit/1aabb784e07ce050f77c4cd3a970e716455b525f))
+
+## [1.70.2](https://github.com/Zephyruso/zashboard/compare/v1.70.1...v1.70.2) (2025-03-04)
+
+
+### Bug Fixes
+
+* bring old default theme back ([ecd0a5b](https://github.com/Zephyruso/zashboard/commit/ecd0a5b30af7ac3240c86b742fa7a970f553988a))
+
+## [1.70.1](https://github.com/Zephyruso/zashboard/compare/v1.70.0...v1.70.1) (2025-03-04)
+
+
+### Bug Fixes
+
+* bring old v4 light and dark theme back to v5 ([d73484a](https://github.com/Zephyruso/zashboard/commit/d73484a84d2e429857e4eb899fe479c78e1a4f4c))
+
+## [1.70.0](https://github.com/Zephyruso/zashboard/compare/v1.69.0...v1.70.0) (2025-03-03)
+
+
+### Features
+
+* daisyui v5 & tailwindcss v4 ([9df2083](https://github.com/Zephyruso/zashboard/commit/9df2083da99dc5baf008edc36f49d68c9c89171e))
+* transfer type for connection table ([28f59c3](https://github.com/Zephyruso/zashboard/commit/28f59c3c8006054c9d40b29b96ee29f5e8b2ff12))
+
+
+### Bug Fixes
+
+* hide toggle collapse btn ([3f3bc03](https://github.com/Zephyruso/zashboard/commit/3f3bc03394925005abbc9e3f9101c172f00ee7aa))
+* promise race for automatic backend switch ([be8fecb](https://github.com/Zephyruso/zashboard/commit/be8fecbc50643dd71919233914ae1b867d348379))
+
+## [1.69.0](https://github.com/Zephyruso/zashboard/compare/v1.68.3...v1.69.0) (2025-02-26)
+
+
+### Features
+
+* switch for display now node & latency number in rule ([5a24958](https://github.com/Zephyruso/zashboard/commit/5a24958d18258136abe8af33e7870ae23ba1a9af))
+
+
+### Bug Fixes
+
+* provider style and count ([8a2eb32](https://github.com/Zephyruso/zashboard/commit/8a2eb32ff73648d7a6537f5875344dcd7fc681e9))
+* proxies preview auto ([9c1f00b](https://github.com/Zephyruso/zashboard/commit/9c1f00b9163ee44ba87bb054c7410da857d31237))
+
+## [1.68.3](https://github.com/Zephyruso/zashboard/compare/v1.68.2...v1.68.3) (2025-02-25)
+
+
+### Bug Fixes
+
+* manage hidden groups and other minor style ([cde403e](https://github.com/Zephyruso/zashboard/commit/cde403ec9e8ce6466bedb7b18c5d354f36111edc))
+* proxy group grid style ([460d426](https://github.com/Zephyruso/zashboard/commit/460d426208f9873f48026ee1fed16447ea0822e5))
+
+## [1.68.2](https://github.com/Zephyruso/zashboard/compare/v1.68.1...v1.68.2) (2025-02-24)
+
+
+### Bug Fixes
+
+* animation and performance for two-column ([1e38efc](https://github.com/Zephyruso/zashboard/commit/1e38efc5ebe7af0672aea8e3a205d2aa34794673))
+
+## [1.68.1](https://github.com/Zephyruso/zashboard/compare/v1.68.0...v1.68.1) (2025-02-24)
+
+
+### Bug Fixes
+
+* proxy provider style with two-columns ([1e2d07e](https://github.com/Zephyruso/zashboard/commit/1e2d07ea943f2764e8d0f6c2a324cdb6cd7b9402))
+
+## [1.68.0](https://github.com/Zephyruso/zashboard/compare/v1.67.1...v1.68.0) (2025-02-24)
+
+
+### Features
+
+* two-columns groups for mobile inspired by Clash Dash and Surge ([9e9fc5f](https://github.com/Zephyruso/zashboard/commit/9e9fc5f5d954d9b70055b99c23f03fde134263f5))
+
+
+### Bug Fixes
+
+* backend available detect ([0d8db22](https://github.com/Zephyruso/zashboard/commit/0d8db2271bef2aa1da0a4c0a5481c1ac31c5c3ec))
+
+## [1.67.1](https://github.com/Zephyruso/zashboard/compare/v1.67.0...v1.67.1) (2025-02-22)
+
+
+### Bug Fixes
+
+* disable proxy select for loadbalance ([e37f83e](https://github.com/Zephyruso/zashboard/commit/e37f83e1e12fd6a5ce984a55bb2076c585579306))
+* switch for display GLOBAL by mode ([60fc0c3](https://github.com/Zephyruso/zashboard/commit/60fc0c33adb13d7fd0e1c18d6a320fd7d5a8a08b))
+
+## [1.67.0](https://github.com/Zephyruso/zashboard/compare/v1.66.0...v1.67.0) (2025-02-21)
+
+
+### Features
+
+* available proxy count ([163f261](https://github.com/Zephyruso/zashboard/commit/163f261d71d0704d2c44e601530b02af560698b5))
+* customizable min card width ([2958beb](https://github.com/Zephyruso/zashboard/commit/2958beb7c3b5b6e20ddb4d9af00312978a9d0283))
+* hover tip for proxygroup now node ([fb3b58e](https://github.com/Zephyruso/zashboard/commit/fb3b58eaa80e2f201323ae9d4149cf99be33cb29))
+* options for display global in non global mode ([9f2ca36](https://github.com/Zephyruso/zashboard/commit/9f2ca36569ced463957c9e8f5493af5aae475501))
+
+
+### Bug Fixes
+
+* options for proxies count ([e0e51af](https://github.com/Zephyruso/zashboard/commit/e0e51af831a62933a2137b7e7230c78d91e2d4f1))
+* proxy provider style ([9eb400b](https://github.com/Zephyruso/zashboard/commit/9eb400b19cfdf905c879616af8e78d2863823dfb))
+
+## [1.66.0](https://github.com/Zephyruso/zashboard/compare/v1.65.1...v1.66.0) (2025-02-19)
+
+
+### Features
+
+* log search history ([091afd4](https://github.com/Zephyruso/zashboard/commit/091afd4ea81782d490458ccaf56880bd1d7a0812))
+* refresh btn for pwa ([791a287](https://github.com/Zephyruso/zashboard/commit/791a28780cc2c2f812de7e5053cf8c143d05e858))
+
+
+### Bug Fixes
+
+* global for sing-box ([ae25805](https://github.com/Zephyruso/zashboard/commit/ae25805370970a2faa82f9a7a65cb36ea6f21b5c))
+* icon cache by browser ([b459108](https://github.com/Zephyruso/zashboard/commit/b459108dae76e5329ed8b0cc8031250257e68fc2))
+
+## [1.65.1](https://github.com/Zephyruso/zashboard/compare/v1.65.0...v1.65.1) (2025-02-18)
+
+
+### Bug Fixes
+
+* scrollbar & proxy chains style ([16bdbc4](https://github.com/Zephyruso/zashboard/commit/16bdbc438214bc00be65f57ce3dfd881a3e238b9))
+
+## [1.65.0](https://github.com/Zephyruso/zashboard/compare/v1.64.0...v1.65.0) (2025-02-17)
+
+
+### Features
+
+* hover tip for latency history ([4814e90](https://github.com/Zephyruso/zashboard/commit/4814e905c8c05280513cc7bf9f815d62731ab670))
+* url params disable upgrade core ([cfca43c](https://github.com/Zephyruso/zashboard/commit/cfca43c3fd58a183fc58f595560cc317273735a7))
+
+
+### Bug Fixes
+
+* connections details modal ([de18946](https://github.com/Zephyruso/zashboard/commit/de189463ac2359e7260ad3fc5d90dde90b6e6b42))
+* ip details when destinationIP is null ([3d1e4cd](https://github.com/Zephyruso/zashboard/commit/3d1e4cdbdbbe6256265553d675156ab2d5f7a678))
+* rule provider style ([f0dda31](https://github.com/Zephyruso/zashboard/commit/f0dda319db40382c82527814803996fdc6343938))
+
+## [1.64.0](https://github.com/Zephyruso/zashboard/compare/v1.63.1...v1.64.0) (2025-02-13)
+
+
+### Features
+
+* draggable & editable source ip label ([36d19a9](https://github.com/Zephyruso/zashboard/commit/36d19a9aff9f9df6a53039fce3d408fb3a5420db))
+
+
+### Bug Fixes
+
+* disable swipe when input focused ([6426052](https://github.com/Zephyruso/zashboard/commit/6426052a9be131a0c032fd8a699160e168002539))
+* placeholder for sourceip & icon ([bbbf52f](https://github.com/Zephyruso/zashboard/commit/bbbf52fe295632dc18b612207f6176ff2c03f6af))
+
+## [1.63.1](https://github.com/Zephyruso/zashboard/compare/v1.63.0...v1.63.1) (2025-02-12)
+
+
+### Bug Fixes
+
+* source ip input & backend version style ([441871c](https://github.com/Zephyruso/zashboard/commit/441871cef532d52787273270e489cd3cf7d3d210))
+* timeout for notification ([2ecbb6b](https://github.com/Zephyruso/zashboard/commit/2ecbb6bd40780266608c4cdc33ba1756ab44aeb8))
+
+## [1.63.0](https://github.com/Zephyruso/zashboard/compare/v1.62.1...v1.63.0) (2025-02-10)
+
+
+### Features
+
+* autocomplete for source ip label ([83640ca](https://github.com/Zephyruso/zashboard/commit/83640ca5e0a334a86202cc379042fb9c72ac6254))
+* switch for core upgrade check ([5ceaa73](https://github.com/Zephyruso/zashboard/commit/5ceaa737bc51d052d71a883ed4db56124d3e76a3))
+
+
+### Bug Fixes
+
+* card/table customize style ([8d3a382](https://github.com/Zephyruso/zashboard/commit/8d3a382d6a10f9d21b08f8c176cba1145d905527))
+* grid style ([677abad](https://github.com/Zephyruso/zashboard/commit/677abad58014930d6cadbc68316dd6a861158018))
+* remove deprecated details button ([b06492a](https://github.com/Zephyruso/zashboard/commit/b06492af4b6ec28d403ccc001b0436140b420ec9))
+
+## [1.62.1](https://github.com/Zephyruso/zashboard/compare/v1.62.0...v1.62.1) (2025-02-08)
+
+
+### Bug Fixes
+
+* card customize style ([3cb1e84](https://github.com/Zephyruso/zashboard/commit/3cb1e84bced195d370e049a64e3aed3a188ff4bf))
+
+## [1.62.0](https://github.com/Zephyruso/zashboard/compare/v1.61.2...v1.62.0) (2025-02-08)
+
+
+### Features
+
+* move card/table customization to connections popup ([e372da1](https://github.com/Zephyruso/zashboard/commit/e372da1ed60cd2c2e85fa93b0ccc54cd4da2312d))
+* preset for connection card style ([539e23c](https://github.com/Zephyruso/zashboard/commit/539e23c968d5384f7fb7d8027fb91ae6580875b8))
+
+
+### Bug Fixes
+
+* default testurl with https ([a1eb0a4](https://github.com/Zephyruso/zashboard/commit/a1eb0a41f2a63ee2ca469467609033b91bd5eeb8))
+* toast & settings style ([f33a077](https://github.com/Zephyruso/zashboard/commit/f33a077e7386779ec438f59b55a2b0956b7e7635))
+
+## [1.61.2](https://github.com/Zephyruso/zashboard/compare/v1.61.1...v1.61.2) (2025-02-08)
+
+
+### Bug Fixes
+
+* connection details style ([acbcfb2](https://github.com/Zephyruso/zashboard/commit/acbcfb2e2c22460c00147d73be610b539e988670))
+* missing proxies ctrl in some cases ([375a0d4](https://github.com/Zephyruso/zashboard/commit/375a0d4e8b86c87ecb25481cbf8dbeae9cae68ee))
+* show hidden group -&gt; manage hidden group ([4e8fb42](https://github.com/Zephyruso/zashboard/commit/4e8fb42977a1513ef4cb28b0cb09bafb7e04c6c6))
+
 ## [1.61.1](https://github.com/Zephyruso/zashboard/compare/v1.61.0...v1.61.1) (2025-02-07)
 
 

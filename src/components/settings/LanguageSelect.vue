@@ -1,8 +1,8 @@
 <template>
   <div class="flex items-center gap-2">
-    {{ $t('language') }}:
+    {{ $t('language') }}
     <select
-      class="select select-bordered select-sm w-48"
+      class="select select-sm w-48"
       v-model="language"
       @change="() => (i18n.global.locale = language)"
     >
@@ -18,7 +18,7 @@
 </template>
 
 <script setup lang="ts">
-import { LANG } from '@/config'
+import { LANG } from '@/constant'
 import { i18n } from '@/i18n'
 import { language } from '@/store/settings'
 

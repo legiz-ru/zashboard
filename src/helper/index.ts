@@ -1,20 +1,27 @@
 import { proxiesFilter } from '@/composables/proxies'
-import { NOT_CONNECTED, PROXY_SORT_TYPE, PROXY_TYPE, ROUTE_NAME } from '@/config'
-import { timeSaved } from '@/store/overview'
-import { getLatencyByName, proxyMap } from '@/store/proxies'
 import {
+  NOT_CONNECTED,
+  PROXY_CHAIN_DIRECTION,
+  PROXY_SORT_TYPE,
+  PROXY_TYPE,
+  ROUTE_NAME,
+} from '@/constant'
+import { timeSaved } from '@/store/overview'
+import { getLatencyByName, hiddenGroupMap, proxyMap } from '@/store/proxies'
+import {
+  customThemes,
   hideUnavailableProxies,
-  language,
   lowLatency,
   mediumLatency,
+  proxyChainDirection,
   proxySortType,
-  sourceIPLabelMap,
+  sourceIPLabelList,
   splitOverviewPage,
 } from '@/store/settings'
 import type { Backend, Connection } from '@/types'
 import dayjs from 'dayjs'
 import prettyBytes, { type Options } from 'pretty-bytes'
-import { computed } from 'vue'
+import { computed, watch } from 'vue'
 
 export const prettyBytesHelper = (bytes: number, opts?: Options) => {
   return prettyBytes(bytes, {
@@ -24,7 +31,7 @@ export const prettyBytesHelper = (bytes: number, opts?: Options) => {
 }
 
 export const fromNow = (timestamp: string) => {
-  return dayjs(timestamp).locale(language.value).fromNow()
+  return dayjs(timestamp).fromNow()
 }
 
 export const isProxyGroup = (name: string) => {
@@ -90,27 +97,73 @@ export const sortAndFilterProxyNodes = (proxies: string[], groupName?: string) =
   }
 }
 
-export const getIPLabelFromMap = (ip: string) => {
-  if (ip === null) {
-    return ''
-  }
-  if (ip === '') {
-    return 'Inner'
-  }
-  const isIPv6 = ip.includes(':')
+const CACHE_SIZE = 256
+const ipLabelCache = new Map<string, string>()
+const sourceIPMap = new Map<string, string>()
+const sourceIPRegexList: { regex: RegExp; label: string }[] = []
 
-  for (const key in sourceIPLabelMap.value) {
+const preprocessSourceIPList = () => {
+  ipLabelCache.clear()
+  sourceIPMap.clear()
+  sourceIPRegexList.length = 0
+
+  for (const { key, label } of sourceIPLabelList.value) {
     if (key.startsWith('/')) {
-      const regex = new RegExp(key, 'i')
-
-      if (regex.test(ip)) {
-        return sourceIPLabelMap.value[key]
-      }
-    } else if (ip === key || (isIPv6 && ip.endsWith(key))) {
-      return sourceIPLabelMap.value[key]
+      sourceIPRegexList.push({ regex: new RegExp(key.slice(1), 'i'), label })
+    } else {
+      sourceIPMap.set(key, label)
     }
   }
-  return ip
+}
+
+const cacheResult = (ip: string, label: string) => {
+  ipLabelCache.set(ip, label)
+
+  if (ipLabelCache.size > CACHE_SIZE) {
+    const firstKey = ipLabelCache.keys().next().value
+
+    if (firstKey) {
+      ipLabelCache.delete(firstKey)
+    }
+  }
+
+  return label
+}
+
+watch(sourceIPLabelList, preprocessSourceIPList, { immediate: true, deep: true })
+
+export const getIPLabelFromMap = (ip: string) => {
+  if (!ip) return ip === '' ? 'Inner' : ''
+
+  if (ipLabelCache.has(ip)) {
+    return ipLabelCache.get(ip)!
+  }
+
+  const isIPv6 = ip.includes(':')
+
+  if (isIPv6) {
+    for (const [key, label] of sourceIPMap.entries()) {
+      if (ip.endsWith(key)) {
+        return cacheResult(ip, label)
+      }
+    }
+  } else if (sourceIPMap.has(ip)) {
+    return cacheResult(ip, sourceIPMap.get(ip)!)
+  }
+
+  for (const { regex, label } of sourceIPRegexList) {
+    if (regex.test(ip)) {
+      return cacheResult(ip, label)
+    }
+  }
+
+  return cacheResult(ip, ip)
+}
+
+export const getHostFromConnection = (connection: Connection) => {
+  return `${connection.metadata.host || connection.metadata.sniffHost || connection.metadata.destinationIP}:${
+    connection.metadata.destinationPort
+  }`
 }
 
 export const getProcessFromConnection = (connection: Connection) => {
@@ -122,11 +175,29 @@ export const getProcessFromConnection = (connection: Connection) => {
 }
 
 export const getDestinationFromConnection = (connection: Connection) => {
-  return (
-    connection.metadata.remoteDestination ||
-    connection.metadata.destinationIP ||
-    connection.metadata.host
-  )
+  return connection.metadata.destinationIP || connection.metadata.host
+}
+
+export const getDestinationTypeFromConnection = (connection: Connection) => {
+  const destinationIP = connection.metadata.destinationIP
+
+  if (!destinationIP) {
+    return 'FQDN'
+  } else if (destinationIP.includes(':')) {
+    return 'IPv6'
+  } else {
+    return 'IPv4'
+  }
+}
+
+export const getChainsStringFromConnection = (connection: Connection) => {
+  const chains = [...connection.chains]
+
+  if (proxyChainDirection.value === PROXY_CHAIN_DIRECTION.NORMAL) {
+    chains.reverse()
+  }
+
+  return chains.join('')
 }
 
 export const getNetworkTypeFromConnection = (connection: Connection) => {
@@ -195,3 +266,31 @@ export const renderRoutes = computed(() => {
     return ![ROUTE_NAME.setup, !splitOverviewPage.value && ROUTE_NAME.overview].includes(r)
   })
 })
+
+export const applyCustomThemes = () => {
+  document.querySelectorAll('.custom-theme').forEach((style) => {
+    style.remove()
+  })
+  customThemes.value.forEach((theme) => {
+    const style = document.createElement('style')
+    const styleString = Object.entries(theme)
+      .filter(([key]) => !['prefersdark', 'default', 'name', 'type', 'id'].includes(key))
+      .map(([key, value]) => `${key}:${value}`)
+      .join(';')
+
+    style.innerHTML = `[data-theme="${theme.name}"] {
+      ${styleString} 
+    }`
+
+    style.className = `custom-theme ${theme.name}`
+    document.head.appendChild(style)
+  })
+}
+
+export const isHiddenGroup = (group: string) => {
+  if (Reflect.has(hiddenGroupMap.value, group)) {
+    return hiddenGroupMap.value[group]
+  }
+
+  return proxyMap.value[group]?.hidden
+}

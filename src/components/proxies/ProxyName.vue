@@ -1,6 +1,6 @@
 <template>
   <div
-    class="flex items-center gap-1 break-all"
+    class="flex shrink-0 items-center gap-1"
     :class="size === 'large' ? 'text-lg font-medium' : 'text-sm'"
   >
     <ProxyIcon

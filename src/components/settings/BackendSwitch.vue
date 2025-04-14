@@ -1,7 +1,7 @@
 <template>
   <div class="join flex">
     <select
-      class="join-item select select-bordered select-sm w-56"
+      class="join-item select select-sm w-56"
       v-model="activeUuid"
     >
       <option
@@ -22,7 +22,7 @@
 </template>
 
 <script setup lang="ts">
-import { ROUTE_NAME } from '@/config'
+import { ROUTE_NAME } from '@/constant'
 import { getUrlFromBackend } from '@/helper'
 import router from '@/router'
 import { activeUuid, backendList } from '@/store/setup'

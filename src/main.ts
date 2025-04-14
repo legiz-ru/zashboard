@@ -1,15 +1,15 @@
-import dayjs from 'dayjs'
-import 'dayjs/locale/ru'
-import 'dayjs/locale/zh-cn'
-import relativeTime from 'dayjs/plugin/relativeTime'
-import updateLocale from 'dayjs/plugin/updateLocale'
+import '@/helper/dayjs'
 import 'tippy.js/animations/scale.css'
 import 'tippy.js/dist/tippy.css'
 import { createApp } from 'vue'
 import App from './App.vue'
 import './assets/main.css'
+import './assets/theme.css'
+import { applyCustomThemes } from './helper'
 import { i18n } from './i18n'
 import router from './router'
+
+applyCustomThemes()
 
 if (import.meta.env.MODE === 'cdn-fonts') {
   const createLink = (href: string) => {
@@ -36,25 +36,6 @@ if (import.meta.env.MODE === 'cdn-fonts') {
 
 const app = createApp(App)
 
-dayjs.extend(relativeTime)
-dayjs.extend(updateLocale)
-dayjs.updateLocale('en', {
-  relativeTime: {
-    future: 'in %s',
-    past: '%s ago',
-    s: 'seconds',
-    m: 'a minute',
-    mm: '%d minutes',
-    h: 'an hour',
-    hh: '%d hours',
-    d: 'a day',
-    dd: '%d days',
-    M: 'a month',
-    MM: '%d months',
-    y: 'a year',
-    yy: '%d years',
-  },
-})
 app.use(router)
 app.use(i18n)
 app.mount('#app')

@@ -1,4 +1,4 @@
-import { ROUTE_NAME } from '@/config'
+import { ROUTE_NAME } from '@/constant'
 import { renderRoutes } from '@/helper'
 import { i18n } from '@/i18n'
 import { language } from '@/store/settings'

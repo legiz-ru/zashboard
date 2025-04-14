@@ -8,15 +8,18 @@
   >
     <div :style="{ height: `${totalSize}px` }">
       <table
-        :class="`table table-zebra ${sizeOfTable} rounded-none shadow-md`"
+        :class="[
+          'table-zebra table rounded-none shadow-md',
+          sizeOfTable,
+          isManualTable && 'table-fixed',
+        ]"
         :style="
           isManualTable && {
-            tableLayout: 'fixed',
             width: `${tanstackTable.getCenterTotalSize()}px`,
           }
         "
       >
-        <thead class="sticky -top-2 z-10 bg-base-100">
+        <thead class="bg-base-100 sticky -top-2 z-10">
           <tr
             v-for="headerGroup in tanstackTable.getHeaderGroups()"
             :key="headerGroup.id"
@@ -69,7 +72,7 @@
                 @dblclick="() => header.column.resetSize()"
                 @mousedown="(e) => header.getResizeHandler()(e)"
                 @touchstart="(e) => header.getResizeHandler()(e)"
-                class="resizer absolute right-0 top-0 h-full w-1 cursor-ew-resize bg-neutral"
+                class="resizer bg-neutral absolute top-0 right-0 h-full w-1 cursor-ew-resize"
               />
             </th>
           </tr>
@@ -82,7 +85,7 @@
               height: `${virtualRow.size}px`,
               transform: `translateY(${virtualRow.start - index * virtualRow.size}px)`,
             }"
-            class="cursor-pointer bg-base-100 hover:!bg-primary hover:text-primary-content"
+            class="bg-base-100 hover:bg-primary! hover:text-primary-content cursor-pointer"
             @click="handlerClickRow(rows[virtualRow.index])"
           >
             <td
@@ -92,7 +95,7 @@
                 isManualTable
                   ? 'truncate text-sm'
                   : twMerge(
-                      'whitespace-nowrap text-sm',
+                      'text-sm whitespace-nowrap',
                       [
                         CONNECTIONS_TABLE_ACCESSOR_KEY.Download,
                         CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
@@ -100,28 +103,32 @@
                         CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed,
                       ].includes(cell.column.id as CONNECTIONS_TABLE_ACCESSOR_KEY) && 'min-w-20',
                       CONNECTIONS_TABLE_ACCESSOR_KEY.Host ===
-                        (cell.column.id as CONNECTIONS_TABLE_ACCESSOR_KEY) && 'max-w-96 truncate',
-                      CONNECTIONS_TABLE_ACCESSOR_KEY.Chains ===
-                        (cell.column.id as CONNECTIONS_TABLE_ACCESSOR_KEY) &&
-                        'max-w-[36rem] truncate',
+                        (cell.column.id as CONNECTIONS_TABLE_ACCESSOR_KEY) && 'max-w-xs truncate',
+                      [
+                        CONNECTIONS_TABLE_ACCESSOR_KEY.Chains,
+                        CONNECTIONS_TABLE_ACCESSOR_KEY.Rule,
+                      ].includes(cell.column.id as CONNECTIONS_TABLE_ACCESSOR_KEY) &&
+                        'max-w-xl truncate',
                     ),
               ]"
             >
               <template v-if="cell.column.getIsGrouped()">
                 <template v-if="rows[virtualRow.index].getCanExpand()">
-                  <MagnifyingGlassMinusIcon
-                    v-if="rows[virtualRow.index].getIsExpanded()"
-                    class="-mt-1 mr-1 inline-block h-4 w-4"
-                  />
-                  <MagnifyingGlassPlusIcon
-                    v-else
-                    class="-mt-1 mr-1 inline-block h-4 w-4"
-                  />
-                  <FlexRender
-                    :render="cell.column.columnDef.cell"
-                    :props="cell.getContext()"
-                  />
-                  <span> ({{ rows[virtualRow.index].subRows.length }}) </span>
+                  <div class="flex items-center">
+                    <MagnifyingGlassMinusIcon
+                      v-if="rows[virtualRow.index].getIsExpanded()"
+                      class="mr-1 inline-block h-4 w-4"
+                    />
+                    <MagnifyingGlassPlusIcon
+                      v-else
+                      class="mr-1 inline-block h-4 w-4"
+                    />
+                    <FlexRender
+                      :render="cell.column.columnDef.cell"
+                      :props="cell.getContext()"
+                    />
+                    <span class="ml-1"> ({{ rows[virtualRow.index].subRows.length }}) </span>
+                  </div>
                 </template>
               </template>
               <FlexRender
@@ -149,10 +156,13 @@ import {
   PROXY_CHAIN_DIRECTION,
   TABLE_SIZE,
   TABLE_WIDTH_MODE,
-} from '@/config'
+} from '@/constant'
 import {
   fromNow,
+  getChainsStringFromConnection,
   getDestinationFromConnection,
+  getDestinationTypeFromConnection,
+  getHostFromConnection,
   getIPLabelFromMap,
   getNetworkTypeFromConnection,
   getProcessFromConnection,
@@ -170,7 +180,6 @@ import {
   ArrowDownCircleIcon,
   ArrowRightCircleIcon,
   ArrowUpCircleIcon,
-  InformationCircleIcon,
   MagnifyingGlassMinusIcon,
   MagnifyingGlassPlusIcon,
   XMarkIcon,
@@ -199,7 +208,6 @@ import ProxyName from '../proxies/ProxyName.vue'
 
 const { handlerInfo } = useConnections()
 const columnWidthMap = useStorage('config/table-column-width', {
-  [CONNECTIONS_TABLE_ACCESSOR_KEY.Details]: 50,
   [CONNECTIONS_TABLE_ACCESSOR_KEY.Close]: 50,
   [CONNECTIONS_TABLE_ACCESSOR_KEY.Host]: 320,
   [CONNECTIONS_TABLE_ACCESSOR_KEY.Chains]: 320,
@@ -221,30 +229,7 @@ const isManualTable = computed(() => tableWidthMode.value === TABLE_WIDTH_MODE.M
 const { t } = useI18n()
 const columns: ColumnDef<Connection>[] = [
   {
-    header: () => t('details'),
-    enableSorting: false,
-    id: CONNECTIONS_TABLE_ACCESSOR_KEY.Details,
-    cell: ({ row }) => {
-      return h(
-        'button',
-        {
-          class: 'btn btn-xs btn-circle',
-          onClick: () => {
-            const connection = row.original
-
-            handlerInfo(connection)
-          },
-        },
-        [
-          h(InformationCircleIcon, {
-            class: 'h-4 w-4',
-          }),
-        ],
-      )
-    },
-  },
-  {
-    header: () => t('close'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Close),
     enableSorting: false,
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Close,
     cell: ({ row }) => {
@@ -268,44 +253,41 @@ const columns: ColumnDef<Connection>[] = [
     },
   },
   {
-    header: () => t('type'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Type),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Type,
-    accessorFn: (original) => getNetworkTypeFromConnection(original),
+    accessorFn: getNetworkTypeFromConnection,
   },
   {
-    header: () => t('process'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Process),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Process,
-    accessorFn: (original) => getProcessFromConnection(original),
+    accessorFn: getProcessFromConnection,
   },
   {
-    header: () => t('host'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Host),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Host,
-    accessorFn: (original) =>
-      `${
-        original.metadata.host || original.metadata.sniffHost || original.metadata.destinationIP
-      }:${original.metadata.destinationPort}`,
+    accessorFn: getHostFromConnection,
   },
   {
-    header: () => t('sniffHost'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.SniffHost,
     accessorFn: (original) => original.metadata.sniffHost || '-',
   },
   {
-    header: () => t('rule'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Rule),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Rule,
     accessorFn: (original) =>
       !original.rulePayload ? original.rule : `${original.rule}: ${original.rulePayload}`,
   },
   {
-    header: () => t('chains'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Chains),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Chains,
-    accessorFn: (original) => original.chains.join(','),
+    accessorFn: getChainsStringFromConnection,
     cell: ({ row }) => {
       const chains: VNode[] = []
       const originChains = row.original.chains
 
       originChains.forEach((chain, index) => {
-        chains.unshift(h(ProxyName, { name: chain, size: 'small', class: 'shrink-0' }))
+        chains.unshift(h(ProxyName, { name: chain, size: 'small' }))
 
         if (index < originChains.length - 1) {
           chains.unshift(
@@ -326,7 +308,7 @@ const columns: ColumnDef<Connection>[] = [
     },
   },
   {
-    header: () => t('connectTime'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime),
     enableGrouping: false,
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.ConnectTime,
     accessorFn: (original) => fromNow(original.start),
@@ -334,50 +316,63 @@ const columns: ColumnDef<Connection>[] = [
       dayjs(next.original.start).valueOf() - dayjs(prev.original.start).valueOf(),
   },
   {
-    header: () => t('dlSpeed'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed),
     enableGrouping: false,
-    enableSorting: true,
+    sortDescFirst: true,
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.DlSpeed,
     accessorFn: (original) => `${prettyBytesHelper(original.downloadSpeed)}/s`,
     sortingFn: (prev, next) => prev.original.downloadSpeed - next.original.downloadSpeed,
   },
   {
-    header: () => t('ulSpeed'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed),
     enableGrouping: false,
+    sortDescFirst: true,
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.UlSpeed,
     accessorFn: (original) => `${prettyBytesHelper(original.uploadSpeed)}/s`,
     sortingFn: (prev, next) => prev.original.uploadSpeed - next.original.uploadSpeed,
   },
   {
-    header: () => t('dl'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Download),
     enableGrouping: false,
+    sortDescFirst: true,
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Download,
     accessorFn: (original) => prettyBytesHelper(original.download),
     sortingFn: (prev, next) => prev.original.download - next.original.download,
   },
   {
-    header: () => t('ul'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Upload),
     enableGrouping: false,
+    sortDescFirst: true,
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Upload,
     accessorFn: (original) => prettyBytesHelper(original.upload),
     sortingFn: (prev, next) => prev.original.upload - next.original.upload,
   },
   {
-    header: () => t('sourceIP'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.SourceIP,
     accessorFn: (original) => {
       return getIPLabelFromMap(original.metadata.sourceIP)
     },
   },
   {
-    header: () => t('sourcePort'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.SourcePort),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.SourcePort,
     accessorFn: (original) => original.metadata.sourcePort,
   },
   {
-    header: () => t('destination'),
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.Destination),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.Destination,
     accessorFn: getDestinationFromConnection,
+  },
+  {
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.DestinationType),
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.DestinationType,
+    accessorFn: getDestinationTypeFromConnection,
+  },
+  {
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.RemoteAddress),
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.RemoteAddress,
+    accessorFn: (original) => original.metadata.remoteDestination || '-',
   },
 ]
 
@@ -462,7 +457,7 @@ const rowVirtualizerOptions = computed(() => {
     count: rows.value.length,
     getScrollElement: () => parentRef.value,
     estimateSize: () => 36,
-    overscan: 48,
+    overscan: 24,
   }
 })
 

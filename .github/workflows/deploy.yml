@@ -36,6 +36,7 @@ jobs:
         run: |
           pnpm i
           pnpm run build
+          echo 'board.zash.run.place' > ./dist/CNAME
 
       - name: Deploy 🚀
         uses: peaceiris/actions-gh-pages@v4
@@ -107,7 +108,7 @@ jobs:
           context: .
           builder: ${{ steps.buildx.outputs.name }}
           file: Dockerfile
-          platforms: linux/amd64,linux/arm64
+          platforms: linux/amd64,linux/arm64,linux/arm/v7
           push: true
           tags: |
             ghcr.io/zephyruso/zashboard:latest

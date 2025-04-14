@@ -1,8 +1,8 @@
-import { useNotification } from '@/composables/tip'
-import { ROUTE_NAME } from '@/config'
+import { useNotification } from '@/composables/notification'
+import { ROUTE_NAME } from '@/constant'
 import { getUrlFromBackend } from '@/helper'
 import router from '@/router'
-import { autoUpgradeCore } from '@/store/settings'
+import { autoUpgradeCore, checkUpgradeCore } from '@/store/settings'
 import { activeBackend, activeUuid, removeBackend } from '@/store/setup'
 import type { Backend, Config, DNSQuery, Proxy, ProxyProvider, Rule, RuleProvider } from '@/types'
 import axios from 'axios'
@@ -26,10 +26,8 @@ axios.interceptors.response.use(null, (error) => {
 
       showNotification({ content: 'unauthorizedTip' })
     })
-  } else if (error.status === 404) {
-    activeUuid.value = null
-    router.push({ name: ROUTE_NAME.setup })
   }
+
   return error
 })
 
@@ -48,7 +46,8 @@ watch(
       const { data } = await fetchVersionAPI()
 
       version.value = data.version
-      if (isSingBox.value) return
+      if (isSingBox.value || !checkUpgradeCore.value || activeBackend.value?.disableUpgradeCore)
+        return
       isCoreUpdateAvailable.value = await fetchBackendUpdateAvailableAPI()
 
       if (isCoreUpdateAvailable.value && autoUpgradeCore.value) {
@@ -266,6 +265,7 @@ export type GlobalIPType = {
   organization: string
   longitude: number
   city: string
+  region: string
   timezone: string
   isp: string
   offset: number
@@ -277,6 +277,7 @@ export type GlobalIPType = {
   postal_code: string
   continent_code: string
   country_code: string
+  region_code: string
 }
 
 export const getIPFromIpsbAPI = async (ip = '') => {
@@ -328,10 +329,6 @@ export const getYouTubeLatencyAPI = () => {
 
 export const getGithubLatencyAPI = () => {
   return getLatencyFromUrlAPI('https://github.githubassets.com/favicon.ico')
-}
-
-export const getOpenAILatencyAPI = () => {
-  return getLatencyFromUrlAPI('https://openai.com/favicon.ico')
 }
 
 export const getBaiduLatencyAPI = () => {
