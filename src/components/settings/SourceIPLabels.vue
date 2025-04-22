@@ -17,68 +17,74 @@
       />
     </button>
   </div>
-  <div class="flex flex-col gap-2 p-1 pr-0">
-    <Draggable
-      v-if="dialogVisible"
-      class="flex flex-1 flex-col gap-2"
-      v-model="sourceIPLabelList"
-      group="list"
-      :animation="150"
-      :handle="'.drag-handle'"
-      :item-key="'uuid'"
-      @start="disableSwipe = true"
-      @end="disableSwipe = false"
-    >
-      <template #item="{ element: { id, key, label } }">
-        <div
-          :key="id"
-          class="flex items-center gap-2"
+  <div
+    class="collapse rounded-none shadow-none"
+    :class="dialogVisible ? 'collapse-open' : ''"
+  >
+    <div class="collapse-content p-0">
+      <div class="flex flex-col gap-2">
+        <Draggable
+          v-if="dialogVisible"
+          class="flex flex-1 flex-col gap-2"
+          v-model="sourceIPLabelList"
+          group="list"
+          :animation="150"
+          :handle="'.drag-handle'"
+          :item-key="'uuid'"
+          @start="disableSwipe = true"
+          @end="disableSwipe = false"
         >
-          <ChevronUpDownIcon class="drag-handle h-4 w-4 shrink-0 cursor-grab" />
-          <TextInput
-            class="w-36 max-w-64 flex-1"
-            :modelValue="key"
-            :menus="sourceList"
-            @change="(e) => handlerLabelKeyChange(id, 'key', e)"
-          />
-          <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
-          <TextInput
-            class="w-28 sm:w-40"
-            :modelValue="label"
-            @change="(e) => handlerLabelKeyChange(id, 'label', e)"
-          />
-          <button
-            class="btn btn-circle btn-ghost btn-sm"
-            @click="() => handlerLabelRemove(id)"
-          >
-            <TrashIcon class="h-4 w-4" />
-          </button>
-        </div>
-      </template>
-    </Draggable>
-
-    <div class="flex w-full items-center gap-2">
-      <TagIcon class="h-4 w-4 shrink-0" />
-      <TextInput
-        class="w-36 max-w-64 flex-1"
-        :menus="sourceList"
-        v-model="newLabelForIP.key"
-        placeholder="IP | eui64 | /Regex"
-      />
-      <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
-      <TextInput
-        class="w-28 sm:w-40"
-        v-model="newLabelForIP.label"
-        :placeholder="$t('label')"
-        @keypress.enter="handlerLabelAdd"
-      />
-      <button
-        class="btn btn-circle btn-sm"
-        @click="handlerLabelAdd"
-      >
-        <PlusIcon class="h-4 w-4" />
-      </button>
+          <template #item="{ element: { id, key, label } }">
+            <div
+              :key="id"
+              class="flex items-center gap-2"
+            >
+              <ChevronUpDownIcon class="drag-handle h-4 w-4 shrink-0 cursor-grab" />
+              <TextInput
+                class="w-36 max-w-64 flex-1"
+                :modelValue="key"
+                :menus="sourceList"
+                @change="(e) => handlerLabelKeyChange(id, 'key', e)"
+              />
+              <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
+              <TextInput
+                class="w-28 sm:w-40"
+                :modelValue="label"
+                @change="(e) => handlerLabelKeyChange(id, 'label', e)"
+              />
+              <button
+                class="btn btn-circle btn-ghost btn-sm"
+                @click="() => handlerLabelRemove(id)"
+              >
+                <TrashIcon class="h-4 w-4" />
+              </button>
+            </div>
+          </template>
+        </Draggable>
+      </div>
     </div>
+  </div>
+  <div class="flex w-full items-center gap-2">
+    <TagIcon class="h-4 w-4 shrink-0" />
+    <TextInput
+      class="w-36 max-w-64 flex-1"
+      :menus="sourceList"
+      v-model="newLabelForIP.key"
+      placeholder="IP | eui64 | /Regex"
+    />
+    <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
+    <TextInput
+      class="w-28 sm:w-40"
+      v-model="newLabelForIP.label"
+      :placeholder="$t('label')"
+      @keypress.enter="handlerLabelAdd"
+    />
+    <button
+      class="btn btn-circle btn-sm"
+      @click="handlerLabelAdd"
+    >
+      <PlusIcon class="h-4 w-4" />
+    </button>
   </div>
 </template>
 

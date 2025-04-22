@@ -178,6 +178,11 @@ const en = {
   displayAllFeatures: 'Display All Features',
   displayAllFeaturesTip:
     'Show all features, including those not supported by the official version of sing-box. If you are using a forked version of sing-box that supports some of these features, you can try enabling them.',
+  blurIntensity: 'Blurry Effect',
+  scrollAnimationEffect: 'Scroll Animation Effect',
+  importFromFile: 'Import From File',
+  importFromUrl: 'Import From URL',
+  sync: 'Sync',
 }
 
 export type LANG_MESSAGE = typeof en

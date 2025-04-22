@@ -99,9 +99,9 @@
         </div>
         <div class="flex items-center gap-2">
           <span class="shrink-0"> {{ $t('customBackgroundURL') }} </span>
-          <div class="join">
+          <div class="join flex-1">
             <TextInput
-              class="join-item max-w-64 flex-1"
+              class="join-item w-48 max-w-64 flex-1"
               v-model="customBackgroundURL"
               :clearable="true"
               @update:modelValue="handlerBackgroundURLChange"
@@ -121,20 +121,41 @@
             @change="handlerFileChange"
           />
         </div>
-        <div
-          class="flex items-center gap-2"
-          v-if="customBackgroundURL"
-        >
-          {{ $t('transparent') }}
+        <template v-if="customBackgroundURL">
+          <div class="flex items-center gap-2">
+            {{ $t('transparent') }}
+            <input
+              type="range"
+              min="0"
+              max="100"
+              v-model="dashboardTransparent"
+              class="range max-w-64"
+              @touchstart.stop
+              @touchmove.stop
+              @touchend.stop
+            />
+          </div>
+
+          <div class="flex items-center gap-2">
+            {{ $t('blurIntensity') }}
+            <input
+              type="range"
+              min="0"
+              max="40"
+              v-model="blurIntensity"
+              class="range max-w-64"
+              @touchstart.stop
+              @touchmove.stop
+              @touchend.stop
+            />
+          </div>
+        </template>
+        <div class="flex items-center gap-2 md:hidden">
+          {{ $t('scrollAnimationEffect') }}
           <input
-            type="range"
-            min="0"
-            max="100"
-            v-model="dashboardTransparent"
-            class="range max-w-64"
-            @touchstart.stop
-            @touchmove.stop
-            @touchend.stop
+            type="checkbox"
+            v-model="scrollAnimationEffect"
+            class="toggle"
           />
         </div>
         <div class="flex items-center gap-2 md:hidden">
@@ -223,6 +244,7 @@ import {
 import {
   autoTheme,
   autoUpgrade,
+  blurIntensity,
   customBackgroundURL,
   customThemes,
   darkTheme,
@@ -231,6 +253,7 @@ import {
   disablePullToRefresh,
   displayAllFeatures,
   font,
+  scrollAnimationEffect,
   swipeInTabs,
 } from '@/store/settings'
 import {

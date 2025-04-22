@@ -1,38 +1,32 @@
 import { isMiddleScreen } from '@/helper/utils'
-import { getCurrentInstance, onBeforeUnmount, onMounted } from 'vue'
+import { scrollAnimationEffect } from '@/store/settings'
+import { useCurrentElement, useElementVisibility } from '@vueuse/core'
+import { onMounted, watch, type Ref } from 'vue'
 
-export function useBounceOnVisible(className = 'bounce-in', triggerOnce = false) {
-  if (!isMiddleScreen.value) return
+const className = 'bounce-in'
 
-  let observer: IntersectionObserver | null = null
+export function useBounceOnVisible(el: Ref<HTMLElement> = useCurrentElement<HTMLElement>()) {
+  if (!isMiddleScreen.value || !scrollAnimationEffect.value) return
+
+  const visible = useElementVisibility(el)
 
   onMounted(() => {
-    const instance = getCurrentInstance()
-    const el = instance?.proxy?.$el as HTMLElement | null
-    if (!el) return
+    if (!el.value) return
 
-    observer = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          el.classList.add(className)
+    el.value.style.opacity = '0'
 
-          if (triggerOnce && observer) {
-            observer.unobserve(el)
-          }
+    watch(
+      visible,
+      (value) => {
+        if (value) {
+          el.value?.classList.add(className)
+          el.value!.style.opacity = 'unset'
         } else {
-          el.classList.remove(className)
+          el.value?.classList.remove(className)
+          el.value!.style.opacity = '0'
         }
       },
-      {
-        threshold: 0,
-        rootMargin: '10px 0px 10px 0px',
-      },
+      { immediate: true },
     )
-
-    observer.observe(el)
-  })
-
-  onBeforeUnmount(() => {
-    observer?.disconnect()
   })
 }

@@ -180,6 +180,11 @@ const ru: LANG_MESSAGE = {
   displayAllFeatures: 'Показать все функции',
   displayAllFeaturesTip:
     'Показать все функции, включая те, которые не поддерживаются официальной версией sing-box. Если вы используете форк sing-box, поддерживающий некоторые из этих функций, вы можете попробовать их включить.',
+  blurIntensity: 'Интенсивность размытия',
+  scrollAnimationEffect: 'Эффект анимации прокрутки',
+  importFromFile: 'Импортировать из файла',
+  importFromUrl: 'Импортировать из URL',
+  sync: 'Синхронизировать',
 }
 
 export default ru

@@ -1,7 +1,7 @@
 <template>
   <div
     class="relative h-20 cursor-pointer"
-    ref="cardRef"
+    ref="cardWrapperRef"
     @click="handlerGroupClick"
   >
     <div
@@ -14,21 +14,12 @@
       :class="[
         activeMode ? `fixed z-50` : 'absolute top-0 left-0 h-auto w-full',
         transitionAll && 'transition-all duration-200',
-        modalMode && 'w-[calc(100vw-1rem)]',
+        blurIntensity < 5 && 'backdrop-blur-sm!',
       ]"
-      :style="[
-        activeMode && {
-          background: 'var(--color-base-100)',
-        },
-        activeMode && styleForCard,
-        activeMode &&
-          !modalMode && {
-            width: initWidth + 'px',
-            height: initHeight + 'px',
-          },
-      ]"
+      :style="activeMode && [cardPosition, cardSize]"
       @contextmenu.prevent.stop="handlerLatencyTest"
       @transitionend="handlerTransitionEnd"
+      ref="cardRef"
     >
       <div class="flex h-20 shrink-0 flex-col gap-1 p-2">
         <ProxyIcon
@@ -109,7 +100,7 @@ import { PROXY_TYPE } from '@/constant'
 import { isHiddenGroup } from '@/helper'
 import { useTooltip } from '@/helper/tooltip'
 import { hiddenGroupMap, proxyGroupLatencyTest, proxyMap, selectProxy } from '@/store/proxies'
-import { manageHiddenGroup } from '@/store/settings'
+import { blurIntensity, manageHiddenGroup } from '@/store/settings'
 import { CheckCircleIcon, EyeIcon, EyeSlashIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
 import { twMerge } from 'tailwind-merge'
 import { computed, ref } from 'vue'
@@ -129,13 +120,26 @@ const isLatencyTesting = ref(false)
 const activeMode = ref(false)
 const modalMode = ref(activeMode.value)
 const diplayAllContent = ref(activeMode.value)
+
+const cardWrapperRef = ref()
 const cardRef = ref()
 
 const initWidth = ref(0)
 const initHeight = ref(0)
 const transitionAll = ref(false)
 
-const styleForCard = ref<Record<string, string>>({})
+const cardPosition = ref<Record<string, string>>({})
+const cardSize = computed(() => {
+  if (modalMode.value) {
+    return {
+      width: 'calc(100vw - 1rem)',
+    }
+  }
+  return {
+    width: initWidth.value + 'px',
+    height: initHeight.value + 'px',
+  }
+})
 
 const sleep = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms))
 
@@ -146,7 +150,7 @@ const handlerTransitionEnd = () => {
 
 const handlerGroupClick = async () => {
   const { innerHeight, innerWidth } = window
-  const { x, y, width, height } = cardRef.value.getBoundingClientRect()
+  const { x, y, width, height } = cardWrapperRef.value.getBoundingClientRect()
   const leftRightKey = x < innerWidth / 3 ? 'left' : 'right'
   const topBottomKey = y < innerHeight / 2 ? 'top' : 'bottom'
   const topBottomValue = topBottomKey === 'top' ? y : innerHeight - y - height
@@ -154,31 +158,25 @@ const handlerGroupClick = async () => {
   transitionEndCallback.value = () => {}
   diplayAllContent.value = false
   transitionAll.value = false
+  cardPosition.value = {
+    [leftRightKey]: '0.5rem',
+    [topBottomKey]: topBottomValue + 'px',
+  }
 
   if (activeMode.value) {
     transitionAll.value = true
     modalMode.value = false
-    styleForCard.value = {
-      [leftRightKey]: '0.5rem',
-      [topBottomKey]: topBottomValue + 'px',
-    }
-    transitionEndCallback.value = async () => {
+    transitionEndCallback.value = () => {
       transitionAll.value = false
       activeMode.value = false
     }
   } else {
-    styleForCard.value = {
-      [leftRightKey]: '0.5rem',
-      [topBottomKey]: topBottomValue + 'px',
-    }
     initWidth.value = width
     initHeight.value = height
     activeMode.value = true
     await sleep(50)
     transitionAll.value = true
-    if (topBottomValue < innerHeight * 0.15) {
-      styleForCard.value[topBottomKey] = innerHeight * 0.15 + 'px'
-    }
+    cardPosition.value[topBottomKey] = Math.max(topBottomValue, innerHeight * 0.15) + 'px'
     modalMode.value = true
     transitionEndCallback.value = () => {
       diplayAllContent.value = true
@@ -222,5 +220,5 @@ const tipForFixed = (e: Event) => {
   })
 }
 
-useBounceOnVisible()
+useBounceOnVisible(cardRef)
 </script>

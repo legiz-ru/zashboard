@@ -1,6 +1,6 @@
 <template>
   <div
-    class="bg-base-200 text-base-content scrollbar-hidden h-full overflow-x-hidden p-2 transition-all"
+    class="sidebar bg-base-200 text-base-content scrollbar-hidden h-full overflow-x-hidden p-2 transition-all"
     :class="isSidebarCollapsed ? 'w-18 px-0' : 'w-[21rem]'"
   >
     <div :class="twMerge('flex h-full flex-col gap-2', isSidebarCollapsed ? 'w-18' : 'w-xs')">

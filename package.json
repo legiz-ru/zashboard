@@ -1,18 +1,18 @@
 {
   "name": "zashboard",
-  "version": "1.78.0",
+  "version": "1.80.2",
   "description": "A Dashboard Using Clash API",
   "license": "MIT",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "preview": "vite preview",
     "build": "vite build",
     "build:cdn-fonts": "vite build --mode cdn-fonts",
-    "type-check": "vue-tsc --build --force",
-    "lint": "eslint . --fix",
+    "dev": "vite",
     "format": "prettier --write src/",
-    "prepare": "husky"
+    "lint": "eslint . --fix",
+    "prepare": "husky",
+    "preview": "vite preview",
+    "type-check": "vue-tsc --build --force"
   },
   "dependencies": {
     "@eslint/plugin-kit": "^0.2.6",
@@ -37,7 +37,6 @@
     "reconnectingwebsocket": "^1.0.0",
     "sort-package-json": "^2.14.0",
     "subsetted-fonts": "^1.0.4",
-    "theme-change": "^2.5.0",
     "tippy.js": "^6.3.7",
     "uuid": "^11.1.0",
     "vite-plugin-pwa": "^0.21.1",
@@ -62,8 +61,8 @@
     "eslint-plugin-vue": "^9.32.0",
     "husky": "^9.1.7",
     "lint-staged": "^15.4.3",
-    "npm-run-all2": "^7.0.2",
     "postcss": "^8.5.3",
+    "postcss-conditionals": "^2.1.0",
     "postcss-for": "^2.1.1",
     "prettier": "^3.5.1",
     "tailwind-merge": "^2.6.0",

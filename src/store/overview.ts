@@ -32,6 +32,10 @@ export const initSatistic = () => {
       if (!data) return
       const timestamp = Date.now().valueOf()
 
+      if (data.inuse === 0) {
+        return
+      }
+
       memory.value = data.inuse
       memoryHistory.value.push({
         value: data.inuse,

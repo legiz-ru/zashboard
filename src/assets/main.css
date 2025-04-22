@@ -59,8 +59,15 @@
     .bg-primary,
     .card,
     .collapse,
+    .input,
+    .select,
+    .toggle,
     .tabs {
       @apply bg-base-100/$(i);
+    }
+
+    option {
+      @apply bg-base-100;
     }
 
     .bg-base-200,
@@ -69,16 +76,48 @@
       @apply bg-base-200/$(i);
     }
 
-    .bg-primary:not(.tab.tab-active) {
-      @apply bg-primary/$(i);
+    .modal-box {
+      @if $i > 70 {
+        @apply bg-base-100/$(i);
+      } @else  {
+        @apply bg-base-100/70;
+      }
     }
 
-    .bg-primary .latency-tag.bg-base-100 {
-      @apply bg-base-300/$(i);
+    .bg-primary:not(.tab.tab-active) {
+      @if $i > 60 {
+        @apply bg-primary/$(i);
+      } @else  {
+        @apply bg-primary/60;
+      }
+    }
+
+    .bg-primary .latency-tag {
+      @if $i > 90 {
+        @apply bg-base-100/$(i);
+      } @else  {
+        @apply bg-base-100/90;
+      }
     }
 
     .home-page.bg-base-200\/50 {
       background-color: transparent;
+    }
+  }
+}
+
+@for $i from 0 to 40 {
+  .blur-intensity-$(i) {
+    .card,
+    .collapse,
+    .sidebar,
+    .ctrls-bar,
+    .nav-bar,
+    .modal-box,
+    .table,
+    .table thead {
+      /* prettier-ignore */
+      backdrop-filter: blur($(i)px);
     }
   }
 }
@@ -177,6 +216,23 @@ div {
   }
 }
 
+@keyframes bounceInForPC {
+  0% {
+    opacity: 0.5;
+    transform: scale(0.97);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 .bounce-in {
   animation: bounceIn 0.4s ease-out;
+}
+
+@media screen and (min-width: 1024px) {
+  .bounce-in {
+    animation: bounceInForPC 0.4s ease-out;
+  }
 }

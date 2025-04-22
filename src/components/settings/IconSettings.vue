@@ -17,52 +17,59 @@
       />
     </button>
   </div>
-  <div class="flex flex-col gap-2">
-    <template v-if="dialogVisible">
-      <div
-        v-for="iconReflect in iconReflectList"
-        :key="iconReflect.uuid"
-        class="flex items-center gap-2"
-      >
-        <TextInput
-          class="w-32"
-          v-model="iconReflect.name"
-          placeholder="Name"
-        />
-        <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
-        <TextInput
-          v-model="iconReflect.icon"
-          placeholder="Icon URL"
-        />
-        <button
-          class="btn btn-sm btn-circle"
-          @click="removeIconReflect(iconReflect.uuid)"
-        >
-          <TrashIcon class="h-4 w-4 shrink-0" />
-        </button>
+  <div
+    class="collapse rounded-none shadow-none"
+    :class="dialogVisible ? 'collapse-open' : ''"
+  >
+    <div class="collapse-content p-0">
+      <div class="grid grid-cols-1 gap-2 md:grid-cols-2">
+        <template v-if="dialogVisible">
+          <div
+            v-for="iconReflect in iconReflectList"
+            :key="iconReflect.uuid"
+            class="flex items-center gap-2"
+          >
+            <TextInput
+              class="w-32"
+              v-model="iconReflect.name"
+              placeholder="Name"
+            />
+            <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
+            <TextInput
+              v-model="iconReflect.icon"
+              placeholder="Icon URL"
+            />
+            <button
+              class="btn btn-sm btn-circle"
+              @click="removeIconReflect(iconReflect.uuid)"
+            >
+              <TrashIcon class="h-4 w-4 shrink-0" />
+            </button>
+          </div>
+        </template>
       </div>
-    </template>
-    <div class="flex items-center gap-2">
-      <TextInput
-        class="w-32"
-        v-model="newIconReflect.name"
-        placeholder="Name"
-        :menus="
-          proxyGroupList.filter((group) => !iconReflectList.some((item) => item.name === group))
-        "
-      />
-      <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
-      <TextInput
-        v-model="newIconReflect.icon"
-        placeholder="Icon URL"
-      />
-      <button
-        class="btn btn-sm btn-circle"
-        @click="addIconReflect"
-      >
-        <PlusIcon class="h-4 w-4 shrink-0" />
-      </button>
     </div>
+  </div>
+  <div class="flex items-center gap-2">
+    <TextInput
+      class="w-32"
+      v-model="newIconReflect.name"
+      placeholder="Name"
+      :menus="
+        proxyGroupList.filter((group) => !iconReflectList.some((item) => item.name === group))
+      "
+    />
+    <ArrowRightCircleIcon class="h-4 w-4 shrink-0" />
+    <TextInput
+      v-model="newIconReflect.icon"
+      placeholder="Icon URL"
+    />
+    <button
+      class="btn btn-sm btn-circle"
+      @click="addIconReflect"
+    >
+      <PlusIcon class="h-4 w-4 shrink-0" />
+    </button>
   </div>
 </template>
 

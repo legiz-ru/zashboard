@@ -1,9 +1,10 @@
-import { disconnectByIdAPI } from '@/api'
+import { disconnectAllAPI, disconnectByIdAPI } from '@/api'
 import { SORT_DIRECTION, SORT_TYPE } from '@/constant'
 import { useTooltip } from '@/helper/tooltip'
 import { isLargeScreen, isMiddleScreen } from '@/helper/utils'
 import {
   connectionFilter,
+  connections,
   connectionSortDirection,
   connectionSortType,
   isPaused,
@@ -31,9 +32,13 @@ import ConnectionTabs from './ConnectionTabs.vue'
 import SourceIPFilter from './SourceIPFilter.vue'
 
 const handlerClickCloseAll = () => {
-  renderConnections.value.forEach((conn) => {
-    disconnectByIdAPI(conn.id)
-  })
+  if (renderConnections.value.length === connections.value.length) {
+    disconnectAllAPI()
+  } else {
+    renderConnections.value.forEach((conn) => {
+      disconnectByIdAPI(conn.id)
+    })
+  }
 }
 
 export default defineComponent({

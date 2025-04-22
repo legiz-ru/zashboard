@@ -27,6 +27,7 @@ import {
   ChevronUpIcon,
   WrenchScrewdriverIcon,
 } from '@heroicons/vue/24/outline'
+import { every } from 'lodash'
 import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import DialogWrapper from '../common/DialogWrapper.vue'
@@ -65,10 +66,12 @@ export default defineComponent({
       return proxyProviederList.value.length > 0
     })
 
+    const defaultModes = ['direct', 'rule', 'global']
     const modeList = computed(() => {
-      return (
-        configs.value?.['mode-list'] || configs.value?.['modes'] || ['direct', 'rule', 'global']
-      )
+      return configs.value?.['mode-list'] || configs.value?.['modes'] || defaultModes
+    })
+    const needTranslateModes = computed(() => {
+      return every(modeList.value, (mode) => defaultModes.includes(mode.toLowerCase()))
     })
 
     const handlerModeChange = (e: Event) => {
@@ -172,9 +175,7 @@ export default defineComponent({
                 key={mode}
                 value={mode}
               >
-                {['global', 'rule', 'direct'].includes(mode.toLowerCase())
-                  ? t(mode.toLowerCase())
-                  : mode}
+                {needTranslateModes.value ? t(mode.toLowerCase()) : mode}
               </option>
             )
           })}

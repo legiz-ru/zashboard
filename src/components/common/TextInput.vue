@@ -55,6 +55,8 @@ const handlerSearchInputClick = (e: Event) => {
   }
   const menus = document.createElement('div')
 
+  menus.className = 'max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hidden min-w-24'
+
   for (const item of props.menus) {
     const itemDiv = document.createElement('div')
 
@@ -73,7 +75,7 @@ const handlerSearchInputClick = (e: Event) => {
     placement: 'bottom-start',
     trigger: 'click',
     interactive: true,
-    appendTo: 'parent',
+    appendTo: document.body,
     arrow: false,
   })
 }

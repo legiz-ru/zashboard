@@ -5,12 +5,8 @@
       class="h-full w-full"
     ></div>
     <span
-      class="border-base-content/10 bg-base-100/70 text-base-content hidden"
-      ref="baseColorRef"
-    ></span>
-    <span
-      class="border-b-primary/30 border-t-info/30 bg-info/60 text-primary/60 hidden"
-      ref="themeColorRef"
+      class="border-b-primary/30 border-t-primary/60 border-l-info/30 border-r-info/60 text-base-content/10 bg-base-100/70 hidden"
+      ref="colorRef"
     ></span>
     <button
       class="btn btn-ghost btn-xs absolute right-1 bottom-0"
@@ -44,139 +40,137 @@ const props = defineProps<{
   min: number
 }>()
 
-const baseColorRef = ref()
-const themeColorRef = ref()
-
-const isPaused = ref(false)
+const colorRef = ref()
 const chart = ref()
+const isPaused = ref(false)
+const colorSet = {
+  primary30: '',
+  primary60: '',
+  info30: '',
+  info60: '',
+  baseContent10: '',
+  baseContent: '',
+  base70: '',
+}
+
+let fontFamily = ''
+
+const updateColorSet = () => {
+  const colorStyle = getComputedStyle(colorRef.value)
+
+  colorSet.baseContent = colorStyle.getPropertyValue('--color-base-content').trim()
+  colorSet.base70 = colorStyle.backgroundColor
+  colorSet.baseContent10 = colorStyle.color
+  colorSet.primary30 = colorStyle.borderTopColor
+  colorSet.primary60 = colorStyle.borderBottomColor
+  colorSet.info30 = colorStyle.borderLeftColor
+  colorSet.info60 = colorStyle.borderRightColor
+}
+const updateFontFamily = () => {
+  const baseColorStyle = getComputedStyle(colorRef.value)
+
+  fontFamily = baseColorStyle.fontFamily
+}
+
+const options = computed(() => {
+  return {
+    legend: {
+      bottom: 0,
+      data: props.data.map((item) => item.name),
+      textStyle: {
+        color: colorSet.baseContent,
+        fontFamily,
+      },
+    },
+    grid: {
+      left: 60,
+      top: 15,
+      right: 10,
+      bottom: 25,
+    },
+    tooltip: {
+      show: true,
+      trigger: 'axis',
+      backgroundColor: colorSet.base70,
+      borderColor: colorSet.base70,
+      confine: true,
+      padding: [0, 5],
+      textStyle: {
+        color: colorSet.baseContent,
+        fontFamily,
+      },
+      formatter: props.toolTipFormatter,
+    },
+    xAxis: {
+      type: 'category',
+      axisLine: { show: false },
+      axisLabel: { show: false },
+      splitLine: { show: false },
+      axisTick: { show: false },
+    },
+    yAxis: {
+      type: 'value',
+      splitNumber: 4,
+      max: (value: { max: number }) => {
+        return Math.max(value.max, props.min)
+      },
+      axisLine: { show: false },
+      splitLine: {
+        show: true,
+        lineStyle: {
+          type: 'dashed',
+          color: colorSet.baseContent10,
+        },
+      },
+      axisLabel: {
+        align: 'left',
+        padding: [0, 0, 0, -45],
+        formatter: props.labelFormatter,
+        color: colorSet.baseContent,
+        fontFamily,
+      },
+    },
+    series: props.data.map((item, index) => {
+      const seriesColor = index === props.data.length - 1 ? colorSet.primary60 : colorSet.info60
+      const areaColor = index === props.data.length - 1 ? colorSet.primary30 : colorSet.info30
+
+      return {
+        name: item.name,
+        symbol: 'none',
+        emphasis: {
+          disabled: true,
+        },
+        lineStyle: {
+          width: 1,
+        },
+        data: item.data,
+        areaStyle: {
+          color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
+            {
+              offset: 0,
+              color: seriesColor,
+            },
+            {
+              offset: 1,
+              color: areaColor,
+            },
+          ]),
+        },
+        type: 'line',
+        color: seriesColor,
+        smooth: true,
+      }
+    }),
+  }
+})
 
 onMounted(() => {
-  const baseColorStyle = getComputedStyle(baseColorRef.value)
-  const themeColorStyle = getComputedStyle(themeColorRef.value)
+  updateColorSet()
+  updateFontFamily()
 
-  let baseContentColor = baseColorStyle.color
-  let baseColor = baseColorStyle.backgroundColor
-  let baseContent10Color = baseColorStyle.borderColor
-  let fontFamily = baseColorStyle.fontFamily
-  let primaryColor = themeColorStyle.color
-  let secondaryColor = themeColorStyle.backgroundColor
-  let primaryColor10 = themeColorStyle.borderBottomColor
-  let secondaryColor10 = themeColorStyle.borderTopColor
-  watch(
-    () => theme.value,
-    () => {
-      const baseColorStyle = getComputedStyle(baseColorRef.value)
-      const themeColorStyle = getComputedStyle(themeColorRef.value)
+  watch(theme, updateColorSet)
+  watch(font, updateFontFamily)
 
-      baseContentColor = baseColorStyle.color
-      baseColor = baseColorStyle.backgroundColor
-      baseContent10Color = baseColorStyle.borderColor
-      primaryColor = themeColorStyle.color
-      secondaryColor = themeColorStyle.backgroundColor
-      primaryColor10 = themeColorStyle.borderBottomColor
-      secondaryColor10 = themeColorStyle.borderTopColor
-    },
-  )
-  watch(
-    () => font.value,
-    () => {
-      const baseColorStyle = getComputedStyle(baseColorRef.value)
-
-      fontFamily = baseColorStyle.fontFamily
-    },
-  )
-
-  const options = computed(() => {
-    return {
-      legend: {
-        bottom: 0,
-        data: props.data.map((item) => item.name),
-        textStyle: {
-          color: baseContentColor,
-          fontFamily,
-        },
-      },
-      grid: {
-        left: 60,
-        top: 15,
-        right: 10,
-        bottom: 25,
-      },
-      tooltip: {
-        show: true,
-        trigger: 'axis',
-        backgroundColor: baseColor,
-        borderColor: baseColor,
-        confine: true,
-        padding: [0, 5],
-        textStyle: {
-          color: baseContentColor,
-          fontFamily,
-        },
-        formatter: props.toolTipFormatter,
-      },
-      xAxis: {
-        type: 'category',
-        axisLine: { show: false },
-        axisLabel: { show: false },
-        splitLine: { show: false },
-        axisTick: { show: false },
-      },
-      yAxis: {
-        type: 'value',
-        splitNumber: 4,
-        max: (value: { max: number }) => {
-          return Math.max(value.max, props.min)
-        },
-        axisLine: { show: false },
-        splitLine: {
-          show: true,
-          lineStyle: {
-            type: 'dashed',
-            color: baseContent10Color,
-          },
-        },
-        axisLabel: {
-          align: 'left',
-          padding: [0, 0, 0, -45],
-          formatter: props.labelFormatter,
-          color: baseContentColor,
-          fontFamily,
-        },
-      },
-      series: props.data.map((item, index) => {
-        const seriesColor = index === props.data.length - 1 ? primaryColor : secondaryColor
-        const areaColor = index === props.data.length - 1 ? primaryColor10 : secondaryColor10
-
-        return {
-          name: item.name,
-          symbol: 'none',
-          emphasis: {
-            disabled: true,
-          },
-          lineStyle: {
-            width: 1,
-          },
-          data: item.data,
-          areaStyle: {
-            color: new echarts.graphic.LinearGradient(0, 0, 0, 1, [
-              {
-                offset: 0,
-                color: seriesColor,
-              },
-              {
-                offset: 1,
-                color: areaColor,
-              },
-            ]),
-          },
-          type: 'line',
-          color: seriesColor,
-          smooth: true,
-        }
-      }),
-    }
-  })
   const myChart = echarts.init(chart.value)
 
   myChart.setOption(options.value)
@@ -193,11 +187,6 @@ onMounted(() => {
     myChart.resize()
   }, 100)
 
-  watch(
-    () => width.value,
-    () => {
-      resize()
-    },
-  )
+  watch(width, resize)
 })
 </script>
