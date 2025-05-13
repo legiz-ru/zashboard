@@ -255,10 +255,11 @@ const CACHE_DURATION = 1000 * 60 * 60
 
 interface CacheEntry<T> {
   timestamp: number
+  version: string
   data: T
 }
 
-export async function fetchWithLocalCache<T>(url: string): Promise<T> {
+export async function fetchWithLocalCache<T>(url: string, version: string): Promise<T> {
   const cacheKey = 'cache/' + url
   const cacheRaw = localStorage.getItem(cacheKey)
 
@@ -267,8 +268,10 @@ export async function fetchWithLocalCache<T>(url: string): Promise<T> {
       const cache: CacheEntry<T> = JSON.parse(cacheRaw)
       const now = Date.now()
 
-      if (now - cache.timestamp < CACHE_DURATION) {
+      if (now - cache.timestamp < CACHE_DURATION && cache.version === version) {
         return cache.data
+      } else {
+        localStorage.removeItem(cacheKey)
       }
     } catch (e) {
       console.warn('Failed to parse cache for', url, e)
@@ -283,6 +286,7 @@ export async function fetchWithLocalCache<T>(url: string): Promise<T> {
   const data: T = await response.json()
   const newCache: CacheEntry<T> = {
     timestamp: Date.now(),
+    version,
     data,
   }
 
@@ -293,6 +297,7 @@ export async function fetchWithLocalCache<T>(url: string): Promise<T> {
 export const fetchIsUIUpdateAvailable = async () => {
   const { tag_name } = await fetchWithLocalCache<{ tag_name: string }>(
     'https://api.github.com/repos/Zephyruso/zashboard/releases/latest',
+    zashboardVersion.value,
   )
 
   return Boolean(tag_name && tag_name !== `v${zashboardVersion.value}`)
@@ -301,6 +306,7 @@ export const fetchIsUIUpdateAvailable = async () => {
 const check = async (url: string, versionNumber: string) => {
   const { assets } = await fetchWithLocalCache<{ assets: { name: string }[] }>(
     `https://api.github.com/repos/MetaCubeX/mihomo${url}`,
+    versionNumber,
   )
   const alreadyLatest = assets.some(({ name }) => name.includes(versionNumber))
 
@@ -313,6 +319,7 @@ export const fetchBackendUpdateAvailableAPI = async () => {
   if (!match) {
     const { tag_name } = await fetchWithLocalCache<{ tag_name: string }>(
       'https://api.github.com/repos/MetaCubeX/mihomo/releases/latest',
+      version.value,
     )
 
     return Boolean(tag_name && !tag_name.endsWith(version.value))

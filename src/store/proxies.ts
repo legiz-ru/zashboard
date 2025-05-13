@@ -231,7 +231,7 @@ export const proxyGroupLatencyTest = async (proxyGroupName: string) => {
   const url = getTestUrl(proxyGroupName)
 
   if (
-    [PROXY_TYPE.Selector, PROXY_TYPE.LoadBalance].includes(
+    [PROXY_TYPE.Selector, PROXY_TYPE.LoadBalance, PROXY_TYPE.Smart].includes(
       proxyNode.type.toLowerCase() as PROXY_TYPE,
     )
   ) {

@@ -27,7 +27,7 @@ const classMap = {
     value: 'text-lg lg:text-xl',
   },
   settings: {
-    list: 'grid w-full grid-cols-3 gap-1 rounded-lg bg-base-200/30 p-3',
+    list: 'grid w-full grid-cols-3 gap-1 rounded-lg bg-base-200/50 p-3',
     item: 'flex flex-col items-start',
     label: 'text-xs text-base-content/70',
     value: 'text-base',
