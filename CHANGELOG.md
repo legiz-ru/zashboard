@@ -2,6 +2,64 @@
 
 # Changelog
 
+## [1.84.0](https://github.com/Zephyruso/zashboard/compare/v1.83.0...v1.84.0) (2025-05-13)
+
+
+### Features
+
+* latency test result tip ([02e4628](https://github.com/Zephyruso/zashboard/commit/02e462841835d7efddf4a58483401c328e4c1079))
+* options for geoip api ([ef693c8](https://github.com/Zephyruso/zashboard/commit/ef693c821686b9d56194787bf9fd0d36b4f0b443))
+
+
+### Bug Fixes
+
+* cache github version check result ([b9f9864](https://github.com/Zephyruso/zashboard/commit/b9f9864594e9306874a060c026259eef155f09d6))
+* display now node for smart ([856a4a6](https://github.com/Zephyruso/zashboard/commit/856a4a6cc8f7b410a25741453b5c99c274088964))
+
+## [1.83.0](https://github.com/Zephyruso/zashboard/compare/v1.82.0...v1.83.0) (2025-05-12)
+
+
+### Features
+
+* make logs history deletable ([efe4bdb](https://github.com/Zephyruso/zashboard/commit/efe4bdb47b8ce98543fe0845f8987e324d9147f2))
+* smart group api ([55510ae](https://github.com/Zephyruso/zashboard/commit/55510ae801a458cd933dae63b332c0826d78845d))
+
+
+### Bug Fixes
+
+* block error tip for latency test ([a84c608](https://github.com/Zephyruso/zashboard/commit/a84c60846d221632cb3a206f7d2e5796894415cc))
+* sourceip options sort ([7907be0](https://github.com/Zephyruso/zashboard/commit/7907be04d52433227d0ae5bde32c0a71ec44ec23))
+* style ([193acc2](https://github.com/Zephyruso/zashboard/commit/193acc23cfdb60722b4b16e1544f6c458d111518))
+
+## [1.82.0](https://github.com/Zephyruso/zashboard/compare/v1.81.0...v1.82.0) (2025-04-27)
+
+
+### Features
+
+* display icon in connection details ([182b51f](https://github.com/Zephyruso/zashboard/commit/182b51f1266ae945d058795d1a8a5aa52336aba7))
+
+
+### Bug Fixes
+
+* case insensitive search for connections ([771119a](https://github.com/Zephyruso/zashboard/commit/771119a9fde71b97dccd7f096a75592201b1169e))
+* discard outdated latency result ([97cce60](https://github.com/Zephyruso/zashboard/commit/97cce608067b038db05f7c418b9410b29f160d99))
+* xudp tag display ([c281d7c](https://github.com/Zephyruso/zashboard/commit/c281d7c6736c01f90b31a56bd3cf0ced66bc8452))
+
+## [1.81.0](https://github.com/Zephyruso/zashboard/compare/v1.80.2...v1.81.0) (2025-04-23)
+
+
+### Features
+
+* inbound user column ([7db4d1b](https://github.com/Zephyruso/zashboard/commit/7db4d1bbdd23c043e5b8cd9f503a96239053667e))
+* notification for upgrade result ([a5adac3](https://github.com/Zephyruso/zashboard/commit/a5adac3be271598db4baf85f39f4dc98855650c8))
+* setting for number of charts in sidebar ([0f61f4d](https://github.com/Zephyruso/zashboard/commit/0f61f4da39a57600cd978a40bd1462810120395e))
+
+
+### Bug Fixes
+
+* icon settings collapse style ([7a17311](https://github.com/Zephyruso/zashboard/commit/7a173114da06fe31a7df25a0c1049c308b7b19c7))
+* safe area for bottom ([72b3682](https://github.com/Zephyruso/zashboard/commit/72b36821e32675850796564f2f23994fcf03cef4))
+
 ## [1.80.2](https://github.com/Zephyruso/zashboard/compare/v1.80.1...v1.80.2) (2025-04-18)
 
 

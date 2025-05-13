@@ -95,18 +95,30 @@ export type ConnectionRawMessage = {
   rulePayload: string
   start: string
   metadata: {
-    network: string
-    type: string
-    remoteDestination: string
+    destinationGeoIP: string
     destinationIP: string
+    destinationIPASN: string
     destinationPort: string
     dnsMode: string
+    dscp: number
     host: string
-    sniffHost: string
-    processPath: string
+    inboundIP: string
+    inboundName: string
+    inboundPort: string
+    inboundUser: string
+    network: string
     process: string
+    processPath: string
+    remoteDestination: string
+    sniffHost: string
+    sourceGeoIP: string
     sourceIP: string
+    sourceIPASN: string
     sourcePort: string
+    specialProxy: string
+    specialRules: string
+    type: string
+    uid: number
   }
 }
 

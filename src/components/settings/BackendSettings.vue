@@ -94,7 +94,7 @@
       </template>
 
       <div
-        class="grid max-w-4xl grid-cols-2 gap-2 md:grid-cols-3 lg:grid-cols-5"
+        class="grid max-w-3xl grid-cols-2 gap-2 md:grid-cols-3 xl:max-w-6xl xl:grid-cols-6"
         v-if="version"
       >
         <template v-if="!isSingBox || displayAllFeatures">
@@ -130,6 +130,13 @@
         >
           {{ $t('flushFakeIP') }}
         </button>
+        <button
+          v-if="Object.values(proxyMap).some((i) => i.type.toLowerCase() === PROXY_TYPE.Smart)"
+          class="btn btn-sm"
+          @click="flushSmartGroupWeightsAPI"
+        >
+          {{ $t('flushSmartWeights') }}
+        </button>
       </div>
       <div class="divider"></div>
       <DnsQuery />
@@ -140,6 +147,7 @@
 <script setup lang="ts">
 import {
   flushFakeIPAPI,
+  flushSmartGroupWeightsAPI,
   isCoreUpdateAvailable,
   isSingBox,
   reloadConfigsAPI,
@@ -151,8 +159,10 @@ import {
 import BackendVersion from '@/components/common/BackendVersion.vue'
 import BackendSwitch from '@/components/settings/BackendSwitch.vue'
 import DnsQuery from '@/components/settings/DnsQuery.vue'
+import { PROXY_TYPE } from '@/constant'
+import { handlerUpgradeSuccess } from '@/helper'
 import { configs, fetchConfigs, updateConfigs } from '@/store/config'
-import { fetchProxies } from '@/store/proxies'
+import { fetchProxies, proxyMap } from '@/store/proxies'
 import { fetchRules } from '@/store/rules'
 import { autoUpgradeCore, checkUpgradeCore, displayAllFeatures } from '@/store/settings'
 import { activeBackend } from '@/store/setup'
@@ -211,8 +221,10 @@ const handlerClickUpgradeCore = async () => {
   try {
     await upgradeCoreAPI()
     reloadAll()
+    handlerUpgradeSuccess()
     isCoreUpgrading.value = false
-  } catch {
+  } catch (e) {
+    console.error(e)
     isCoreUpgrading.value = false
   }
 }

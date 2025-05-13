@@ -31,40 +31,30 @@
         <div class="text-md truncate">
           {{ proxyGroup.name }}
         </div>
-        <div class="text-base-content/80 flex h-4 gap-1 truncate text-xs">
-          <template v-if="proxyGroup.now">
-            <LockClosedIcon
-              class="h-4 w-4 shrink-0"
-              v-if="proxyGroup.fixed === proxyGroup.now"
-              @mouseenter="tipForFixed"
-            />
-            {{ proxyGroup.now }}
-          </template>
-          <template v-else-if="proxyGroup.type.toLowerCase() === PROXY_TYPE.LoadBalance">
-            <CheckCircleIcon class="h-4 w-4 shrink-0" />
-            {{ $t('loadBalance') }}
-          </template>
+        <div class="text-base-content/80 flex gap-1 truncate text-xs">
+          <ProxyGroupNow :name="proxyGroup.name" />
         </div>
 
         <div class="flex h-4 items-center justify-between gap-1">
-          <span class="text-base-content/60 text-xs">
-            {{ proxyGroup.type }} ({{ proxiesCount }})
-          </span>
-          <button
-            v-if="manageHiddenGroup"
-            class="btn btn-circle btn-xs z-10 ml-1"
-            @click.stop="handlerGroupToggle"
-          >
-            <EyeIcon
-              v-if="!hiddenGroup"
-              class="h-3 w-3"
-            />
-            <EyeSlashIcon
-              v-else
-              class="h-3 w-3"
-            />
-          </button>
-          <div class="flex-1"></div>
+          <div class="flex flex-1 items-center gap-1 truncate">
+            <span class="text-base-content/60 shrink-0 text-xs">
+              {{ proxyGroup.type }} ({{ proxiesCount }})
+            </span>
+            <button
+              v-if="manageHiddenGroup"
+              class="btn btn-circle btn-xs z-10"
+              @click.stop="handlerGroupToggle"
+            >
+              <EyeIcon
+                v-if="!hiddenGroup"
+                class="h-3 w-3"
+              />
+              <EyeSlashIcon
+                v-else
+                class="h-3 w-3"
+              />
+            </button>
+          </div>
           <LatencyTag
             :class="twMerge('bg-base-200/50 z-10 hover:shadow-sm')"
             :loading="isLatencyTesting"
@@ -98,14 +88,13 @@ import { useBounceOnVisible } from '@/composables/bouncein'
 import { useRenderProxies } from '@/composables/renderProxies'
 import { PROXY_TYPE } from '@/constant'
 import { isHiddenGroup } from '@/helper'
-import { useTooltip } from '@/helper/tooltip'
 import { hiddenGroupMap, proxyGroupLatencyTest, proxyMap, selectProxy } from '@/store/proxies'
 import { blurIntensity, manageHiddenGroup } from '@/store/settings'
-import { CheckCircleIcon, EyeIcon, EyeSlashIcon, LockClosedIcon } from '@heroicons/vue/24/outline'
+import { EyeIcon, EyeSlashIcon } from '@heroicons/vue/24/outline'
 import { twMerge } from 'tailwind-merge'
 import { computed, ref } from 'vue'
-import { useI18n } from 'vue-i18n'
 import LatencyTag from './LatencyTag.vue'
+import ProxyGroupNow from './ProxyGroupNow.vue'
 import ProxyIcon from './ProxyIcon.vue'
 import ProxyNodeCard from './ProxyNodeCard.vue'
 
@@ -210,14 +199,6 @@ const handlerProxySelect = (name: string) => {
   if (proxyGroup.value.type.toLowerCase() === PROXY_TYPE.LoadBalance) return
 
   selectProxy(props.name, name)
-}
-
-const { showTip } = useTooltip()
-const { t } = useI18n()
-const tipForFixed = (e: Event) => {
-  showTip(e, t('tipForFixed'), {
-    delay: [500, 0],
-  })
 }
 
 useBounceOnVisible(cardRef)

@@ -1,6 +1,6 @@
 import { fetchConnectionsAPI } from '@/api'
 import { CONNECTION_TAB_TYPE, SORT_DIRECTION, SORT_TYPE } from '@/constant'
-import { getChainsStringFromConnection } from '@/helper'
+import { getChainsStringFromConnection, getInboundUserFromConnection } from '@/helper'
 import type { Connection, ConnectionRawMessage } from '@/types'
 import { useStorage } from '@vueuse/core'
 import dayjs from 'dayjs'
@@ -119,6 +119,9 @@ const sortFunctionMap: Record<SORT_TYPE, (a: Connection, b: Connection) => numbe
   [SORT_TYPE.CONNECT_TIME]: (a: Connection, b: Connection) => {
     return dayjs(a.start).valueOf() - dayjs(b.start).valueOf()
   },
+  [SORT_TYPE.INBOUND_USER]: (a: Connection, b: Connection) => {
+    return getInboundUserFromConnection(a).localeCompare(getInboundUserFromConnection(b))
+  },
 }
 
 export const connectionSortType = useStorage<SORT_TYPE>(
@@ -140,10 +143,13 @@ export const connections = computed(() => {
 })
 
 export const renderConnections = computed(() => {
+  const lowerCaseFilter = connectionFilter.value?.toLowerCase()
   let regex: RegExp | null = null
+
   if (quickFilterEnabled.value && quickFilterRegex.value) {
     regex = new RegExp(quickFilterRegex.value, 'i')
   }
+
   return connections.value
     .filter((conn) => {
       const metadatas = [
@@ -177,7 +183,7 @@ export const renderConnections = computed(() => {
       }
 
       if (connectionFilter.value) {
-        return metadatas.some((i) => i?.includes(connectionFilter.value))
+        return metadatas.some((i) => i?.toLowerCase().includes(lowerCaseFilter))
       }
 
       return true

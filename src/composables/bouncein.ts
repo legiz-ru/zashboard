@@ -18,6 +18,8 @@ export function useBounceOnVisible(el: Ref<HTMLElement> = useCurrentElement<HTML
     watch(
       visible,
       (value) => {
+        if (!el.value) return
+
         if (value) {
           el.value?.classList.add(className)
           el.value!.style.opacity = 'unset'

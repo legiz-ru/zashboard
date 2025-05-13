@@ -42,6 +42,7 @@ export enum CONNECTIONS_TABLE_ACCESSOR_KEY {
   Destination = 'destination',
   DestinationType = 'destinationType',
   RemoteAddress = 'remoteAddress',
+  InboundUser = 'inboundUser',
 }
 
 export enum TABLE_WIDTH_MODE {
@@ -84,6 +85,7 @@ export enum SORT_TYPE {
   UPLOAD = 'upload',
   UPLOAD_SPEED = 'uploadSpeed',
   SOURCE_IP = 'sourceIP',
+  INBOUND_USER = 'inboundUser',
 }
 
 export enum SORT_DIRECTION {
@@ -157,6 +159,7 @@ export enum PROXY_TYPE {
   Selector = 'selector',
   Fallback = 'fallback',
   URLTest = 'urltest',
+  Smart = 'smart',
   LoadBalance = 'loadbalance',
 }
 
@@ -266,3 +269,9 @@ export const DEFAULT_THEME = {
 }
 
 export type THEME = Record<string, string>
+
+export enum IP_INFO_API {
+  IPWHOIS = 'ipwho.is',
+  IPSB = 'ip.sb',
+  IPAPI = 'ipapi.is',
+}

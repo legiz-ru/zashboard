@@ -27,10 +27,12 @@
 <script lang="ts" setup>
 import { useTooltip } from '@/helper/tooltip'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
+import { createApp, defineComponent, h } from 'vue'
 
 const emits = defineEmits<{
   (e: 'input', value: string): void
   (e: 'change', value: string): void
+  (e: 'update:menus', value: string[]): void
 }>()
 
 const props = defineProps<{
@@ -40,6 +42,7 @@ const props = defineProps<{
   autocomplete?: string
   clearable?: boolean
   menus?: string[]
+  menusDeleteable?: boolean
 }>()
 
 const inputValue = defineModel<string>()
@@ -53,24 +56,57 @@ const handlerSearchInputClick = (e: Event) => {
   if (!props.menus?.length) {
     return
   }
-  const menus = document.createElement('div')
+  const PopContent = defineComponent({
+    props: {
+      menus: {
+        type: Array,
+        default: () => [],
+      },
+      menusDeleteable: {
+        type: Boolean,
+        default: false,
+      },
+    },
+    setup(props: { menus: string[]; menusDeleteable: boolean }) {
+      return () =>
+        h(
+          'div',
+          { class: 'max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hidden min-w-24' },
+          props.menus.map((item) =>
+            h('div', { class: 'cursor-pointer p-1 flex gap-2 items-center' }, [
+              h(
+                'span',
+                {
+                  class: 'flex-1 transition-transform hover:scale-105 hover:text-primary',
+                  onClick: () => {
+                    inputValue.value = item
+                    hideTip()
+                  },
+                },
+                item,
+              ),
+              props.menusDeleteable &&
+                h(XMarkIcon, {
+                  class: 'h-3 w-3 transition-transform hover:scale-125',
+                  onClick: () => {
+                    emits(
+                      'update:menus',
+                      props.menus.filter((menu) => menu !== item),
+                    )
+                    hideTip()
+                  },
+                }),
+            ]),
+          ),
+        )
+    },
+  })
+  const mountEl = document.createElement('div')
+  const app = createApp(PopContent, { menus: props.menus, menusDeleteable: props.menusDeleteable })
 
-  menus.className = 'max-h-64 overflow-y-auto overflow-x-hidden scrollbar-hidden min-w-24'
+  app.mount(mountEl)
 
-  for (const item of props.menus) {
-    const itemDiv = document.createElement('div')
-
-    itemDiv.className = 'cursor-pointer p-1 transition-transform hover:scale-105 hover:text-primary'
-
-    itemDiv.textContent = item
-    itemDiv.addEventListener('click', () => {
-      inputValue.value = item
-      hideTip()
-    })
-    menus.appendChild(itemDiv)
-  }
-
-  showTip(e, menus, {
+  showTip(e, mountEl, {
     theme: 'base',
     placement: 'bottom-start',
     trigger: 'click',

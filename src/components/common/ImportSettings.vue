@@ -43,7 +43,6 @@
 
 <script setup lang="ts">
 import { useNotification } from '@/composables/notification'
-import { i18n } from '@/i18n'
 import { ArrowDownCircleIcon, ArrowUpCircleIcon } from '@heroicons/vue/24/outline'
 import { useStorage } from '@vueuse/core'
 import { ref } from 'vue'
@@ -60,7 +59,7 @@ const importSettingsFromFile = () => {
 
 const handlerJsonUpload = () => {
   showNotification({
-    content: i18n.global.t('importing'),
+    content: 'importing',
   })
   const file = inputRef.value?.files?.[0]
   if (!file) return
@@ -80,7 +79,7 @@ const importSettingsUrl = useStorage('config/import-settings-url', '')
 
 const importSettingsFromUrl = async () => {
   showNotification({
-    content: i18n.global.t('importing'),
+    content: 'importing',
   })
 
   const res = await fetch(importSettingsUrl.value)

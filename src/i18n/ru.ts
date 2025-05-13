@@ -140,6 +140,8 @@ const ru: LANG_MESSAGE = {
   manual: 'Ручной',
   tableWidthMode: 'Режим ширины таблицы',
   testFinishedTip: '{number} Тест завершен',
+  testFinishedResultTip: 'Тест завершен, {success} Успешно, {failed} Таймаут',
+  testFailedTip: 'Тест задержки таймаут',
   updateFinishedTip: '{number} Обновление завершено',
   independentLatencyTest: 'Независимый тест задержки',
   independentLatencyTestTip:
@@ -185,6 +187,15 @@ const ru: LANG_MESSAGE = {
   importFromFile: 'Импортировать из файла',
   importFromUrl: 'Импортировать из URL',
   sync: 'Синхронизировать',
+  upgradeSuccess: 'Обновление успешно',
+  numberOfChartsInSidebar: 'Количество графиков в боковой панели',
+  displayWeights: 'Показать веса',
+  flushWeights: 'Очистить веса',
+  flushSmartWeights: 'Очистить Smart веса',
+  IPInfoAPI: 'API информации о IP',
+  IPInfoAPITip:
+    'Этот API будет использоваться для проверки IP-адресов при запросах информации о глобальных узлах, определения геолокации IP-адресов в деталях соединения, а также для определения геолокации IP-адресов при DNS-запросах в панели.',
+  general: 'Универсальный',
 }
 
 export default ru

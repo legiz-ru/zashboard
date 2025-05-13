@@ -45,7 +45,7 @@ export default defineComponent({
                 params: {
                   number: `${updateCount}/${ruleProviderList.value.length}`,
                 },
-                type: isFinished ? 'alert-success' : 'alert-warning',
+                type: isFinished ? 'alert-success' : 'alert-info',
                 timeout: isFinished ? 2000 : 0,
               })
             }),

@@ -2,6 +2,14 @@
 
 <img src="pc.png" height="350">   <img src="mobile.png" height="350">
 
+## **Requirement**
+Browser support
+
+- Chrome 111 (released March 2023)
+- Firefox 128 (released July 2024)
+- Safari 16.4 (released March 2023)
+- Not supported on iOS 16.4 jailbroken version.
+
 ## **Online**
 You can access the online zashboard at the following link:
 - [Online zashboard](http://board.zash.run.place)

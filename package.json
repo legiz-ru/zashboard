@@ -1,6 +1,6 @@
 {
   "name": "zashboard",
-  "version": "1.80.2",
+  "version": "1.84.0",
   "description": "A Dashboard Using Clash API",
   "license": "MIT",
   "type": "module",
@@ -28,6 +28,7 @@
     "dayjs": "^1.11.13",
     "dompurify": "^3.2.4",
     "echarts": "^5.6.0",
+    "ipaddr.js": "^2.2.0",
     "lodash": "^4.17.21",
     "misans": "^4.0.0",
     "p-limit": "^6.2.0",

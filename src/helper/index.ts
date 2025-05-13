@@ -1,3 +1,4 @@
+import { useNotification } from '@/composables/notification'
 import { proxiesFilter } from '@/composables/proxies'
 import {
   NOT_CONNECTED,
@@ -204,6 +205,15 @@ export const getNetworkTypeFromConnection = (connection: Connection) => {
   return `${connection.metadata.type} | ${connection.metadata.network}`
 }
 
+export const getInboundUserFromConnection = (connection: Connection) => {
+  return (
+    connection.metadata.inboundUser ||
+    connection.metadata.inboundName ||
+    connection.metadata.inboundPort ||
+    '-'
+  )
+}
+
 export const getToolTipForParams = (
   params: ToolTipParams,
   config: {
@@ -293,4 +303,13 @@ export const isHiddenGroup = (group: string) => {
   }
 
   return proxyMap.value[group]?.hidden
+}
+
+export const handlerUpgradeSuccess = () => {
+  const { showNotification } = useNotification()
+
+  showNotification({
+    content: 'upgradeSuccess',
+    type: 'alert-success',
+  })
 }

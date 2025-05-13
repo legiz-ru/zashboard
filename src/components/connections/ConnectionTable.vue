@@ -163,6 +163,7 @@ import {
   getDestinationFromConnection,
   getDestinationTypeFromConnection,
   getHostFromConnection,
+  getInboundUserFromConnection,
   getIPLabelFromMap,
   getNetworkTypeFromConnection,
   getProcessFromConnection,
@@ -373,6 +374,11 @@ const columns: ColumnDef<Connection>[] = [
     header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.RemoteAddress),
     id: CONNECTIONS_TABLE_ACCESSOR_KEY.RemoteAddress,
     accessorFn: (original) => original.metadata.remoteDestination || '-',
+  },
+  {
+    header: () => t(CONNECTIONS_TABLE_ACCESSOR_KEY.InboundUser),
+    id: CONNECTIONS_TABLE_ACCESSOR_KEY.InboundUser,
+    accessorFn: getInboundUserFromConnection,
   },
 ]
 

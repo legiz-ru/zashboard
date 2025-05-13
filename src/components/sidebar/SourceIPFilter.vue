@@ -18,14 +18,32 @@
 <script setup lang="ts">
 import { getIPLabelFromMap } from '@/helper'
 import { connections, sourceIPFilter } from '@/store/connections'
+import * as ipaddr from 'ipaddr.js'
 import { isEqual, uniq } from 'lodash'
 import { computed, ref, watch } from 'vue'
+
 defineProps<{
   horizontal?: boolean
 }>()
 
 const sourceIPs = computed(() => {
-  return uniq(connections.value.map((conn) => conn.metadata.sourceIP)).sort()
+  return uniq(connections.value.map((conn) => conn.metadata.sourceIP)).sort((a, b) => {
+    const isPreIPv4 = ipaddr.IPv4.isIPv4(a)
+    const isNextIPv4 = ipaddr.IPv4.isIPv4(b)
+
+    if (!isPreIPv4 && isNextIPv4) return 1
+    if (!isNextIPv4 && isPreIPv4) return -1
+
+    const preIP = ipaddr.parse(a).toByteArray()
+    const nextIP = ipaddr.parse(b).toByteArray()
+
+    for (let i = 0; i < preIP.length; i++) {
+      if (preIP[i] !== nextIP[i]) {
+        return preIP[i] - nextIP[i]
+      }
+    }
+    return 0
+  })
 })
 const sourceIPOpts = ref<{ label: string; value: string[] }[]>([])
 

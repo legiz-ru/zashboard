@@ -21,21 +21,6 @@ export default {
         '.scrollbar-thin': {
           'scrollbar-width': 'thin',
         },
-        '.font-MiSans': {
-          'font-family': 'MiSans-VF, NotoEmoji, system-ui',
-        },
-        '.font-SarasaUI': {
-          'font-family': 'SarasaUiSC-Regular, NotoEmoji, system-ui',
-        },
-        '.font-PingFang': {
-          'font-family': 'PingFangSC-Regular, NotoEmoji, system-ui',
-        },
-        '.font-FiraSans': {
-          'font-family': 'Fira Sans, NotoEmoji, system-ui',
-        },
-        '.font-SystemUI': {
-          'font-family': 'NotoEmoji, system-ui',
-        },
       })
     }),
   ],

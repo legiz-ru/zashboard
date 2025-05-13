@@ -7,6 +7,7 @@ import {
   getDestinationFromConnection,
   getDestinationTypeFromConnection,
   getHostFromConnection,
+  getInboundUserFromConnection,
   getIPLabelFromMap,
   getNetworkTypeFromConnection,
   getProcessFromConnection,
@@ -119,6 +120,9 @@ export default defineComponent<{
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.DestinationType]: (
           <div class="gap-1 whitespace-nowrap">{getDestinationTypeFromConnection(conn)}</div>
+        ),
+        [CONNECTIONS_TABLE_ACCESSOR_KEY.InboundUser]: (
+          <div class="gap-1 whitespace-nowrap">{getInboundUserFromConnection(conn)}</div>
         ),
         [CONNECTIONS_TABLE_ACCESSOR_KEY.Close]: (
           <button

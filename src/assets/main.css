@@ -1,9 +1,24 @@
 @import 'tailwindcss';
+
+@config '../../tailwind.config.ts';
 @plugin "daisyui" {
   themes: all;
 }
 
-@config '../../tailwind.config.ts';
+@theme {
+  --font-MiSans: 'MiSans-VF', 'NotoEmoji', 'system-ui';
+  --font-SarasaUI: 'SarasaUiSC-Regular', 'NotoEmoji', 'system-ui';
+  --font-PingFang: 'PingFangSC-Regular', 'NotoEmoji', 'system-ui';
+  --font-FiraSans: 'Fira Sans', 'NotoEmoji', 'system-ui';
+  --font-SystemUI: 'NotoEmoji', 'system-ui';
+}
+
+@layer utilities {
+  @font-face {
+    font-family: 'NotoEmoji';
+    src: url('./NotoColorEmoji-flagsonly.ttf') format('truetype');
+  }
+}
 
 @utility card {
   @apply bg-base-100 rounded-lg shadow-md;
@@ -44,13 +59,6 @@
 .btn.btn-sm,
 .tabs.tabs-xs .tab {
   @apply text-sm;
-}
-
-@layer utilities {
-  @font-face {
-    font-family: 'NotoEmoji';
-    src: url('./NotoColorEmoji-flagsonly.ttf') format('truetype');
-  }
 }
 
 @for $i from 0 to 100 {

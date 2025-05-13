@@ -33,11 +33,11 @@
         <template v-if="isMiddleScreen">
           <div
             class="nav-bar shrink-0"
-            :class="isPWA ? 'h-[5.5rem]' : 'h-14'"
+            :style="styleForSafeArea"
           />
           <div
             class="dock dock-sm bg-base-200 z-30"
-            :class="isPWA ? 'h-[5.5rem] pb-8' : 'h-14'"
+            :style="styleForSafeArea"
           >
             <button
               v-for="r in renderRoutes"
@@ -93,7 +93,7 @@ import { useSettings } from '@/composables/settings'
 import { useSwipeRouter } from '@/composables/swipe'
 import { PROXY_TAB_TYPE, ROUTE_ICON_MAP, ROUTE_NAME, RULE_TAB_TYPE } from '@/constant'
 import { getUrlFromBackend, renderRoutes } from '@/helper'
-import { isMiddleScreen, isPWA } from '@/helper/utils'
+import { isMiddleScreen } from '@/helper/utils'
 import { fetchConfigs } from '@/store/config'
 import { initConnections } from '@/store/connections'
 import { initLogs } from '@/store/logs'
@@ -112,6 +112,11 @@ const ctrlsMap: Record<string, Component> = {
   [ROUTE_NAME.logs]: LogsCtrl,
   [ROUTE_NAME.proxies]: ProxiesCtrl,
   [ROUTE_NAME.rules]: RulesCtrl,
+}
+
+const styleForSafeArea = {
+  height: 'calc(var(--spacing) * 14 + env(safe-area-inset-bottom))',
+  'padding-bottom': 'env(safe-area-inset-bottom)',
 }
 
 const router = useRouter()

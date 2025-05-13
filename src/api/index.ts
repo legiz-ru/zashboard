@@ -5,7 +5,7 @@ import router from '@/router'
 import { autoUpgradeCore, checkUpgradeCore } from '@/store/settings'
 import { activeBackend, activeUuid, removeBackend } from '@/store/setup'
 import type { Backend, Config, DNSQuery, Proxy, ProxyProvider, Rule, RuleProvider } from '@/types'
-import axios from 'axios'
+import axios, { AxiosError } from 'axios'
 import { debounce } from 'lodash'
 import ReconnectingWebSocket from 'reconnectingwebsocket'
 import { computed, nextTick, ref, watch } from 'vue'
@@ -16,20 +16,33 @@ axios.interceptors.request.use((config) => {
   return config
 })
 
-axios.interceptors.response.use(null, (error) => {
-  if (error.status === 401 && activeUuid.value) {
-    removeBackend(activeUuid.value)
-    activeUuid.value = null
-    router.push({ name: ROUTE_NAME.setup })
-    nextTick(() => {
-      const { showNotification } = useNotification()
+axios.interceptors.response.use(
+  null,
+  (
+    error: AxiosError<{
+      message: string
+    }>,
+  ) => {
+    const { showNotification } = useNotification()
 
-      showNotification({ content: 'unauthorizedTip' })
-    })
-  }
+    if (error.status === 401 && activeUuid.value) {
+      removeBackend(activeUuid.value)
+      activeUuid.value = null
+      router.push({ name: ROUTE_NAME.setup })
+      nextTick(() => {
+        showNotification({ content: 'unauthorizedTip' })
+      })
+    } else if (!error.config?.url?.endsWith('/delay')) {
+      showNotification({
+        content: error.response?.data?.message || error.message,
+        type: 'alert-error',
+      })
+      return Promise.reject(error)
+    }
 
-  return error
-})
+    return error
+  },
+)
 
 export const version = ref()
 export const isCoreUpdateAvailable = ref(false)
@@ -45,7 +58,7 @@ watch(
     if (val) {
       const { data } = await fetchVersionAPI()
 
-      version.value = data.version
+      version.value = data?.version || ''
       if (isSingBox.value || !checkUpgradeCore.value || activeBackend.value?.disableUpgradeCore)
         return
       isCoreUpdateAvailable.value = await fetchBackendUpdateAvailableAPI()
@@ -82,6 +95,17 @@ export const fetchProxyGroupLatencyAPI = (proxyName: string, url: string, timeou
       timeout,
     },
   })
+}
+
+export const fetchSmartGroupWeightsAPI = (proxyName: string) => {
+  return axios.get<{
+    message: string
+    weights: Record<string, number>
+  }>(`/group/${encodeURIComponent(proxyName)}/weights`)
+}
+
+export const flushSmartGroupWeightsAPI = () => {
+  return axios.post(`/cache/smart/flush`)
 }
 
 export const fetchProxyProviderAPI = () => {
@@ -227,17 +251,64 @@ export const isBackendAvailable = async (backend: Backend, timeout: number = 100
   }
 }
 
-export const fetchIsUIUpdateAvailable = async () => {
-  const response = await fetch('https://api.github.com/repos/Zephyruso/zashboard/releases/latest')
-  const { tag_name } = await response.json()
+const CACHE_DURATION = 1000 * 60 * 60
 
-  return tag_name && tag_name !== `v${zashboardVersion.value}`
+interface CacheEntry<T> {
+  timestamp: number
+  version: string
+  data: T
+}
+
+export async function fetchWithLocalCache<T>(url: string, version: string): Promise<T> {
+  const cacheKey = 'cache/' + url
+  const cacheRaw = localStorage.getItem(cacheKey)
+
+  if (cacheRaw) {
+    try {
+      const cache: CacheEntry<T> = JSON.parse(cacheRaw)
+      const now = Date.now()
+
+      if (now - cache.timestamp < CACHE_DURATION && cache.version === version) {
+        return cache.data
+      } else {
+        localStorage.removeItem(cacheKey)
+      }
+    } catch (e) {
+      console.warn('Failed to parse cache for', url, e)
+    }
+  }
+
+  const response = await fetch(url)
+  if (!response.ok) {
+    throw new Error(`Fetch failed: ${response.status} ${response.statusText}`)
+  }
+
+  const data: T = await response.json()
+  const newCache: CacheEntry<T> = {
+    timestamp: Date.now(),
+    version,
+    data,
+  }
+
+  localStorage.setItem(cacheKey, JSON.stringify(newCache))
+  return data
+}
+
+export const fetchIsUIUpdateAvailable = async () => {
+  const { tag_name } = await fetchWithLocalCache<{ tag_name: string }>(
+    'https://api.github.com/repos/Zephyruso/zashboard/releases/latest',
+    zashboardVersion.value,
+  )
+
+  return Boolean(tag_name && tag_name !== `v${zashboardVersion.value}`)
 }
 
 const check = async (url: string, versionNumber: string) => {
-  const response = await fetch(`https://api.github.com/repos/MetaCubeX/mihomo${url}`)
-  const { assets } = await response.json()
-  const alreadyLatest = assets.some(({ name }: { name: string }) => name.includes(versionNumber))
+  const { assets } = await fetchWithLocalCache<{ assets: { name: string }[] }>(
+    `https://api.github.com/repos/MetaCubeX/mihomo${url}`,
+    versionNumber,
+  )
+  const alreadyLatest = assets.some(({ name }) => name.includes(versionNumber))
 
   return !alreadyLatest
 }
@@ -246,10 +317,12 @@ export const fetchBackendUpdateAvailableAPI = async () => {
   const match = /(alpha|beta|meta)-?(\w+)/.exec(version.value)
 
   if (!match) {
-    const response = await fetch(`https://api.github.com/repos/MetaCubeX/mihomo/releases/latest`)
-    const { tag_name } = await response.json()
+    const { tag_name } = await fetchWithLocalCache<{ tag_name: string }>(
+      'https://api.github.com/repos/MetaCubeX/mihomo/releases/latest',
+      version.value,
+    )
 
-    return tag_name && !tag_name.endsWith(version.value)
+    return Boolean(tag_name && !tag_name.endsWith(version.value))
   }
 
   const channel = match[1],
@@ -259,42 +332,6 @@ export const fetchBackendUpdateAvailableAPI = async () => {
   if (channel === 'alpha') return await check('/releases/tags/Prerelease-Alpha', versionNumber)
 
   return false
-}
-
-export type GlobalIPType = {
-  organization: string
-  longitude: number
-  city: string
-  region: string
-  timezone: string
-  isp: string
-  offset: number
-  asn: number
-  asn_organization: string
-  country: string
-  ip: string
-  latitude: number
-  postal_code: string
-  continent_code: string
-  country_code: string
-  region_code: string
-}
-
-export const getIPFromIpsbAPI = async (ip = '') => {
-  const response = await fetch('https://api.ip.sb/geoip' + (ip ? `/${ip}` : ''))
-
-  return (await response.json()) as GlobalIPType
-}
-
-export const getIPFromIpipnetAPI = async () => {
-  const response = await fetch('https://myip.ipip.net/json')
-
-  return (await response.json()) as {
-    data: {
-      ip: string
-      location: string[]
-    }
-  }
 }
 
 export const getLatencyFromUrlAPI = (url: string) => {
