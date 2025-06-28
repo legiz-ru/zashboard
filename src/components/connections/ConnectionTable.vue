@@ -101,6 +101,7 @@
               <div
                 v-if="isManualTable"
                 @dblclick="() => header.column.resetSize()"
+                @click.stop
                 @mousedown.stop="(e) => header.getResizeHandler()(e)"
                 @touchstart.stop="(e) => header.getResizeHandler()(e)"
                 class="resizer bg-neutral absolute top-0 right-0 h-full w-1 cursor-ew-resize"

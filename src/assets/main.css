@@ -141,7 +141,6 @@
       @apply bg-transparent! backdrop-blur-xl;
     }
 
-    .table thead::before,
     .table tbody::before {
       position: absolute;
       content: '';
