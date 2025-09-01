@@ -15,6 +15,7 @@
       @transitionend="handlerTransitionEnd"
     >
       <div
+        v-if="isMounted"
         class="max-h-108 overflow-y-auto"
         :class="[SCROLLABLE_PARENT_CLASS, !showCollapse && 'opacity-0']"
       >
@@ -32,7 +33,7 @@
 import { collapsedBus } from '@/composables/bus'
 import { SCROLLABLE_PARENT_CLASS } from '@/helper/utils'
 import { collapseGroupMap } from '@/store/settings'
-import { computed, onUnmounted, ref } from 'vue'
+import { computed, nextTick, onMounted, onUnmounted, ref } from 'vue'
 
 const props = defineProps<{
   name: string
@@ -53,7 +54,8 @@ const showCollapse = computed({
 })
 
 const showContent = ref(showCollapse.value)
-const showFullContent = ref(showCollapse.value)
+const showFullContent = ref(false)
+const isMounted = ref(false)
 
 const handlerTransitionEnd = () => {
   if (showCollapse.value) {
@@ -68,6 +70,23 @@ const busHandler = ({ open }: { open: boolean }) => {
 }
 
 collapsedBus.on(busHandler)
+
+const execUntil = (fn: () => void, timeout: number) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      fn()
+      resolve(true)
+    }, timeout)
+  })
+}
+
+onMounted(async () => {
+  await nextTick()
+  isMounted.value = true
+  await execUntil(() => {
+    showFullContent.value = showCollapse.value
+  }, Math.random() * 50)
+})
 
 onUnmounted(() => {
   collapsedBus.off(busHandler)
