@@ -88,6 +88,12 @@ const en = {
   bar: 'Bar',
   exportSettings: 'Export Settings',
   importSettings: 'Import Settings',
+  connectionSettings: 'Connection Settings',
+  proxySettings: 'Proxy Settings',
+  logSettings: 'Log Settings',
+  ruleSettings: 'Rule Settings',
+  connectionDetails: 'Connection Details',
+  customTheme: 'Custom Theme',
   unavailableProxy: 'Hide Unavailable Proxies',
   protocolTips:
     'You are trying to connect to an HTTP backend, but zashboard is provided via HTTPS. This may cause connection errors. Please allow insecure content in your browser settings or use the HTTP version of zashboard, such as http://board.zash.run.place.',

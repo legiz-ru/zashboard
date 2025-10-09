@@ -113,7 +113,10 @@ export default defineComponent({
           >
             <WrenchScrewdriverIcon class="h-4 w-4" />
           </button>
-          <DialogWrapper v-model={settingsModel.value}>
+          <DialogWrapper
+            v-model={settingsModel.value}
+            title={t('ruleSettings')}
+          >
             <div class="flex flex-col gap-4 p-2 text-sm">
               <div class="flex items-center gap-2">
                 {t('displaySelectedNode')}

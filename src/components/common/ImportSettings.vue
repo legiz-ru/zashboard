@@ -5,7 +5,10 @@
   >
     {{ $t('importSettings') }}
   </button>
-  <DialogWrapper v-model="importDialogShow">
+  <DialogWrapper
+    v-model="importDialogShow"
+    :title="$t('importSettings')"
+  >
     <div class="my-4 flex items-center gap-2">
       {{ $t('importFromFile') }}
       <button

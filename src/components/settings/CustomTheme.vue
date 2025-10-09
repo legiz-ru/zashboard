@@ -1,5 +1,8 @@
 <template>
-  <DialogWrapper v-model="model">
+  <DialogWrapper
+    v-model="model"
+    :title="$t('customTheme')"
+  >
     <div class="divider">Color</div>
     <div class="grid grid-cols-4 gap-2">
       <div

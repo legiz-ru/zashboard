@@ -1,11 +1,10 @@
 <template>
   <DialogWrapper
     v-model="isVisible"
+    :title="t('editBackendTitle')"
     @keydown.enter="!isSaving && handleSave()"
   >
     <div class="flex flex-col gap-4">
-      <h3 class="text-lg font-bold">{{ t('editBackendTitle') }}</h3>
-
       <!-- 后端选择器 -->
       <div class="flex flex-col gap-1">
         <label class="text-sm">{{ t('selectBackend') }}</label>

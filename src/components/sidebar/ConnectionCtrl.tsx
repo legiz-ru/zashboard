@@ -60,11 +60,13 @@ export default defineComponent({
 
     return () => {
       const sortForCards = (
-        <div class="flex w-full items-center gap-1 text-sm lg:w-auto">
+        <div
+          class={`flex items-center gap-1 text-sm ${props.isLargeCtrlsBar ? 'w-auto' : 'w-full'}`}
+        >
           <span class="shrink-0">{t('sortBy')}</span>
-          <div class="join flex-1 max-lg:w-0">
+          <div class={`join flex-1 ${props.isLargeCtrlsBar ? 'min-w-46' : ''}`}>
             <select
-              class="join-item select select-sm flex-1 max-lg:w-0"
+              class="join-item select select-sm flex-1"
               v-model={connectionSortType.value}
             >
               {(Object.values(SORT_TYPE) as string[]).map((opt) => (
@@ -103,7 +105,10 @@ export default defineComponent({
           >
             <WrenchScrewdriverIcon class="h-4 w-4" />
           </button>
-          <DialogWrapper v-model={settingsModel.value}>
+          <DialogWrapper
+            v-model={settingsModel.value}
+            title={t('connectionSettings')}
+          >
             <div class="flex flex-col gap-4 p-2 text-sm">
               <div class="flex items-center gap-2">
                 <span class="shrink-0">{t('hideConnectionRegex')}</span>

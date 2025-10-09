@@ -6,7 +6,6 @@ import prettyBytes, { type Options } from 'pretty-bytes'
 
 export const isPreferredDark = useMediaQuery('(prefers-color-scheme: dark)')
 export const isMiddleScreen = useMediaQuery('(max-width: 768px)')
-export const isLargeScreen = useMediaQuery('(max-width: 1024px)')
 export const isPWA = (() => {
   return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone
 })()

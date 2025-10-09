@@ -1,14 +1,14 @@
 <template>
   <DialogWrapper
     v-model="connectionDetailModalShow"
-    :no-padding="true"
+    :title="$t('connectionDetails')"
     :box-class="proxyChainStart ? `max-w-256` : `max-w-128`"
   >
-    <div class="flex h-full max-h-[69dvh] flex-col py-4 md:max-h-[89dvh] md:flex-row">
+    <div class="flex flex-col md:flex-row">
       <div class="md:w-128">
         <VueJsonPretty
           :data="infoConn"
-          class="overflow-y-auto px-4"
+          class="overflow-y-auto"
         >
           <template #renderNodeValue="{ node, defaultValue }">
             <template v-if="node.path.startsWith('root.chains') && proxyMap[node.content]?.icon">
@@ -27,7 +27,7 @@
           </template>
         </VueJsonPretty>
         <div
-          class="min-h-12 shrink-0 px-4 pt-2 text-sm"
+          class="min-h-12 shrink-0 pt-2 text-sm"
           v-if="destinationIP && !isPrivateIP"
         >
           <template v-if="details">
@@ -61,7 +61,7 @@
         </div>
       </div>
       <template v-if="proxyChainStart">
-        <div class="divider md:divider-horizontal md:m-0" />
+        <div class="divider divider-vertical md:divider-horizontal m-0"></div>
         <div class="md:w-128">
           <ProxyChains :name="proxyChainStart" />
         </div>

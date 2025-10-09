@@ -5,7 +5,7 @@
   >
     <div
       v-if="index > 0"
-      class="divider m-0 h-1"
+      class="border-base-content/15 border-b"
     />
     <ProxyGroup
       :name="name"

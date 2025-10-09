@@ -90,6 +90,12 @@ const ru: LANG_MESSAGE = {
   bar: 'Полоса',
   exportSettings: 'Экспорт настроек',
   importSettings: 'Импорт настроек',
+  connectionSettings: 'Настройки подключения',
+  proxySettings: 'Настройки прокси',
+  logSettings: 'Настройки журнала',
+  ruleSettings: 'Настройки правил',
+  connectionDetails: 'Детали подключения',
+  customTheme: 'Пользовательская тема',
   unavailableProxy: 'Скрыть недоступное',
   protocolTips:
     'Вы пытаетесь подключиться к HTTP-бэкенду, но Zashboard предоставляется через HTTPS. Это может вызвать ошибки подключения. Разрешите небезопасный контент в настройках браузера или используйте HTTP-версию панели, например, http://board.zash.run.place.',

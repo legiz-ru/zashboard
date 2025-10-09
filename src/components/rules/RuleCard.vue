@@ -23,14 +23,17 @@
           ({{ size }})
           <QuestionMarkCircleIcon
             v-if="size === 0"
-            class="ml-1 h-4 w-4"
+            class="-mt-1 ml-1 inline-block h-4 w-4"
             @mouseenter="showMMDBSizeTip"
           />
         </span>
         <button
           v-if="isUpdateableRuleSet"
           :class="
-            twMerge('btn btn-circle btn-ghost btn-xs -mt-1 ml-1', isUpdating ? 'animate-spin' : '')
+            twMerge(
+              'btn btn-circle btn-ghost btn-xs -mt-[2px] ml-1',
+              isUpdating ? 'animate-spin' : '',
+            )
           "
           @click="updateRuleProviderClickHandler"
         >

@@ -83,7 +83,7 @@
 }
 
 @utility modal {
-  @apply max-md:bg-transparent!;
+  @apply max-md:bg-transparent! max-md:backdrop-blur-sm max-md:transition-[backdrop-filter];
 }
 
 .select.select-sm,

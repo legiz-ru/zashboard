@@ -6,23 +6,31 @@
   >
     <form
       method="dialog"
-      class="modal-backdrop w-screen transition-[backdrop-filter]"
-      :class="isOpen ? 'backdrop-blur-sm' : 'backdrop-blur-none'"
+      class="modal-backdrop w-screen"
     >
       <button class="!outline-none">close</button>
     </form>
     <div
-      class="modal-box relative max-h-[90dvh] overflow-hidden p-0 max-md:max-h-[70dvh]"
+      class="modal-box relative overflow-hidden p-0"
       :class="[blurIntensity < 5 && 'backdrop-blur-sm!', boxClass]"
     >
-      <form method="dialog">
-        <button class="btn btn-circle btn-ghost btn-xs absolute top-1 right-1 z-10">
-          <XMarkIcon class="h-4 w-4" />
-        </button>
-      </form>
       <div
-        :class="['max-h-[90dvh] overflow-y-auto max-md:max-h-[70dvh]', noPadding ? 'p-0' : 'p-4']"
+        v-if="title && isOpen"
+        class="border-base-content/10 relative border-b px-4 py-2 text-base font-bold"
+      >
+        {{ title }}
+        <form
+          method="dialog"
+          class="-mr-1"
+        >
+          <button class="btn btn-circle btn-ghost btn-xs absolute top-2 right-2">
+            <XMarkIcon class="h-4 w-4" />
+          </button>
+        </form>
+      </div>
+      <div
         v-if="isOpen"
+        class="max-h-[90dvh] overflow-y-auto p-4 max-md:max-h-[70dvh]"
       >
         <slot></slot>
       </div>
@@ -37,7 +45,7 @@ import { ref, watch } from 'vue'
 
 const modalRef = ref<HTMLDialogElement>()
 const isOpen = defineModel<boolean>()
-defineProps<{ noPadding?: boolean; boxClass?: string }>()
+defineProps<{ noPadding?: boolean; boxClass?: string; title?: string }>()
 
 watch(isOpen, (value) => {
   if (value) {

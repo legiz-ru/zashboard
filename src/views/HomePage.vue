@@ -59,8 +59,10 @@
       </div>
     </RouterView>
 
-    <DialogWrapper v-model="autoSwitchBackendDialog">
-      <h3 class="text-lg font-bold">{{ $t('currentBackendUnavailable') }}</h3>
+    <DialogWrapper
+      v-model="autoSwitchBackendDialog"
+      :title="$t('currentBackendUnavailable')"
+    >
       <div class="flex justify-end gap-2">
         <button
           class="btn btn-sm"
@@ -99,6 +101,7 @@ import { initLogs } from '@/store/logs'
 import { initSatistic } from '@/store/overview'
 import { fetchProxies, proxiesTabShow } from '@/store/proxies'
 import { fetchRules, rulesTabShow } from '@/store/rules'
+import { useConnectionCard } from '@/store/settings'
 import { activeBackend, activeUuid, backendList } from '@/store/setup'
 import type { Backend } from '@/types'
 import { useDocumentVisibility, useElementSize } from '@vueuse/core'
@@ -123,6 +126,9 @@ const { swiperRef } = useSwipeRouter()
 const ctrlsBarRef = ref<HTMLDivElement>()
 const { width: ctrlsBarWidth } = useElementSize(ctrlsBarRef)
 const isLargeCtrlsBar = computed(() => {
+  if (router.currentRoute.value.name === ROUTE_NAME.connections && useConnectionCard.value) {
+    return ctrlsBarWidth.value > 860
+  }
   return ctrlsBarWidth.value > 720
 })
 

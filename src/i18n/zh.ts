@@ -90,6 +90,12 @@ const zh: LANG_MESSAGE = {
   bar: '条',
   exportSettings: '导出设置',
   importSettings: '导入设置',
+  connectionSettings: '连接设置',
+  proxySettings: '代理设置',
+  logSettings: '日志设置',
+  ruleSettings: '规则设置',
+  connectionDetails: '连接详情',
+  customTheme: '自定义主题',
   unavailableProxy: '隐藏不可用节点',
   protocolTips:
     '您正在尝试连接一个http后端但zashboard是通过https提供的，这可能会导致连接错误，请在浏览器设置中允许不安全的内容，或者使用http版本面板例如http://board.zash.run.place',
