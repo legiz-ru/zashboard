@@ -19,6 +19,7 @@
         class="border-base-content/10 relative border-b px-4 py-2 text-base font-bold"
       >
         {{ title }}
+        <slot name="title-right"></slot>
         <form
           method="dialog"
           class="-mr-1"

@@ -194,6 +194,7 @@ const ru: LANG_MESSAGE = {
   themeName: 'Название темы',
   save: 'Сохранить',
   moreDetails: 'Подробнее',
+  moreSettings: 'Дополнительные настройки',
   customIcon: 'Пользовательская иконка',
   disablePullToRefresh: 'Отключить свойство обновления',
   disablePullToRefreshTip:

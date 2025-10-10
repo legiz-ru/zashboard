@@ -1,6 +1,6 @@
 import { disconnectByIdAPI, isSingBox, updateProxyProviderAPI } from '@/api'
 import { renderGroups } from '@/composables/proxies'
-import { PROXY_SORT_TYPE, PROXY_TAB_TYPE } from '@/constant'
+import { PROXY_SORT_TYPE, PROXY_TAB_TYPE, ROUTE_NAME } from '@/constant'
 import { getMinCardWidth } from '@/helper/utils'
 import { configs, updateConfigs } from '@/store/config'
 import { activeConnections } from '@/store/connections'
@@ -36,6 +36,7 @@ import {
 import { every } from 'lodash'
 import { computed, defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import DialogWrapper from '../common/DialogWrapper.vue'
 import TextInput from '../common/TextInput.vue'
 
@@ -49,6 +50,7 @@ export default defineComponent({
   },
   setup(props) {
     const { t } = useI18n()
+    const router = useRouter()
     const isUpgrading = ref(false)
     const isAllLatencyTesting = ref(false)
     const settingsModel = ref(false)
@@ -314,6 +316,19 @@ export default defineComponent({
                   </button>
                 </div>
               </div>
+              <div class="divider m-0"></div>
+              <button
+                class="btn btn-block"
+                onClick={() => {
+                  settingsModel.value = false
+                  router.push({
+                    name: ROUTE_NAME.settings,
+                    query: { scrollTo: 'proxies-settings' },
+                  })
+                }}
+              >
+                {t('moreSettings')}
+              </button>
             </div>
           </DialogWrapper>
         </>

@@ -4,10 +4,10 @@
     <OverviewCard v-if="!splitOverviewPage" />
     <BackendSettings />
     <GeneralSettings />
-    <ProxiesSettings />
+    <ProxiesSettings id="proxies-settings" />
 
     <template v-if="isMounted">
-      <ConnectionsSettings />
+      <ConnectionsSettings id="connections-settings" />
       <OverviewSettings />
     </template>
   </div>
@@ -22,13 +22,23 @@ import OverviewSettings from '@/components/settings/OverviewSettings.vue'
 import ProxiesSettings from '@/components/settings/ProxiesSettings.vue'
 import ZashboardSettings from '@/components/settings/ZashboardSettings.vue'
 import { splitOverviewPage } from '@/store/settings'
-import { onMounted, ref } from 'vue'
+import { nextTick, onMounted, ref } from 'vue'
+import { useRoute } from 'vue-router'
 
 const isMounted = ref(false)
+const route = useRoute()
 
 onMounted(() => {
-  requestAnimationFrame(() => {
+  requestAnimationFrame(async () => {
     isMounted.value = true
+    await nextTick()
+    const scrollTo = route.query.scrollTo as string
+    if (scrollTo) {
+      const element = document.getElementById(scrollTo)
+      if (element) {
+        element.scrollIntoView({ behavior: 'auto', block: 'start' })
+      }
+    }
   })
 })
 </script>

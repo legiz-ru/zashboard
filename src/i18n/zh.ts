@@ -191,6 +191,7 @@ const zh: LANG_MESSAGE = {
   themeName: '主题名称',
   save: '保存',
   moreDetails: '更多详情',
+  moreSettings: '更多设置',
   customIcon: '自定义图标',
   disablePullToRefresh: '禁用下拉刷新',
   disablePullToRefreshTip:

@@ -1,5 +1,5 @@
 import { disconnectAllAPI, disconnectByIdAPI } from '@/api'
-import { SORT_DIRECTION, SORT_TYPE } from '@/constant'
+import { ROUTE_NAME, SORT_DIRECTION, SORT_TYPE } from '@/constant'
 import { useTooltip } from '@/helper/tooltip'
 import {
   connectionFilter,
@@ -23,6 +23,7 @@ import {
 } from '@heroicons/vue/24/outline'
 import { defineComponent, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 import DialogWrapper from '../common/DialogWrapper.vue'
 import TextInput from '../common/TextInput.vue'
 import ConnectionCardSettings from '../settings/ConnectionCardSettings.vue'
@@ -55,6 +56,7 @@ export default defineComponent({
   },
   setup(props) {
     const { t } = useI18n()
+    const router = useRouter()
     const settingsModel = ref(false)
     const { showTip } = useTooltip()
 
@@ -135,6 +137,19 @@ export default defineComponent({
                 </div>
               </div>
               {useConnectionCard.value ? <ConnectionCardSettings /> : <TableSettings />}
+              <div class="divider m-0"></div>
+              <button
+                class="btn btn-block"
+                onClick={() => {
+                  settingsModel.value = false
+                  router.push({
+                    name: ROUTE_NAME.settings,
+                    query: { scrollTo: 'connections-settings' },
+                  })
+                }}
+              >
+                {t('moreSettings')}
+              </button>
             </div>
           </DialogWrapper>
         </>

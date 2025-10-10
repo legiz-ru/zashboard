@@ -61,7 +61,7 @@
         </div>
       </div>
       <template v-if="proxyChainStart">
-        <div class="divider divider-vertical md:divider-horizontal m-0"></div>
+        <div class="divider md:divider-horizontal m-0"></div>
         <div class="md:w-128">
           <ProxyChains :name="proxyChainStart" />
         </div>

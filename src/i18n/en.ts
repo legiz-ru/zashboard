@@ -192,6 +192,7 @@ const en = {
   themeName: 'Theme Name',
   save: 'Save',
   moreDetails: 'More Details',
+  moreSettings: 'More Settings',
   customIcon: 'Custom Icon',
   disablePullToRefresh: 'Disable Pull to Refresh',
   disablePullToRefreshTip:
