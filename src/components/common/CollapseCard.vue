@@ -11,12 +11,12 @@
       />
     </div>
     <div
-      class="collapse-content max-sm:px-2"
+      class="collapse-content p-0"
       @transitionend="handlerTransitionEnd"
     >
       <div
         v-if="showContent"
-        class="max-h-108 overflow-y-auto"
+        class="max-h-108 overflow-y-auto p-4 pt-0 max-md:p-2"
         :class="[SCROLLABLE_PARENT_CLASS, !showCollapse && 'opacity-0']"
       >
         <slot name="content" />
