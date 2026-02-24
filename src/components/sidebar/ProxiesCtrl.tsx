@@ -155,7 +155,7 @@ export default defineComponent({
       )
       const modeSelect = configs.value && (
         <select
-          class={['select select-sm inline-block', isLargeCtrlsBar.value ? 'min-w-40' : 'min-w-24']}
+          class={['select select-sm', isLargeCtrlsBar.value ? 'min-w-40' : 'min-w-24']}
           v-model={configs.value.mode}
           onChange={handlerModeChange}
         >
