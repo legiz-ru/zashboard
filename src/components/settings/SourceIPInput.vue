@@ -19,7 +19,7 @@
       class="w-12 max-w-64 flex-1 sm:w-36"
       :menus="sourceList"
       v-model="sourceIPLabel.key"
-      placeholder="IP | eui64 | /Regex"
+      placeholder="IP/CIDR | eui64 | /Regex"
     />
     <div
       v-if="backendList.length > 1"
