@@ -1,5 +1,8 @@
 <template>
-  <div class="relative">
+  <div
+    class="relative"
+    ref="inputRef"
+  >
     <XMarkIcon
       v-if="beforeClose && clearable"
       class="absolute top-2 right-2 z-10 h-4 w-3 cursor-pointer hover:scale-125"
@@ -27,7 +30,7 @@
 <script lang="ts" setup>
 import { useTooltip } from '@/helper/tooltip'
 import { XMarkIcon } from '@heroicons/vue/24/outline'
-import { createApp, defineComponent, h } from 'vue'
+import { createApp, defineComponent, h, ref } from 'vue'
 
 const emits = defineEmits<{
   (e: 'input', value: string): void
@@ -51,7 +54,7 @@ const clearInput = () => {
 }
 
 const { showTip, hideTip } = useTooltip()
-
+const inputRef = ref()
 const handlerSearchInputClick = (e: Event) => {
   if (!props.menus?.length) {
     return
