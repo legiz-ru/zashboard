@@ -2,13 +2,14 @@
   <DialogWrapper
     v-model="connectionDetailModalShow"
     :title="$t('connectionDetails')"
+    :no-padding="true"
     :box-class="proxyChainStart ? `max-w-256` : `max-w-128`"
   >
-    <div class="flex flex-col md:flex-row">
-      <div class="md:w-128">
+    <div class="flex flex-col md:h-[70dvh] md:max-h-[70dvh] md:flex-row md:overflow-hidden">
+      <div class="flex flex-1 flex-col overflow-hidden p-4">
         <VueJsonPretty
           :data="infoConn"
-          class="overflow-y-auto"
+          class="flex-1 overflow-y-auto"
         >
           <template #renderNodeValue="{ node, defaultValue }">
             <template v-if="node.path.startsWith('root.chains') && proxyMap[node.content]?.icon">
@@ -62,8 +63,8 @@
       </div>
       <template v-if="proxyChainStart">
         <div class="divider md:divider-horizontal m-0"></div>
-        <div class="overflow-hidden md:w-128">
-          <div class="p-3">
+        <div class="flex flex-1 flex-col">
+          <div class="shrink-0 p-3">
             <ProxyChainPath
               :proxy="proxyChainStart"
               :selected="selectedProxy"
