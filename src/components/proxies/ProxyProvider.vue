@@ -2,13 +2,15 @@
   <CollapseCard :name="proxyProvider.name">
     <template v-slot:title>
       <div class="flex items-center justify-between gap-2">
-        <div class="text-lg font-medium">
-          {{ proxyProvider.name }}
-          <span class="text-base-content/60 text-sm font-normal"> ({{ proxiesCount }}) </span>
+        <div class="flex flex-1 items-center gap-1">
+          <span class="text-base font-semibold tracking-tight">{{ proxyProvider.name }}</span>
+          <span class="text-base-content/50 text-xs tabular-nums">
+            · {{ proxyProvider.vehicleType }} · {{ proxiesCount }}
+          </span>
         </div>
-        <div class="flex gap-2">
+        <div class="flex items-center gap-1.5">
           <button
-            :class="twMerge('btn btn-circle btn-sm z-30')"
+            class="btn btn-circle btn-ghost btn-xs z-30"
             @click.stop="healthCheckClickHandler"
           >
             <span
@@ -17,30 +19,40 @@
             ></span>
             <BoltIcon
               v-else
-              class="h-4 w-4"
+              class="h-3.5 w-3.5 opacity-60"
             />
           </button>
           <button
             v-if="proxyProvider.vehicleType !== 'Inline'"
-            :class="twMerge('btn btn-circle btn-sm z-30', isUpdating ? 'animate-spin' : '')"
+            :class="
+              twMerge('btn btn-circle btn-ghost btn-xs z-30', isUpdating ? 'animate-spin' : '')
+            "
             @click.stop="updateProviderClickHandler"
           >
-            <ArrowPathIcon class="h-4 w-4" />
+            <ArrowPathIcon class="h-3.5 w-3.5 opacity-60" />
           </button>
         </div>
       </div>
-      <div
-        class="text-base-content/60 flex items-end justify-between text-sm max-sm:flex-col max-sm:items-start"
-      >
-        <div class="min-h-10">
-          <div v-if="subscriptionInfo">
-            {{ subscriptionInfo.expireStr }}
+      <div class="mt-2 space-y-1.5">
+        <div
+          v-if="subscriptionInfo"
+          class="space-y-1"
+        >
+          <div class="bg-base-content/10 h-1.5 w-full overflow-hidden rounded-full">
+            <div
+              class="h-full rounded-full transition-all duration-500"
+              :class="usageBarColor"
+              :style="{ width: `${subscriptionInfo.percentage}%` }"
+            />
           </div>
-          <div v-if="subscriptionInfo">
-            {{ subscriptionInfo.usageStr }}
+          <div class="text-base-content/50 flex justify-between text-xs">
+            <span>{{ subscriptionInfo.usageStr }}</span>
+            <span>{{ subscriptionInfo.expireStr }}</span>
           </div>
         </div>
-        <div>{{ $t('updated') }} {{ fromNow(proxyProvider.updatedAt) }}</div>
+        <div class="text-base-content/40 text-xs">
+          {{ $t('updated') }} {{ fromNow(proxyProvider.updatedAt) }}
+        </div>
       </div>
     </template>
     <template v-slot:preview>
@@ -106,10 +118,19 @@ const subscriptionInfo = computed(() => {
     return {
       expireStr,
       usageStr,
+      percentage: Math.min(percentage, 100),
     }
   }
 
   return null
+})
+
+const usageBarColor = computed(() => {
+  const pct = subscriptionInfo.value?.percentage ?? 0
+
+  if (pct >= 90) return 'bg-error'
+  if (pct >= 70) return 'bg-warning'
+  return 'bg-primary'
 })
 
 const isUpdating = ref(false)

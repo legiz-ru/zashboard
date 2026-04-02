@@ -141,11 +141,11 @@ const defaultOverviewCardOrder: { card: OVERVIEW_CARD; visible: boolean }[] = [
     visible: true,
   },
   {
-    card: OVERVIEW_CARD.ProviderTrafficOverview,
+    card: OVERVIEW_CARD.TopologyCharts,
     visible: true,
   },
   {
-    card: OVERVIEW_CARD.TopologyCharts,
+    card: OVERVIEW_CARD.ProviderTrafficOverview,
     visible: true,
   },
   {
