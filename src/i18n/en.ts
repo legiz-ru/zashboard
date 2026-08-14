@@ -679,6 +679,33 @@ const en = {
   onboardingGoToProxies: 'Go to proxies',
   onboardingBack: 'Back',
   onboardingStep: 'Step {current} of {total}',
+
+  // Desktop: kernel manager, TUN helper, global hotkeys, window controls
+  kernelManager: 'Switch kernel build',
+  kernelManagerDesc: 'Download and switch the mihomo build the app runs.',
+  kernelSourceMihomo: 'mihomo (upstream)',
+  kernelSourceSmart: 'Smart fork (vernesong)',
+  refreshList: 'Refresh',
+  install: 'Install',
+  useBundledKernel: 'Back to bundled',
+  currentKernel: 'In use: {source} {version}',
+  tunModeDesc:
+    'Routes the whole machine through a virtual adapter. Installs a privileged helper service the first time.',
+  tunStack: 'Stack',
+  uninstallHelper: 'Remove helper',
+  tunUnsupported:
+    'The helper service is available on Linux and macOS. On Windows use "Run kernel as administrator" instead.',
+  globalHotkeys: 'Global shortcuts',
+  globalHotkeysDesc: 'Work while the app is in the background. Leave empty to disable one.',
+  hotkeyTaken: 'in use by another app',
+  hotkey_toggleWindow: 'Show / hide window',
+  hotkey_toggleSystemProxy: 'Toggle system proxy',
+  hotkey_restartKernel: 'Restart kernel',
+  hotkey_modeRule: 'Mode: rule',
+  hotkey_modeGlobal: 'Mode: global',
+  hotkey_modeDirect: 'Mode: direct',
+  minimize: 'Minimize',
+  maximize: 'Maximize',
 }
 
 export type LANG_MESSAGE = typeof en

@@ -66,10 +66,30 @@ What the app does on top of the web dashboard:
   the proxies view instead of the setup page;
 - toggles the **system proxy** (Windows / macOS / GNOME-based Linux) from the
   tray or the Kernel menu;
+- manages **profiles**: subscriptions and local configs, validated by the kernel
+  before they go live, with usage/expiry and auto-update (own page in the app,
+  plus `clash://` one-click import links);
 - adds a **Desktop** section to the dashboard's settings page — kernel control,
-  privileged launch, kernel version, system proxy, launch at login and the data
-  folders;
-- keeps running in the tray when the window is closed.
+  privileged launch, kernel version switching, TUN, global shortcuts, system
+  proxy, launch at login and the data folders;
+- runs in a frameless window with its own title bar, and keeps running in the
+  tray when that window is closed.
+
+### Kernel versions
+
+**Settings → Desktop → Switch kernel build** downloads and swaps the mihomo the
+app runs, from either upstream `MetaCubeX/mihomo` (stable tags) or
+[vernesong's Smart fork](https://github.com/vernesong/mihomo) (the rolling
+`Prerelease-Alpha`, which adds the Smart outbound group). Each build lands in
+its own directory, so switching back to one you already used costs no download,
+and **Back to bundled** returns to the kernel that shipped with the app.
+
+### Global shortcuts
+
+Show/hide the window, toggle the system proxy, restart the kernel and switch
+mihomo's mode — all while the app is in the background. Bindings live in
+Settings → Desktop; an empty field disables one, and a combination another app
+already holds is reported instead of silently doing nothing.
 
 Your config lives in the app's data directory (`%APPDATA%\zashboard`,
 `~/Library/Application Support/zashboard`, `~/.config/zashboard`) as
@@ -78,6 +98,19 @@ yours to edit afterwards — the app only rewrites `external-controller`, `secre
 and `external-controller-cors` on each start, and fills in `mixed-port` if it is
 missing. Use **Open config folder** in the tray menu to get there. Kernel output
 is mirrored to `logs/kernel.log`.
+
+### TUN mode
+
+**Settings → Desktop → TUN mode** routes the whole machine through a virtual
+adapter. Because that needs a privileged kernel, the app installs a small helper
+service (systemd on Linux, a LaunchDaemon on macOS) the first time you turn it
+on: the helper runs as root, owns the mihomo process while TUN is active, and
+accepts exactly four commands over a root-owned local socket, authorized by a
+shared secret. The GUI itself never runs elevated. **Remove helper** uninstalls
+the service again.
+
+On Windows the helper service is not implemented; use _Run kernel as
+administrator_ below, which gives the kernel the same privileges through UAC.
 
 ### Running the kernel as administrator
 

@@ -668,6 +668,31 @@ const zhTW: LANG_MESSAGE = {
   onboardingGoToProxies: '前往代理',
   onboardingBack: '返回',
   onboardingStep: '第 {current} / {total} 步',
+
+  // 桌面端：核心管理、TUN 助手、全域快捷鍵、視窗控制
+  kernelManager: '切換核心建置',
+  kernelManagerDesc: '下載並切換應用程式使用的 mihomo 建置。',
+  kernelSourceMihomo: 'mihomo（上游）',
+  kernelSourceSmart: 'Smart 分支（vernesong）',
+  refreshList: '重新整理清單',
+  install: '安裝',
+  useBundledKernel: '還原內建',
+  currentKernel: '目前：{source} {version}',
+  tunModeDesc: '讓整機流量走虛擬網卡。首次開啟會安裝一個特權助手服務。',
+  tunStack: '協定堆疊',
+  uninstallHelper: '解除安裝助手',
+  tunUnsupported: '助手服務僅支援 Linux 與 macOS。Windows 請改用「以系統管理員身分啟動核心」。',
+  globalHotkeys: '全域快捷鍵',
+  globalHotkeysDesc: '應用程式在背景時同樣生效。留空即為關閉該快捷鍵。',
+  hotkeyTaken: '已被其他應用程式占用',
+  hotkey_toggleWindow: '顯示 / 隱藏視窗',
+  hotkey_toggleSystemProxy: '切換系統代理',
+  hotkey_restartKernel: '重新啟動核心',
+  hotkey_modeRule: '模式：規則',
+  hotkey_modeGlobal: '模式：全域',
+  hotkey_modeDirect: '模式：直連',
+  minimize: '最小化',
+  maximize: '最大化',
 }
 
 export default zhTW

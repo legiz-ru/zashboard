@@ -5,15 +5,23 @@ import { dirname, join } from 'node:path'
 import type {
   BootstrapSnapshot,
   DesktopSettings,
+  HotkeyAction,
+  KernelSource,
   KernelState,
   OpenTarget,
   ProfilesSnapshot,
+  TunStack,
+  TunStatus,
 } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 import { buildAppMenu } from './app-menu'
 import { resolveDefaultConfig, resolveKernelBinary } from './binary-path'
 import { findFreePort } from './free-port'
+import { callHelper, helperAvailable, helperPaths } from './helper-client'
+import { helperSupported, installHelper, uninstallHelper } from './helper-installer'
+import { Hotkeys } from './hotkeys'
 import { Kernel } from './kernel'
+import { downloadKernel, listKernelVersions } from './kernel-source'
 import { createLogFile } from './log-file'
 import { bootstrapDataDir } from './paths'
 import { ProfileStore } from './profiles'
@@ -21,6 +29,7 @@ import { APP_INDEX, APP_ORIGIN, registerAppScheme, serveRenderer } from './proto
 import { SettingsStore } from './settings'
 import { isSystemProxyEnabled, setSystemProxy } from './sysproxy'
 import { createTray } from './tray'
+import { readTunState, writeTunBlock } from './tun'
 
 /** mihomo's conventional REST API port; reused whenever it is free. */
 const PREFERRED_API_PORT = 9090
@@ -45,6 +54,7 @@ let tray: ReturnType<typeof createTray> | null = null
 let kernel: Kernel | null = null
 let settings: SettingsStore | null = null
 let profiles: ProfileStore | null = null
+let hotkeys: Hotkeys | null = null
 let quitting = false
 /** True once we have pointed the OS proxy at the kernel, so we can undo it. */
 let systemProxyApplied = false
@@ -182,6 +192,12 @@ const createWindow = (): void => {
     autoHideMenuBar: true,
     backgroundColor: '#1d232a',
     title: 'zashboard',
+    // Frameless with an in-page title bar. macOS keeps its traffic lights via
+    // hiddenInset (users expect them where the OS puts them); the other
+    // platforms get the buttons the renderer draws.
+    ...(process.platform === 'darwin'
+      ? { titleBarStyle: 'hiddenInset' as const, trafficLightPosition: { x: 12, y: 10 } }
+      : { frame: false }),
     webPreferences: {
       preload: join(__dirname, '..', 'preload', 'index.cjs'),
       contextIsolation: true,
@@ -202,6 +218,9 @@ const createWindow = (): void => {
   window.on('closed', () => {
     window = null
   })
+
+  window.on('maximize', () => broadcast(IPC.onWindowMaximized, true))
+  window.on('unmaximize', () => broadcast(IPC.onWindowMaximized, false))
 
   // The renderer only ever talks to its own origin; anything else (a proxy
   // provider's homepage, a subscription link) belongs in the user's browser.
@@ -303,6 +322,223 @@ const registerIpc = (snapshot: () => BootstrapSnapshot): void => {
   ipcMain.handle(IPC.openPath, (_event, target: OpenTarget) => openTarget(target))
 
   registerProfileIpc()
+  registerKernelSourceIpc()
+  registerHotkeyIpc()
+  registerWindowIpc()
+  registerTunIpc()
+}
+
+/**
+ * TUN needs a privileged kernel. Rather than elevating the GUI, the app hands
+ * the kernel to a root helper service: the app's own supervisor stops its
+ * unprivileged child, the helper starts mihomo with the TUN block in place, and
+ * the dashboard keeps talking to the same REST endpoint either way.
+ */
+const helperSecretFor = (userData: string): string => {
+  const path = join(userData, 'helper-secret.txt')
+
+  try {
+    const existing = readFileSync(path, 'utf8').trim()
+
+    if (existing) return existing
+  } catch {
+    // First use — mint one below.
+  }
+
+  const secret = randomBytes(24).toString('hex')
+
+  try {
+    writeFileSync(path, secret, { encoding: 'utf8', mode: 0o600 })
+  } catch {
+    // Non-persistable: TUN will simply need re-installing next launch.
+  }
+
+  return secret
+}
+
+const helperInstallRequest = () => {
+  const userData = app.getPath('userData')
+  const paths = helperPaths()
+
+  return {
+    electronPath: process.execPath,
+    // Must be a real on-disk file: an OS service cannot execute a path inside
+    // app.asar (see asarUnpack in electron-builder.yml).
+    helperEntry: isPackaged
+      ? join(appRoot, '..', 'app.asar.unpacked', 'out', 'helper', 'index.cjs')
+      : join(appRoot, 'out', 'helper', 'index.cjs'),
+    socketPath: paths.socketPath,
+    secretPath: paths.secretPath,
+    configPath: paths.configPath,
+    secret: helperSecretFor(userData),
+    binaryPath: resolveKernelBinary({ ...binaryInput, userOverride: settings?.get().kernelPath }),
+    homeDir: bootstrapPaths().homeDir,
+    kernelConfigPath: bootstrapPaths().configPath,
+    prompt: 'zashboard needs administrator rights to install its TUN helper service.',
+  }
+}
+
+const tunStatus = async (): Promise<TunStatus> => {
+  const request = helperInstallRequest()
+  const supported = helperSupported()
+  const helperInstalled = supported && (await helperAvailable(request.socketPath, request.secret))
+  const { enabled, stack } = await readTunState(bootstrapPaths().configPath)
+
+  return { supported, helperInstalled, enabled: enabled && helperInstalled, stack }
+}
+
+const publishTun = async (): Promise<TunStatus> => {
+  const status = await tunStatus()
+
+  broadcast(IPC.onTun, status)
+
+  return status
+}
+
+const registerTunIpc = (): void => {
+  ipcMain.handle(IPC.tunStatus, () => tunStatus())
+
+  ipcMain.handle(IPC.tunEnable, async (_event, stack: TunStack) => {
+    const request = helperInstallRequest()
+
+    if (!helperSupported()) {
+      return {
+        ...(await tunStatus()),
+        error:
+          'TUN through a helper service is only available on Linux and macOS. On Windows, enable "Run kernel as administrator" instead.',
+      } satisfies TunStatus
+    }
+
+    if (!(await helperAvailable(request.socketPath, request.secret))) {
+      if (!(await installHelper(request))) {
+        return { ...(await tunStatus()), error: 'the helper could not be installed' }
+      }
+      // launchctl/systemd return before the daemon has bound its socket.
+      for (let attempt = 0; attempt < 20; attempt++) {
+        if (await helperAvailable(request.socketPath, request.secret)) break
+        await new Promise((resolve) => setTimeout(resolve, 250))
+      }
+    }
+
+    await writeTunBlock(bootstrapPaths().configPath, stack)
+    // Only one process may own the kernel: ours steps aside before the helper
+    // starts a privileged one against the same config and API port.
+    await kernel?.stop()
+    await callHelper(request.socketPath, request.secret, 'start')
+
+    return publishTun()
+  })
+
+  ipcMain.handle(IPC.tunDisable, async () => {
+    const request = helperInstallRequest()
+
+    if (await helperAvailable(request.socketPath, request.secret)) {
+      await callHelper(request.socketPath, request.secret, 'stop')
+    }
+
+    await writeTunBlock(bootstrapPaths().configPath, null)
+    await kernel?.start()
+
+    return publishTun()
+  })
+
+  ipcMain.handle(IPC.tunUninstallHelper, async () => {
+    const request = helperInstallRequest()
+
+    if (await helperAvailable(request.socketPath, request.secret)) {
+      await callHelper(request.socketPath, request.secret, 'stop')
+    }
+
+    await uninstallHelper(request)
+    await writeTunBlock(bootstrapPaths().configPath, null)
+    await kernel?.start()
+
+    return publishTun()
+  })
+}
+
+/** Window controls for the in-page title bar of the frameless window. */
+const registerWindowIpc = (): void => {
+  ipcMain.on(IPC.windowMinimize, () => window?.minimize())
+  ipcMain.on(IPC.windowToggleMaximize, () => {
+    if (!window) return
+    if (window.isMaximized()) window.unmaximize()
+    else window.maximize()
+  })
+  // Closing follows the same rule as the window's own close button: hide to the
+  // tray unless the user asked for a real quit.
+  ipcMain.on(IPC.windowClose, () => window?.close())
+  ipcMain.handle(IPC.windowIsMaximized, () => window?.isMaximized() ?? false)
+}
+
+/** Switch mihomo's routing mode through its own REST API. */
+const setKernelMode = async (mode: 'rule' | 'global' | 'direct'): Promise<void> => {
+  const endpoint = kernel?.endpoint
+
+  if (!endpoint || kernel?.getState().status !== 'running') return
+
+  try {
+    await fetch(`${endpoint.url}/configs`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${endpoint.secret}`,
+      },
+      body: JSON.stringify({ mode }),
+    })
+  } catch {
+    // The kernel may be restarting; the shortcut is fire-and-forget.
+  }
+}
+
+const registerHotkeyIpc = (): void => {
+  ipcMain.handle(IPC.hotkeysGet, () => hotkeys?.snapshot() ?? null)
+  ipcMain.handle(IPC.hotkeysSet, (_event, bindings: Partial<Record<HotkeyAction, string>>) => {
+    const snapshot = hotkeys?.set(bindings) ?? null
+
+    if (snapshot) {
+      const next = settings?.patch({ hotkeys: snapshot.bindings })
+
+      broadcast(IPC.onSettings, next)
+    }
+
+    return snapshot
+  })
+}
+
+const registerKernelSourceIpc = (): void => {
+  ipcMain.handle(IPC.kernelListVersions, (_event, source: KernelSource) =>
+    listKernelVersions(source),
+  )
+
+  ipcMain.handle(IPC.kernelSwitchVersion, async (_event, source: KernelSource, tag: string) => {
+    const destDir = join(app.getPath('userData'), 'kernels', `${source}-${tag}`)
+    const binPath = await downloadKernel(source, tag, destDir, process.platform, process.arch)
+
+    // Persist before swapping: a crash mid-restart should still come back on the
+    // kernel the user picked.
+    const next = settings?.patch({
+      kernelPath: binPath,
+      kernelSource: source,
+      kernelVersion: tag,
+    })
+
+    kernel?.setBinaryPath(binPath)
+    await kernel?.restart()
+    broadcast(IPC.onSettings, next)
+
+    return next ?? null
+  })
+
+  ipcMain.handle(IPC.kernelUseBundled, async () => {
+    const next = settings?.patch({ kernelPath: '', kernelSource: '', kernelVersion: '' })
+
+    kernel?.setBinaryPath(resolveKernelBinary(binaryInput))
+    await kernel?.restart()
+    broadcast(IPC.onSettings, next)
+
+    return next ?? null
+  })
 }
 
 const profilesSnapshot = (): ProfilesSnapshot => ({
@@ -437,6 +673,20 @@ const boot = async (): Promise<void> => {
   })
   profiles.startScheduler()
 
+  hotkeys = new Hotkeys(
+    {
+      toggleWindow: () =>
+        window?.isVisible() && window.isFocused() ? window.hide() : showWindow(),
+      toggleSystemProxy: () => toggleSystemProxy(!settings?.get().systemProxy),
+      restartKernel: () => void kernel?.restart().catch(() => {}),
+      modeRule: () => void setKernelMode('rule'),
+      modeGlobal: () => void setKernelMode('global'),
+      modeDirect: () => void setKernelMode('direct'),
+    },
+    desktopSettings.hotkeys,
+  )
+  hotkeys.apply()
+
   kernel.on('log', (line) => {
     kernelLog.write(line.line)
     broadcast(IPC.onKernelLog, line)
@@ -570,6 +820,7 @@ if (!singleInstance) {
     event.preventDefault()
 
     const shutdown = async () => {
+      hotkeys?.dispose()
       profiles?.stopScheduler()
       if (systemProxyApplied) await applySystemProxy(false)
       await kernel?.stop()

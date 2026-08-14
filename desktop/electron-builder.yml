@@ -36,6 +36,12 @@ files:
 
 asar: true
 
+# The privileged helper is launched by systemd/launchd as a real on-disk file
+# (`<electron> out/helper/index.cjs`, ELECTRON_RUN_AS_NODE=1). A path inside
+# app.asar cannot be executed that way.
+asarUnpack:
+  - 'out/helper/**'
+
 # The dashboard, the kernel and the seed config all live outside the asar: the
 # kernel must be a real, executable on-disk file, and serving the renderer from
 # a plain directory keeps asset resolution independent of asar internals.

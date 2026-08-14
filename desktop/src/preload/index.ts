@@ -2,10 +2,16 @@ import { contextBridge, ipcRenderer } from 'electron'
 import type {
   BootstrapSnapshot,
   DesktopSettings,
+  HotkeyAction,
+  HotkeysSnapshot,
   KernelLogLine,
+  KernelSource,
   KernelState,
+  KernelVersion,
   OpenTarget,
   ProfilesSnapshot,
+  TunStack,
+  TunStatus,
 } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 
@@ -62,6 +68,33 @@ const api = {
     content: (id: string) => ipcRenderer.invoke(IPC.profilesContent, id) as Promise<string>,
     onChange: (handler: (snapshot: ProfilesSnapshot) => void) =>
       subscribe<ProfilesSnapshot>(IPC.onProfiles, handler),
+  },
+  tun: {
+    status: () => ipcRenderer.invoke(IPC.tunStatus) as Promise<TunStatus>,
+    enable: (stack: TunStack) => ipcRenderer.invoke(IPC.tunEnable, stack) as Promise<TunStatus>,
+    disable: () => ipcRenderer.invoke(IPC.tunDisable) as Promise<TunStatus>,
+    uninstallHelper: () => ipcRenderer.invoke(IPC.tunUninstallHelper) as Promise<TunStatus>,
+    onChange: (handler: (status: TunStatus) => void) => subscribe<TunStatus>(IPC.onTun, handler),
+  },
+  window: {
+    minimize: () => ipcRenderer.send(IPC.windowMinimize),
+    toggleMaximize: () => ipcRenderer.send(IPC.windowToggleMaximize),
+    close: () => ipcRenderer.send(IPC.windowClose),
+    isMaximized: () => ipcRenderer.invoke(IPC.windowIsMaximized) as Promise<boolean>,
+    onMaximizeChange: (handler: (maximized: boolean) => void) =>
+      subscribe<boolean>(IPC.onWindowMaximized, handler),
+  },
+  hotkeys: {
+    get: () => ipcRenderer.invoke(IPC.hotkeysGet) as Promise<HotkeysSnapshot>,
+    set: (bindings: Partial<Record<HotkeyAction, string>>) =>
+      ipcRenderer.invoke(IPC.hotkeysSet, bindings) as Promise<HotkeysSnapshot>,
+  },
+  kernelSource: {
+    versions: (source: KernelSource) =>
+      ipcRenderer.invoke(IPC.kernelListVersions, source) as Promise<KernelVersion[]>,
+    switch: (source: KernelSource, tag: string) =>
+      ipcRenderer.invoke(IPC.kernelSwitchVersion, source, tag) as Promise<DesktopSettings>,
+    useBundled: () => ipcRenderer.invoke(IPC.kernelUseBundled) as Promise<DesktopSettings>,
   },
   settings: {
     get: () => ipcRenderer.invoke(IPC.settingsGet) as Promise<DesktopSettings>,

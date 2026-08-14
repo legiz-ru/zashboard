@@ -3,6 +3,7 @@ import { computed, onMounted, ref, type Ref, watch } from 'vue'
 import { RouterView } from 'vue-router'
 import ConfirmDialogHost from './components/common/ConfirmDialogHost.vue'
 import OnboardingWizard from './components/desktop/OnboardingWizard.vue'
+import TitleBar from './components/desktop/TitleBar.vue'
 import { useKeyboard } from './composables/keyboard'
 import { EMOJIS, FONTS } from './constant'
 import {
@@ -205,7 +206,7 @@ useKeyboard()
     ref="app"
     id="app-content"
     :class="[
-      'bg-base-100 flex w-screen overflow-hidden',
+      'bg-base-100 flex w-screen flex-col overflow-hidden',
       fontClassName,
       backgroundImage &&
         `custom-background-${dashboardTransparent} custom-background bg-cover bg-center`,
@@ -213,7 +214,12 @@ useKeyboard()
     ]"
     :style="[backgroundImage, { height: 'var(--app-height, 100dvh)' }]"
   >
-    <RouterView />
+    <TitleBar />
+    <!-- 页面自身是横向布局(侧栏 + 内容),所以这里再包一层行容器,
+         标题栏只在纵向上占位。 -->
+    <div class="flex min-h-0 w-full flex-1 overflow-hidden">
+      <RouterView />
+    </div>
     <ConfirmDialogHost />
     <OnboardingWizard />
     <div

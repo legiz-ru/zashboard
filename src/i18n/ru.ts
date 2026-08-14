@@ -682,6 +682,33 @@ const ru: LANG_MESSAGE = {
   onboardingGoToProxies: 'К прокси',
   onboardingBack: 'Назад',
   onboardingStep: 'Шаг {current} из {total}',
+
+  // Десктоп: менеджер ядра, TUN-помощник, горячие клавиши, управление окном
+  kernelManager: 'Сменить сборку ядра',
+  kernelManagerDesc: 'Скачать и переключить сборку mihomo, на которой работает приложение.',
+  kernelSourceMihomo: 'mihomo (оригинал)',
+  kernelSourceSmart: 'Smart-форк (vernesong)',
+  refreshList: 'Обновить список',
+  install: 'Установить',
+  useBundledKernel: 'Вернуть встроенное',
+  currentKernel: 'Используется: {source} {version}',
+  tunModeDesc:
+    'Направляет весь трафик машины через виртуальный адаптер. При первом включении ставит привилегированную службу-помощник.',
+  tunStack: 'Стек',
+  uninstallHelper: 'Удалить помощник',
+  tunUnsupported:
+    'Служба-помощник доступна на Linux и macOS. На Windows используйте «Запускать ядро от администратора».',
+  globalHotkeys: 'Глобальные горячие клавиши',
+  globalHotkeysDesc: 'Работают, когда приложение в фоне. Пустое поле отключает сочетание.',
+  hotkeyTaken: 'занято другим приложением',
+  hotkey_toggleWindow: 'Показать / скрыть окно',
+  hotkey_toggleSystemProxy: 'Переключить системный прокси',
+  hotkey_restartKernel: 'Перезапустить ядро',
+  hotkey_modeRule: 'Режим: правила',
+  hotkey_modeGlobal: 'Режим: глобальный',
+  hotkey_modeDirect: 'Режим: прямой',
+  minimize: 'Свернуть',
+  maximize: 'Развернуть',
 }
 
 export default ru

@@ -667,6 +667,31 @@ const zh: LANG_MESSAGE = {
   onboardingGoToProxies: '前往代理',
   onboardingBack: '返回',
   onboardingStep: '第 {current} / {total} 步',
+
+  // 桌面端：内核管理、TUN 助手、全局快捷键、窗口控制
+  kernelManager: '切换内核构建',
+  kernelManagerDesc: '下载并切换应用所使用的 mihomo 构建。',
+  kernelSourceMihomo: 'mihomo（上游）',
+  kernelSourceSmart: 'Smart 分支（vernesong）',
+  refreshList: '刷新列表',
+  install: '安装',
+  useBundledKernel: '恢复内置',
+  currentKernel: '当前：{source} {version}',
+  tunModeDesc: '让整机流量走虚拟网卡。首次开启会安装一个特权助手服务。',
+  tunStack: '协议栈',
+  uninstallHelper: '卸载助手',
+  tunUnsupported: '助手服务仅支持 Linux 与 macOS。Windows 请改用「以管理员身份启动内核」。',
+  globalHotkeys: '全局快捷键',
+  globalHotkeysDesc: '应用在后台时同样生效。留空即为关闭该快捷键。',
+  hotkeyTaken: '已被其他应用占用',
+  hotkey_toggleWindow: '显示 / 隐藏窗口',
+  hotkey_toggleSystemProxy: '切换系统代理',
+  hotkey_restartKernel: '重启内核',
+  hotkey_modeRule: '模式：规则',
+  hotkey_modeGlobal: '模式：全局',
+  hotkey_modeDirect: '模式：直连',
+  minimize: '最小化',
+  maximize: '最大化',
 }
 
 export default zh

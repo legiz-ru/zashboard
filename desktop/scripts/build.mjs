@@ -37,3 +37,12 @@ await build({
   entryPoints: [join(root, 'src', 'preload', 'index.ts')],
   outfile: join(root, 'out', 'preload', 'index.cjs'),
 })
+
+// The privileged helper is run by an OS service as `<electron> out/helper/index.cjs`
+// with ELECTRON_RUN_AS_NODE=1, so it must stay outside app.asar (asarUnpack) and
+// must not import electron.
+await build({
+  ...common,
+  entryPoints: [join(root, 'src', 'helper', 'index.ts')],
+  outfile: join(root, 'out', 'helper', 'index.cjs'),
+})

@@ -30,6 +30,29 @@ declare type DesktopKernelLogLine = {
   ts: number
 }
 
+declare type DesktopKernelSource = 'mihomo' | 'smart'
+
+declare type DesktopKernelVersion = { tag: string; label: string }
+
+declare type DesktopTunStack = 'mixed' | 'gvisor' | 'system'
+
+declare type DesktopTunStatus = {
+  supported: boolean
+  helperInstalled: boolean
+  enabled: boolean
+  stack: DesktopTunStack
+  error?: string
+}
+
+declare type DesktopHotkeyAction =
+  'toggleWindow' | 'toggleSystemProxy' | 'restartKernel' | 'modeRule' | 'modeGlobal' | 'modeDirect'
+
+declare type DesktopHotkeysSnapshot = {
+  bindings: Record<DesktopHotkeyAction, string>
+  defaults: Record<DesktopHotkeyAction, string>
+  failed: { action: DesktopHotkeyAction; accelerator: string }[]
+}
+
 declare type DesktopSettings = {
   /** Ask for administrator/root rights when starting the kernel (TUN mode). */
   elevateKernel: boolean
@@ -37,6 +60,9 @@ declare type DesktopSettings = {
   minimizeToTray: boolean
   launchAtLogin: boolean
   kernelPath: string
+  kernelSource: DesktopKernelSource | ''
+  kernelVersion: string
+  hotkeys: Partial<Record<DesktopHotkeyAction, string>>
 }
 
 declare type DesktopSubscriptionInfo = {
@@ -103,6 +129,29 @@ declare type ZashboardDesktopApi = {
   systemProxy: {
     get: () => Promise<boolean>
     set: (enabled: boolean) => Promise<DesktopSettings>
+  }
+  kernelSource: {
+    versions: (source: DesktopKernelSource) => Promise<DesktopKernelVersion[]>
+    switch: (source: DesktopKernelSource, tag: string) => Promise<DesktopSettings>
+    useBundled: () => Promise<DesktopSettings>
+  }
+  tun: {
+    status: () => Promise<DesktopTunStatus>
+    enable: (stack: DesktopTunStack) => Promise<DesktopTunStatus>
+    disable: () => Promise<DesktopTunStatus>
+    uninstallHelper: () => Promise<DesktopTunStatus>
+    onChange: (handler: (status: DesktopTunStatus) => void) => () => void
+  }
+  hotkeys: {
+    get: () => Promise<DesktopHotkeysSnapshot>
+    set: (bindings: Partial<Record<DesktopHotkeyAction, string>>) => Promise<DesktopHotkeysSnapshot>
+  }
+  window: {
+    minimize: () => void
+    toggleMaximize: () => void
+    close: () => void
+    isMaximized: () => Promise<boolean>
+    onMaximizeChange: (handler: (maximized: boolean) => void) => () => void
   }
   open: (target: 'config' | 'configDir' | 'logs') => Promise<void>
 }
