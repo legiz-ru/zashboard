@@ -692,6 +692,12 @@ const zh: LANG_MESSAGE = {
   hotkey_modeDirect: '模式：直连',
   minimize: '最小化',
   maximize: '最大化',
+
+  runtimeConfig: '内核实际配置',
+  runtimeConfigDesc:
+    '只读：内核启动时使用的文件，即当前配置加上注入的 external-controller、secret 与 mixed-port。',
+  show: '查看',
+  noActiveProfile: '尚未启用任何配置，内核正在使用默认配置，其中没有任何代理。',
 }
 
 export default zh

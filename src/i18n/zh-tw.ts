@@ -693,6 +693,12 @@ const zhTW: LANG_MESSAGE = {
   hotkey_modeDirect: '模式：直連',
   minimize: '最小化',
   maximize: '最大化',
+
+  runtimeConfig: '核心實際設定',
+  runtimeConfigDesc:
+    '唯讀：核心啟動時使用的檔案，即目前設定檔加上注入的 external-controller、secret 與 mixed-port。',
+  show: '檢視',
+  noActiveProfile: '尚未啟用任何設定檔，核心正在使用預設設定，其中沒有任何代理。',
 }
 
 export default zhTW

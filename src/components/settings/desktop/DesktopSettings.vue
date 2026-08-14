@@ -297,6 +297,31 @@
         />
       </SettingItem>
 
+      <!-- 内核实际运行的配置(只读) -->
+      <SettingItem
+        :setting-key="k.runtimeConfig"
+        class="p-4"
+      >
+        <div class="flex w-full flex-col gap-2">
+          <div class="flex items-center justify-between gap-2">
+            <div class="flex flex-col">
+              <div class="setting-item-label">{{ $t('runtimeConfig') }}</div>
+              <div class="text-base-content/60 text-xs">{{ $t('runtimeConfigDesc') }}</div>
+            </div>
+            <button
+              class="btn btn-xs"
+              @click="handlerRuntimeConfig"
+            >
+              {{ runtimeConfig ? $t('refreshList') : $t('show') }}
+            </button>
+          </div>
+          <pre
+            v-if="runtimeConfig"
+            class="bg-base-200 max-h-64 overflow-auto rounded p-2 text-xs whitespace-pre-wrap"
+            >{{ runtimeConfig }}</pre>
+        </div>
+      </SettingItem>
+
       <SettingItem
         :setting-key="k.openFolders"
         class="p-4"
@@ -336,6 +361,7 @@ import {
   listKernelVersions,
   openDesktopPath,
   patchDesktopSettings,
+  readRuntimeConfig,
   refreshHotkeys,
   refreshTunStatus,
   restartDesktopKernel,
@@ -473,6 +499,14 @@ const handlerHotkey = (action: DesktopHotkeyAction, event: Event) => {
   const accelerator = (event.target as HTMLInputElement).value.trim()
 
   void setHotkeys({ [action]: accelerator })
+}
+
+// --- 内核实际运行的配置 ---
+
+const runtimeConfig = ref('')
+
+const handlerRuntimeConfig = async () => {
+  runtimeConfig.value = await readRuntimeConfig()
 }
 
 onMounted(() => {

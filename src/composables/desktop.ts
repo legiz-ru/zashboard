@@ -105,6 +105,9 @@ export const useBundledKernel = async () => {
   desktopSettings.value = await bridge.kernelSource.useBundled()
 }
 
+/** The config file the kernel is running, injected keys included. */
+export const readRuntimeConfig = () => bridge?.runtimeConfig() ?? Promise.resolve('')
+
 // --- TUN -------------------------------------------------------------------
 
 const tun = ref<DesktopTunStatus | null>(null)

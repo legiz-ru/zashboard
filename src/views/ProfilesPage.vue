@@ -50,6 +50,14 @@
         />
       </div>
 
+      <!-- 没有活动配置时,内核跑的是空的默认配置,页面全空会让人以为导入失败 -->
+      <div
+        v-if="snapshot.profiles.length && !snapshot.activeId"
+        class="alert alert-warning py-2 text-sm"
+      >
+        {{ $t('noActiveProfile') }}
+      </div>
+
       <!-- 配置列表 -->
       <div
         v-if="!snapshot.profiles.length"

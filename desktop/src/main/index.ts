@@ -1,6 +1,7 @@
 import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron'
 import { randomBytes } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
+import { readFile } from 'node:fs/promises'
 import { dirname, join } from 'node:path'
 import type {
   BootstrapSnapshot,
@@ -554,19 +555,39 @@ const publishProfiles = (): ProfilesSnapshot => {
   return snapshot
 }
 
+/**
+ * Importing a profile has to make it live, or the user is left staring at an
+ * empty dashboard: the kernel keeps running the seeded default config, which
+ * has no proxies at all. Only the FIRST profile is activated automatically —
+ * someone adding a second subscription to a working setup should not have it
+ * switched out from under them.
+ *
+ * The snapshot is published before activating, so the new profile is visible in
+ * the list even when the kernel rejects it and the error propagates to the UI.
+ */
+const activateFirstImport = async (id?: string): Promise<ProfilesSnapshot> => {
+  publishProfiles()
+
+  if (id && profiles && !profiles.activeId()) {
+    await profiles.setActive(id)
+  }
+
+  return publishProfiles()
+}
+
 const registerProfileIpc = (): void => {
   ipcMain.handle(IPC.profilesList, () => profilesSnapshot())
 
   ipcMain.handle(IPC.profilesImportUrl, async (_event, url: string, name?: string) => {
-    await profiles?.importFromUrl(url, name)
+    const created = await profiles?.importFromUrl(url, name)
 
-    return publishProfiles()
+    return activateFirstImport(created?.id)
   })
 
   ipcMain.handle(IPC.profilesImportLocal, async (_event, name: string, content: string) => {
-    await profiles?.importLocal(name, content)
+    const created = await profiles?.importLocal(name, content)
 
-    return publishProfiles()
+    return activateFirstImport(created?.id)
   })
 
   ipcMain.handle(IPC.profilesRefresh, async (_event, id: string) => {
@@ -597,6 +618,18 @@ const registerProfileIpc = (): void => {
   })
 
   ipcMain.handle(IPC.profilesContent, (_event, id: string) => profiles?.content(id) ?? '')
+
+  // Read-only view of the file the kernel was actually started with — the
+  // active profile *after* external-controller, secret, the CORS block and
+  // mixed-port were injected into it. This is the ground truth when the
+  // dashboard and the kernel disagree.
+  ipcMain.handle(IPC.runtimeConfig, async () => {
+    try {
+      return await readFile(bootstrapPaths().configPath, 'utf8')
+    } catch (error) {
+      return `# could not read the active config: ${error instanceof Error ? error.message : error}`
+    }
+  })
 }
 
 /**

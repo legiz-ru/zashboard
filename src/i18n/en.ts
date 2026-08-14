@@ -706,6 +706,13 @@ const en = {
   hotkey_modeDirect: 'Mode: direct',
   minimize: 'Minimize',
   maximize: 'Maximize',
+
+  runtimeConfig: 'Kernel config in use',
+  runtimeConfigDesc:
+    'Read-only view of the file the kernel was started with — the active profile plus the injected external-controller, secret and mixed-port.',
+  show: 'Show',
+  noActiveProfile:
+    'No profile is active — the kernel is running the default config, which has no proxies.',
 }
 
 export type LANG_MESSAGE = typeof en

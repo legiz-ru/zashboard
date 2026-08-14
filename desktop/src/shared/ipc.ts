@@ -18,6 +18,7 @@ export const IPC = {
   profilesRemove: 'zashboard:profiles:remove',
   profilesActivate: 'zashboard:profiles:activate',
   profilesContent: 'zashboard:profiles:content',
+  runtimeConfig: 'zashboard:runtime-config',
   tunStatus: 'zashboard:tun:status',
   tunEnable: 'zashboard:tun:enable',
   tunDisable: 'zashboard:tun:disable',
