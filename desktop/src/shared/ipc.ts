@@ -10,6 +10,29 @@ export const IPC = {
   kernelStart: 'zashboard:kernel:start',
   kernelStop: 'zashboard:kernel:stop',
   kernelRestart: 'zashboard:kernel:restart',
+  profilesList: 'zashboard:profiles:list',
+  profilesImportUrl: 'zashboard:profiles:import-url',
+  profilesImportLocal: 'zashboard:profiles:import-local',
+  profilesRefresh: 'zashboard:profiles:refresh',
+  profilesPatch: 'zashboard:profiles:patch',
+  profilesRemove: 'zashboard:profiles:remove',
+  profilesActivate: 'zashboard:profiles:activate',
+  profilesContent: 'zashboard:profiles:content',
+  tunStatus: 'zashboard:tun:status',
+  tunEnable: 'zashboard:tun:enable',
+  tunDisable: 'zashboard:tun:disable',
+  tunUninstallHelper: 'zashboard:tun:uninstall-helper',
+  onTun: 'zashboard:on:tun',
+  windowMinimize: 'zashboard:window:minimize',
+  windowToggleMaximize: 'zashboard:window:toggle-maximize',
+  windowClose: 'zashboard:window:close',
+  windowIsMaximized: 'zashboard:window:is-maximized',
+  onWindowMaximized: 'zashboard:on:window-maximized',
+  hotkeysGet: 'zashboard:hotkeys:get',
+  hotkeysSet: 'zashboard:hotkeys:set',
+  kernelListVersions: 'zashboard:kernel:list-versions',
+  kernelSwitchVersion: 'zashboard:kernel:switch-version',
+  kernelUseBundled: 'zashboard:kernel:use-bundled',
   settingsGet: 'zashboard:settings:get',
   settingsPatch: 'zashboard:settings:patch',
   systemProxyGet: 'zashboard:system-proxy:get',
@@ -19,7 +42,66 @@ export const IPC = {
   onKernelState: 'zashboard:on:kernel-state',
   onKernelLog: 'zashboard:on:kernel-log',
   onSettings: 'zashboard:on:settings',
+  onProfiles: 'zashboard:on:profiles',
 } as const
+
+export type TunStack = 'mixed' | 'gvisor' | 'system'
+
+export type TunStatus = {
+  /** Whether this platform can host the privileged helper at all. */
+  supported: boolean
+  /** Whether an installed helper is reachable and authenticated. */
+  helperInstalled: boolean
+  /** Whether the active config has TUN on and the helper owns the kernel. */
+  enabled: boolean
+  stack: TunStack
+  error?: string
+}
+
+export type HotkeyAction =
+  'toggleWindow' | 'toggleSystemProxy' | 'restartKernel' | 'modeRule' | 'modeGlobal' | 'modeDirect'
+
+export type HotkeysSnapshot = {
+  bindings: Record<HotkeyAction, string>
+  defaults: Record<HotkeyAction, string>
+  /** Accelerators the OS refused, e.g. because another app holds them. */
+  failed: { action: HotkeyAction; accelerator: string }[]
+}
+
+/** Upstream mihomo, or vernesong's fork carrying the Smart outbound group. */
+export type KernelSource = 'mihomo' | 'smart'
+
+export type KernelVersion = {
+  /** Release tag used for the download. */
+  tag: string
+  /** What the UI shows; for a rolling release this carries the build sha. */
+  label: string
+}
+
+export type SubscriptionInfo = {
+  upload: number
+  download: number
+  total: number
+  /** Unix seconds; 0 when the plan does not expire. */
+  expire: number
+}
+
+export type ProfileMeta = {
+  id: string
+  name: string
+  type: 'local' | 'remote'
+  /** Subscription URL; remote profiles only. */
+  url?: string
+  /** Auto-update period in minutes; 0 disables it. Remote profiles only. */
+  updateInterval?: number
+  updatedAt: number
+  subscriptionInfo?: SubscriptionInfo
+}
+
+export type ProfilesSnapshot = {
+  profiles: ProfileMeta[]
+  activeId?: string
+}
 
 export type KernelStatus = 'stopped' | 'starting' | 'running' | 'errored'
 
@@ -58,6 +140,12 @@ export type DesktopSettings = {
   launchAtLogin: boolean
   /** Absolute path to a user-supplied mihomo binary; empty = the bundled one. */
   kernelPath: string
+  /** Which project `kernelPath` was downloaded from; empty when bundled. */
+  kernelSource: KernelSource | ''
+  /** Release tag `kernelPath` was downloaded from; empty when bundled. */
+  kernelVersion: string
+  /** Global shortcut bindings; an empty accelerator disables that action. */
+  hotkeys: Partial<Record<HotkeyAction, string>>
 }
 
 export type OpenTarget = 'config' | 'configDir' | 'logs'
@@ -72,4 +160,5 @@ export type BootstrapSnapshot = {
   paths: { home: string; config: string; logs: string; kernelBinary: string }
   kernel: KernelState
   settings: DesktopSettings
+  profiles: ProfilesSnapshot
 }

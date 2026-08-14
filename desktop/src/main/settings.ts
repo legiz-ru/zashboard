@@ -7,6 +7,9 @@ export const DEFAULT_SETTINGS: DesktopSettings = {
   minimizeToTray: true,
   launchAtLogin: false,
   kernelPath: '',
+  kernelSource: '',
+  kernelVersion: '',
+  hotkeys: {},
 }
 
 const coerce = (raw: unknown): DesktopSettings => {
@@ -20,6 +23,13 @@ const coerce = (raw: unknown): DesktopSettings => {
     minimizeToTray: bool('minimizeToTray'),
     launchAtLogin: bool('launchAtLogin'),
     kernelPath: typeof value.kernelPath === 'string' ? value.kernelPath : '',
+    kernelSource:
+      value.kernelSource === 'mihomo' || value.kernelSource === 'smart' ? value.kernelSource : '',
+    kernelVersion: typeof value.kernelVersion === 'string' ? value.kernelVersion : '',
+    hotkeys:
+      value.hotkeys && typeof value.hotkeys === 'object'
+        ? (value.hotkeys as DesktopSettings['hotkeys'])
+        : {},
   }
 }
 

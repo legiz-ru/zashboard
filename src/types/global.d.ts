@@ -30,6 +30,29 @@ declare type DesktopKernelLogLine = {
   ts: number
 }
 
+declare type DesktopKernelSource = 'mihomo' | 'smart'
+
+declare type DesktopKernelVersion = { tag: string; label: string }
+
+declare type DesktopTunStack = 'mixed' | 'gvisor' | 'system'
+
+declare type DesktopTunStatus = {
+  supported: boolean
+  helperInstalled: boolean
+  enabled: boolean
+  stack: DesktopTunStack
+  error?: string
+}
+
+declare type DesktopHotkeyAction =
+  'toggleWindow' | 'toggleSystemProxy' | 'restartKernel' | 'modeRule' | 'modeGlobal' | 'modeDirect'
+
+declare type DesktopHotkeysSnapshot = {
+  bindings: Record<DesktopHotkeyAction, string>
+  defaults: Record<DesktopHotkeyAction, string>
+  failed: { action: DesktopHotkeyAction; accelerator: string }[]
+}
+
 declare type DesktopSettings = {
   /** Ask for administrator/root rights when starting the kernel (TUN mode). */
   elevateKernel: boolean
@@ -37,6 +60,33 @@ declare type DesktopSettings = {
   minimizeToTray: boolean
   launchAtLogin: boolean
   kernelPath: string
+  kernelSource: DesktopKernelSource | ''
+  kernelVersion: string
+  hotkeys: Partial<Record<DesktopHotkeyAction, string>>
+}
+
+declare type DesktopSubscriptionInfo = {
+  upload: number
+  download: number
+  total: number
+  /** Unix seconds; 0 when the plan does not expire. */
+  expire: number
+}
+
+declare type DesktopProfile = {
+  id: string
+  name: string
+  type: 'local' | 'remote'
+  url?: string
+  /** Auto-update period in minutes; 0 disables it. */
+  updateInterval?: number
+  updatedAt: number
+  subscriptionInfo?: DesktopSubscriptionInfo
+}
+
+declare type DesktopProfilesSnapshot = {
+  profiles: DesktopProfile[]
+  activeId?: string
 }
 
 declare type ZashboardDesktopApi = {
@@ -48,6 +98,21 @@ declare type ZashboardDesktopApi = {
   paths: { home: string; config: string; logs: string; kernelBinary: string }
   initialKernelState: DesktopKernelState
   initialSettings: DesktopSettings
+  initialProfiles: DesktopProfilesSnapshot
+  profiles: {
+    list: () => Promise<DesktopProfilesSnapshot>
+    importUrl: (url: string, name?: string) => Promise<DesktopProfilesSnapshot>
+    importLocal: (name: string, content: string) => Promise<DesktopProfilesSnapshot>
+    refresh: (id: string) => Promise<DesktopProfilesSnapshot>
+    patch: (
+      id: string,
+      patch: { name?: string; updateInterval?: number },
+    ) => Promise<DesktopProfilesSnapshot>
+    remove: (id: string) => Promise<DesktopProfilesSnapshot>
+    activate: (id: string) => Promise<DesktopProfilesSnapshot>
+    content: (id: string) => Promise<string>
+    onChange: (handler: (snapshot: DesktopProfilesSnapshot) => void) => () => void
+  }
   kernel: {
     state: () => Promise<DesktopKernelState>
     start: () => Promise<DesktopKernelState>
@@ -64,6 +129,29 @@ declare type ZashboardDesktopApi = {
   systemProxy: {
     get: () => Promise<boolean>
     set: (enabled: boolean) => Promise<DesktopSettings>
+  }
+  kernelSource: {
+    versions: (source: DesktopKernelSource) => Promise<DesktopKernelVersion[]>
+    switch: (source: DesktopKernelSource, tag: string) => Promise<DesktopSettings>
+    useBundled: () => Promise<DesktopSettings>
+  }
+  tun: {
+    status: () => Promise<DesktopTunStatus>
+    enable: (stack: DesktopTunStack) => Promise<DesktopTunStatus>
+    disable: () => Promise<DesktopTunStatus>
+    uninstallHelper: () => Promise<DesktopTunStatus>
+    onChange: (handler: (status: DesktopTunStatus) => void) => () => void
+  }
+  hotkeys: {
+    get: () => Promise<DesktopHotkeysSnapshot>
+    set: (bindings: Partial<Record<DesktopHotkeyAction, string>>) => Promise<DesktopHotkeysSnapshot>
+  }
+  window: {
+    minimize: () => void
+    toggleMaximize: () => void
+    close: () => void
+    isMaximized: () => Promise<boolean>
+    onMaximizeChange: (handler: (maximized: boolean) => void) => () => void
   }
   open: (target: 'config' | 'configDir' | 'logs') => Promise<void>
 }

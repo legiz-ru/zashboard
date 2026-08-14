@@ -1,6 +1,7 @@
 import { can } from '@/assembly/backend'
 import { connectionAccessor } from '@/assembly/connections'
 import { hiddenGroupMap, proxyMap } from '@/assembly/proxies'
+import { isDesktop } from '@/composables/desktop'
 import { NOT_CONNECTED, PROXY_CHAIN_DIRECTION, PROXY_TYPE, ROUTE_NAME } from '@/constant'
 import { showNotification } from '@/helper/notification'
 import {
@@ -130,6 +131,9 @@ export const renderRoutes = computed(() => {
   }
   return Object.values(ROUTE_NAME).filter((r) => {
     if (r === ROUTE_NAME.setup) return false
+    // Profiles are managed by the Electron shell; there is nothing behind this
+    // route in the browser build.
+    if (r === ROUTE_NAME.profiles && !isDesktop) return false
     if (!splitOverviewPage.value && r === ROUTE_NAME.overview) return false
     if (r in routeCapable && routeCapable[r] === false) return false
     return true
