@@ -2,7 +2,13 @@ import { BrowserWindow, app, dialog, ipcMain, shell } from 'electron'
 import { randomBytes } from 'node:crypto'
 import { existsSync, readFileSync, writeFileSync } from 'node:fs'
 import { dirname, join } from 'node:path'
-import type { BootstrapSnapshot, DesktopSettings, KernelState, OpenTarget } from '../shared/ipc'
+import type {
+  BootstrapSnapshot,
+  DesktopSettings,
+  KernelState,
+  OpenTarget,
+  ProfilesSnapshot,
+} from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 import { buildAppMenu } from './app-menu'
 import { resolveDefaultConfig, resolveKernelBinary } from './binary-path'
@@ -10,6 +16,7 @@ import { findFreePort } from './free-port'
 import { Kernel } from './kernel'
 import { createLogFile } from './log-file'
 import { bootstrapDataDir } from './paths'
+import { ProfileStore } from './profiles'
 import { APP_INDEX, APP_ORIGIN, registerAppScheme, serveRenderer } from './protocol'
 import { SettingsStore } from './settings'
 import { isSystemProxyEnabled, setSystemProxy } from './sysproxy'
@@ -37,6 +44,7 @@ let window: BrowserWindow | null = null
 let tray: ReturnType<typeof createTray> | null = null
 let kernel: Kernel | null = null
 let settings: SettingsStore | null = null
+let profiles: ProfileStore | null = null
 let quitting = false
 /** True once we have pointed the OS proxy at the kernel, so we can undo it. */
 let systemProxyApplied = false
@@ -293,6 +301,99 @@ const registerIpc = (snapshot: () => BootstrapSnapshot): void => {
   })
 
   ipcMain.handle(IPC.openPath, (_event, target: OpenTarget) => openTarget(target))
+
+  registerProfileIpc()
+}
+
+const profilesSnapshot = (): ProfilesSnapshot => ({
+  profiles: profiles?.list() ?? [],
+  activeId: profiles?.activeId(),
+})
+
+const publishProfiles = (): ProfilesSnapshot => {
+  const snapshot = profilesSnapshot()
+
+  broadcast(IPC.onProfiles, snapshot)
+
+  return snapshot
+}
+
+const registerProfileIpc = (): void => {
+  ipcMain.handle(IPC.profilesList, () => profilesSnapshot())
+
+  ipcMain.handle(IPC.profilesImportUrl, async (_event, url: string, name?: string) => {
+    await profiles?.importFromUrl(url, name)
+
+    return publishProfiles()
+  })
+
+  ipcMain.handle(IPC.profilesImportLocal, async (_event, name: string, content: string) => {
+    await profiles?.importLocal(name, content)
+
+    return publishProfiles()
+  })
+
+  ipcMain.handle(IPC.profilesRefresh, async (_event, id: string) => {
+    await profiles?.refresh(id)
+
+    return publishProfiles()
+  })
+
+  ipcMain.handle(
+    IPC.profilesPatch,
+    async (_event, id: string, patch: { name?: string; updateInterval?: number }) => {
+      await profiles?.patch(id, patch)
+
+      return publishProfiles()
+    },
+  )
+
+  ipcMain.handle(IPC.profilesRemove, async (_event, id: string) => {
+    await profiles?.remove(id)
+
+    return publishProfiles()
+  })
+
+  ipcMain.handle(IPC.profilesActivate, async (_event, id: string) => {
+    await profiles?.setActive(id)
+
+    return publishProfiles()
+  })
+
+  ipcMain.handle(IPC.profilesContent, (_event, id: string) => profiles?.content(id) ?? '')
+}
+
+/**
+ * Import a subscription handed to the app as a `clash://install-config?url=…`
+ * deep link (the "one-click import" button subscription providers ship).
+ */
+const importDeepLink = async (rawUrl: string): Promise<void> => {
+  let target: string | null = null
+
+  try {
+    const parsed = new URL(rawUrl)
+
+    if (parsed.protocol === 'clash:' || parsed.protocol === 'clashmeta:') {
+      target = parsed.searchParams.get('url')
+    }
+  } catch {
+    return
+  }
+
+  if (!target || !profiles) return
+
+  try {
+    const imported = await profiles.importFromUrl(target)
+
+    await profiles.setActive(imported.id)
+    publishProfiles()
+    showWindow()
+  } catch (error) {
+    dialog.showErrorBox(
+      'Subscription import',
+      error instanceof Error ? error.message : String(error),
+    )
+  }
 }
 
 const boot = async (): Promise<void> => {
@@ -322,6 +423,19 @@ const boot = async (): Promise<void> => {
     confirmElevation,
     elevationPrompt: ELEVATION_PROMPT,
   })
+
+  profiles = new ProfileStore({
+    dir: join(userData, 'profiles'),
+    activeConfigPath: paths.configPath,
+    validate: (configPath) =>
+      kernel?.validate(configPath) ?? Promise.resolve({ valid: false, message: 'no kernel' }),
+    // Activating a profile replaces the config the kernel was started with, so
+    // it only takes effect after a restart.
+    applied: async () => {
+      await kernel?.restart()
+    },
+  })
+  profiles.startScheduler()
 
   kernel.on('log', (line) => {
     kernelLog.write(line.line)
@@ -365,6 +479,7 @@ const boot = async (): Promise<void> => {
       elevated: false,
     },
     settings: settings?.get() ?? desktopSettings,
+    profiles: profilesSnapshot(),
   }))
 
   tray = createTray(
@@ -404,13 +519,37 @@ const boot = async (): Promise<void> => {
 
 const singleInstance = app.requestSingleInstanceLock()
 
+const deepLinkFrom = (argv: string[]): string | undefined =>
+  argv.find((arg) => arg.startsWith('clash://') || arg.startsWith('clashmeta://'))
+
 if (!singleInstance) {
   app.quit()
 } else {
-  app.on('second-instance', showWindow)
+  // A clash:// link opened while the app runs arrives as a second instance on
+  // Windows/Linux (in argv) and as `open-url` on macOS.
+  app.on('second-instance', (_event, argv) => {
+    showWindow()
 
-  app.whenReady().then(() => {
-    void boot()
+    const link = deepLinkFrom(argv)
+
+    if (link) void importDeepLink(link)
+  })
+
+  app.on('open-url', (event, url) => {
+    event.preventDefault()
+    void importDeepLink(url)
+  })
+
+  app.whenReady().then(async () => {
+    for (const scheme of ['clash', 'clashmeta']) app.setAsDefaultProtocolClient(scheme)
+
+    await boot()
+
+    // A link that launched the app is only importable once the profile store
+    // exists, so this waits for boot() rather than racing it.
+    const link = deepLinkFrom(process.argv)
+
+    if (link) void importDeepLink(link)
 
     app.on('activate', () => {
       if (BrowserWindow.getAllWindows().length === 0) createWindow()
@@ -431,6 +570,7 @@ if (!singleInstance) {
     event.preventDefault()
 
     const shutdown = async () => {
+      profiles?.stopScheduler()
       if (systemProxyApplied) await applySystemProxy(false)
       await kernel?.stop()
       tray?.destroy()

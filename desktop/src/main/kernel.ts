@@ -296,6 +296,49 @@ export class Kernel extends EventEmitter<KernelEvents> {
     await this.start()
   }
 
+  /**
+   * Dry-run a candidate config through the kernel (`mihomo -t`).
+   *
+   * The timeout is generous on purpose: on a fresh home directory the first
+   * validation of a config with geosite/geoip rules makes mihomo download those
+   * databases synchronously, which can take minutes on a slow link. Killing it
+   * early would report a perfectly good subscription as broken.
+   */
+  validate(configPath: string): Promise<{ valid: boolean; message: string }> {
+    return new Promise((resolve) => {
+      const child = spawn(this.binaryPath, ['-t', '-d', this.options.homeDir, '-f', configPath], {
+        stdio: ['ignore', 'pipe', 'pipe'],
+        windowsHide: true,
+      })
+
+      let output = ''
+      const collect = (chunk: Buffer) => {
+        output += chunk.toString('utf8')
+      }
+
+      child.stdout?.on('data', collect)
+      child.stderr?.on('data', collect)
+
+      const timer = setTimeout(() => {
+        killTree(child)
+        resolve({ valid: false, message: 'the kernel did not finish validating in time' })
+      }, 300_000)
+
+      timer.unref?.()
+      child.once('error', (error) => {
+        clearTimeout(timer)
+        resolve({ valid: false, message: error.message })
+      })
+      child.once('exit', (code) => {
+        clearTimeout(timer)
+        resolve({
+          valid: code === 0,
+          message: code === 0 ? '' : output.trim().split('\n').slice(-8).join('\n'),
+        })
+      })
+    })
+  }
+
   /** Ask the running kernel for its version string; empty when unavailable. */
   async version(): Promise<string> {
     try {

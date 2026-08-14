@@ -4,6 +4,14 @@ productName: zashboard
 # would become "@zashboarddesktop", which the AppImage builder rejects.
 executableName: zashboard
 copyright: Copyright © zashboard contributors
+# Subscription "one-click import" links. REQUIRED on macOS:
+# app.setAsDefaultProtocolClient only works for schemes already declared in the
+# bundle's Info.plist, so without this the clash:// links never reach the app.
+protocols:
+  - name: Clash Subscription
+    schemes:
+      - clash
+      - clashmeta
 # Re-stage the arch-correct mihomo before EACH arch is packed — one run builds
 # both x64 and arm64 from a single host. See scripts/before-pack.cjs.
 beforePack: scripts/before-pack.cjs
@@ -18,6 +26,13 @@ directories:
 files:
   - 'out/**/*'
   - 'package.json'
+  # electron-builder adds the app's production dependencies on top of `files`,
+  # and in a pnpm workspace it resolves them from the WORKSPACE ROOT — which is
+  # the dashboard, whose deps (echarts, misans, three, …) are ~225 MB. None of
+  # them are needed at runtime: the dashboard ships pre-built in resources/
+  # renderer, and main/preload are bundled into out/. Without this the packaged
+  # app.asar grows from ~1 MB to ~227 MB.
+  - '!**/node_modules/**/*'
 
 asar: true
 

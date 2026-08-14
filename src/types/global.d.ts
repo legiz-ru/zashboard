@@ -39,6 +39,30 @@ declare type DesktopSettings = {
   kernelPath: string
 }
 
+declare type DesktopSubscriptionInfo = {
+  upload: number
+  download: number
+  total: number
+  /** Unix seconds; 0 when the plan does not expire. */
+  expire: number
+}
+
+declare type DesktopProfile = {
+  id: string
+  name: string
+  type: 'local' | 'remote'
+  url?: string
+  /** Auto-update period in minutes; 0 disables it. */
+  updateInterval?: number
+  updatedAt: number
+  subscriptionInfo?: DesktopSubscriptionInfo
+}
+
+declare type DesktopProfilesSnapshot = {
+  profiles: DesktopProfile[]
+  activeId?: string
+}
+
 declare type ZashboardDesktopApi = {
   appVersion: string
   kernelVersion: string
@@ -48,6 +72,21 @@ declare type ZashboardDesktopApi = {
   paths: { home: string; config: string; logs: string; kernelBinary: string }
   initialKernelState: DesktopKernelState
   initialSettings: DesktopSettings
+  initialProfiles: DesktopProfilesSnapshot
+  profiles: {
+    list: () => Promise<DesktopProfilesSnapshot>
+    importUrl: (url: string, name?: string) => Promise<DesktopProfilesSnapshot>
+    importLocal: (name: string, content: string) => Promise<DesktopProfilesSnapshot>
+    refresh: (id: string) => Promise<DesktopProfilesSnapshot>
+    patch: (
+      id: string,
+      patch: { name?: string; updateInterval?: number },
+    ) => Promise<DesktopProfilesSnapshot>
+    remove: (id: string) => Promise<DesktopProfilesSnapshot>
+    activate: (id: string) => Promise<DesktopProfilesSnapshot>
+    content: (id: string) => Promise<string>
+    onChange: (handler: (snapshot: DesktopProfilesSnapshot) => void) => () => void
+  }
   kernel: {
     state: () => Promise<DesktopKernelState>
     start: () => Promise<DesktopKernelState>

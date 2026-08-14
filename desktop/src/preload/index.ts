@@ -5,6 +5,7 @@ import type {
   KernelLogLine,
   KernelState,
   OpenTarget,
+  ProfilesSnapshot,
 } from '../shared/ipc'
 import { IPC } from '../shared/ipc'
 
@@ -34,6 +35,7 @@ const api = {
   /** Snapshots taken while this preload ran; the `on*` streams take over after. */
   initialKernelState: bootstrap.kernel,
   initialSettings: bootstrap.settings,
+  initialProfiles: bootstrap.profiles,
   kernel: {
     state: () => ipcRenderer.invoke(IPC.kernelState) as Promise<KernelState>,
     start: () => ipcRenderer.invoke(IPC.kernelStart) as Promise<KernelState>,
@@ -43,6 +45,23 @@ const api = {
       subscribe<KernelState>(IPC.onKernelState, handler),
     onLog: (handler: (line: KernelLogLine) => void) =>
       subscribe<KernelLogLine>(IPC.onKernelLog, handler),
+  },
+  profiles: {
+    list: () => ipcRenderer.invoke(IPC.profilesList) as Promise<ProfilesSnapshot>,
+    importUrl: (url: string, name?: string) =>
+      ipcRenderer.invoke(IPC.profilesImportUrl, url, name) as Promise<ProfilesSnapshot>,
+    importLocal: (name: string, content: string) =>
+      ipcRenderer.invoke(IPC.profilesImportLocal, name, content) as Promise<ProfilesSnapshot>,
+    refresh: (id: string) =>
+      ipcRenderer.invoke(IPC.profilesRefresh, id) as Promise<ProfilesSnapshot>,
+    patch: (id: string, patch: { name?: string; updateInterval?: number }) =>
+      ipcRenderer.invoke(IPC.profilesPatch, id, patch) as Promise<ProfilesSnapshot>,
+    remove: (id: string) => ipcRenderer.invoke(IPC.profilesRemove, id) as Promise<ProfilesSnapshot>,
+    activate: (id: string) =>
+      ipcRenderer.invoke(IPC.profilesActivate, id) as Promise<ProfilesSnapshot>,
+    content: (id: string) => ipcRenderer.invoke(IPC.profilesContent, id) as Promise<string>,
+    onChange: (handler: (snapshot: ProfilesSnapshot) => void) =>
+      subscribe<ProfilesSnapshot>(IPC.onProfiles, handler),
   },
   settings: {
     get: () => ipcRenderer.invoke(IPC.settingsGet) as Promise<DesktopSettings>,

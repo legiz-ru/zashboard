@@ -1,4 +1,5 @@
 import { can, type Cap } from '@/assembly/backend'
+import { isDesktop } from '@/composables/desktop'
 import { ROUTE_NAME } from '@/constant'
 import { renderRoutes } from '@/helper'
 import { i18n } from '@/i18n'
@@ -26,6 +27,13 @@ const childrenRouter = [
     path: 'overview',
     name: ROUTE_NAME.overview,
     component: OverviewPage,
+  },
+  {
+    // Desktop build only — renderRoutes() hides it in the browser, and the guard
+    // below turns a stale bookmark into a redirect rather than a blank page.
+    path: 'profiles',
+    name: ROUTE_NAME.profiles,
+    component: () => import('@/views/ProfilesPage.vue'),
   },
   {
     path: 'connections',
@@ -106,6 +114,13 @@ router.beforeEach((to, from) => {
 
   if (!activeBackend.value && to.name !== ROUTE_NAME.setup) {
     router.push({ name: ROUTE_NAME.setup })
+    return
+  }
+
+  // The profiles page is backed by the Electron shell; in the browser build
+  // there is nothing to render.
+  if (to.name === ROUTE_NAME.profiles && !isDesktop) {
+    router.push({ name: ROUTE_NAME.proxies })
     return
   }
 
