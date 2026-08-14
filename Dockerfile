@@ -4,7 +4,9 @@ WORKDIR /build
 
 COPY . .
 
-RUN pnpm install
+# Filtered: the image only needs the web dashboard, never the desktop shell's
+# electron toolchain.
+RUN pnpm install --filter zashboard...
 RUN pnpm build
 
 FROM docker.io/caddy:alpine

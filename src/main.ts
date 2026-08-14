@@ -7,6 +7,7 @@ import App from './App.vue'
 import { loadFonts } from './assets/load-fonts'
 import './assets/main.css'
 import { applyCustomThemes, applyKsuTheme } from './helper'
+import { setupDesktopBackend } from './helper/desktop'
 import { i18n } from './i18n'
 import router from './router'
 
@@ -19,6 +20,10 @@ if (isEdge) {
     return originalReplaceState.apply(this, args)
   }
 }
+
+// Must run before the router is used: it redirects to the setup page whenever no
+// backend is configured, and in the desktop build the bundled kernel is one.
+setupDesktopBackend()
 
 applyCustomThemes()
 applyKsuTheme()

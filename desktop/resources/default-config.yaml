@@ -1,0 +1,64 @@
+# zashboard desktop — first-run mihomo configuration.
+#
+# This file is copied into the app's data directory on first launch and is
+# yours to edit afterwards; updating the app never overwrites it. The desktop
+# shell rewrites only `external-controller`, `secret` and
+# `external-controller-cors` on every start (it owns the API endpoint the
+# dashboard talks to) and fills in `mixed-port` when it is missing.
+#
+# Import a subscription from the dashboard, or paste your own proxies below.
+
+mixed-port: 7890
+allow-lan: false
+bind-address: '*'
+mode: rule
+log-level: info
+ipv6: true
+unified-delay: true
+tcp-concurrent: true
+find-process-mode: strict
+global-client-fingerprint: chrome
+
+profile:
+  store-selected: true
+  store-fake-ip: true
+
+sniffer:
+  enable: true
+  sniff:
+    HTTP:
+      ports: [80, 8080-8880]
+      override-destination: true
+    TLS:
+      ports: [443, 8443]
+    QUIC:
+      ports: [443, 8443]
+  skip-domain:
+    - 'Mijia Cloud'
+    - '+.push.apple.com'
+
+dns:
+  enable: true
+  listen: 127.0.0.1:1053
+  ipv6: true
+  enhanced-mode: fake-ip
+  fake-ip-range: 198.18.0.1/16
+  fake-ip-filter:
+    - '*.lan'
+    - '*.local'
+    - '+.msftconnecttest.com'
+    - '+.msftncsi.com'
+  default-nameserver:
+    - 1.1.1.1
+    - 8.8.8.8
+  nameserver:
+    - https://1.1.1.1/dns-query
+    - https://dns.google/dns-query
+
+proxies: []
+
+proxy-groups: []
+
+# Everything goes direct until you add proxies and rules of your own.
+rules:
+  - MATCH,DIRECT

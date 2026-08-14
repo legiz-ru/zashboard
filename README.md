@@ -46,6 +46,55 @@ dev:
 - [gh-pages-pingfang-only.zip (3.25 MB)](https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages-pingfang-only.zip)
 - [gh-pages-sarasa-only.zip (3.67 MB)](https://github.com/Zephyruso/zashboard/archive/refs/heads/gh-pages-sarasa-only.zip)
 
+## **Desktop app**
+
+The desktop build is the dashboard packaged as an Electron app **with a mihomo
+kernel bundled inside** — no separate core to install, configure or keep
+running. Installers are attached to every release:
+
+| Platform | Artifacts                                                        |
+| -------- | ---------------------------------------------------------------- |
+| Windows  | `zashboard-<version>-win-{x64,arm64}.exe/.zip`                   |
+| macOS    | `zashboard-<version>-mac-{x64,arm64}.dmg/.zip`                   |
+| Linux    | `zashboard-<version>-linux-{x64,arm64}.AppImage`, `.deb`, `.rpm` |
+
+What the app does on top of the web dashboard:
+
+- starts the bundled mihomo on launch and supervises it (restart with backoff on
+  a crash), stopping it again when you quit;
+- registers its own kernel as a backend, so the dashboard opens straight into
+  the proxies view instead of the setup page;
+- toggles the **system proxy** (Windows / macOS / GNOME-based Linux) from the
+  tray or the Kernel menu;
+- keeps running in the tray when the window is closed.
+
+Your config lives in the app's data directory (`%APPDATA%\zashboard`,
+`~/Library/Application Support/zashboard`, `~/.config/zashboard`) as
+`mihomo-home/config.yaml`. It is seeded once from a default profile and is
+yours to edit afterwards — the app only rewrites `external-controller`, `secret`
+and `external-controller-cors` on each start, and fills in `mixed-port` if it is
+missing. Use **Open config folder** in the tray menu to get there. Kernel output
+is mirrored to `logs/kernel.log`.
+
+TUN mode needs elevated privileges, which the app does not request; run it as
+administrator/root if you want it.
+
+### Building it yourself
+
+```bash
+pnpm i                                              # installs the desktop workspace too
+pnpm --filter @zashboard/desktop fetch:mihomo       # stage the kernel for your OS/arch
+pnpm --filter zashboard build                       # build the dashboard
+pnpm --filter @zashboard/desktop copy:renderer      # stage it into the shell
+pnpm --filter @zashboard/desktop build              # bundle main + preload
+pnpm --filter @zashboard/desktop package            # installers land in desktop/dist
+```
+
+For development, `pnpm --filter @zashboard/desktop dev` starts the Vite dev
+server and launches Electron against it, so the renderer keeps HMR while the
+real main process (and a real kernel) runs. Bump `MIHOMO_VERSION` in
+`desktop/scripts/mihomo-asset.mjs` to ship a different kernel release.
+
 ## **Docker Setup**
 
 To run zashboard via Docker, use the following command:
