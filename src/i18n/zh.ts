@@ -558,6 +558,7 @@ const zh: LANG_MESSAGE = {
   settingsMenuProxies: '代理',
   settingsMenuConnections: '连接',
   settingsMenuOverview: '概览',
+  settingsMenuDesktop: '桌面',
   ports: '端口',
   actions: '操作',
   showAllPreset: '全部显示',
@@ -616,6 +617,28 @@ const zh: LANG_MESSAGE = {
   folder_preview: '自动匹配的代理组',
   folder_no_matches: '没有匹配的代理组',
   folder_delete_confirm: '确认删除文件夹「{name}」？',
+
+  // 桌面端（Electron 构建）
+  desktopSettings: '桌面应用',
+  kernelControl: '内核管理',
+  kernelStopped: '内核已停止',
+  kernelStarting: '内核启动中…',
+  kernelRunning: '内核运行中',
+  kernelErrored: '内核出错',
+  startCore: '启动内核',
+  stopCore: '停止内核',
+  elevated: '已提权',
+  elevateKernel: '以管理员身份启动内核',
+  elevateKernelDesc: '每次启动内核时申请管理员权限。TUN 模式需要它；拒绝后内核仍会以普通权限启动。',
+  kernelVersion: '内核版本',
+  bundledKernel: '内置：{version}',
+  systemProxy: '系统代理',
+  systemProxyDesc: '将系统流量经由内核的 {port} 端口转发。',
+  launchAtLogin: '开机自启',
+  minimizeToTray: '关闭时最小化到托盘',
+  openFolders: '文件夹',
+  openConfigFolder: '打开配置文件夹',
+  openLogsFolder: '打开日志文件夹',
 }
 
 export default zh

@@ -1,0 +1,106 @@
+name: Desktop
+
+# Builds the Electron desktop app (dashboard + bundled mihomo kernel) for
+# Windows, macOS and Linux. Called by the release pipeline once release-please
+# cuts a tag, and runnable on its own for a test build.
+on:
+  workflow_dispatch:
+    inputs:
+      tag_name:
+        description: 'Release tag to upload the installers to (leave empty to only keep them as workflow artifacts)'
+        required: false
+        type: string
+  workflow_call:
+    inputs:
+      tag_name:
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  build-desktop:
+    name: ${{ matrix.platform }}
+    runs-on: ${{ matrix.os }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            platform: linux
+          - os: macos-latest
+            platform: mac
+          - os: windows-latest
+            platform: win
+
+    steps:
+      - uses: actions/checkout@v6
+      - uses: actions/setup-node@v6
+        with:
+          node-version: 22
+      - uses: pnpm/action-setup@v6
+
+      # electron-builder drives fpm for the deb/rpm targets, and fpm shells out
+      # to rpmbuild — which the Ubuntu runner image does not ship.
+      - name: Install rpm tooling
+        if: matrix.platform == 'linux'
+        run: sudo apt-get update && sudo apt-get install -y rpm
+
+      - name: Install dependencies
+        run: pnpm i
+
+      # pnpm may skip electron's postinstall depending on the workspace's build
+      # allowlist; this makes the runtime's presence explicit rather than a
+      # confusing electron-builder failure later.
+      - name: Ensure the Electron runtime
+        run: pnpm --filter @zashboard/desktop ensure:electron
+
+      - name: Build the dashboard
+        run: pnpm --filter zashboard build
+
+      - name: Stage the dashboard into the shell
+        run: pnpm --filter @zashboard/desktop copy:renderer
+
+      - name: Bundle main and preload
+        run: pnpm --filter @zashboard/desktop build
+
+      # release-please only bumps the root package; the installers take their
+      # version (and filenames) from the desktop package.
+      - name: Sync the desktop package version
+        run: pnpm --filter @zashboard/desktop sync:version
+
+      - name: Package installers
+        env:
+          # Unsigned builds: stop electron-builder from hunting for a keychain
+          # identity on macOS and failing when it finds none.
+          CSC_IDENTITY_AUTO_DISCOVERY: false
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: pnpm --filter @zashboard/desktop exec electron-builder --${{ matrix.platform }} --publish never
+
+      - name: Upload workflow artifacts
+        uses: actions/upload-artifact@v5
+        with:
+          name: zashboard-desktop-${{ matrix.platform }}
+          if-no-files-found: error
+          path: |
+            desktop/dist/*.AppImage
+            desktop/dist/*.deb
+            desktop/dist/*.rpm
+            desktop/dist/*.dmg
+            desktop/dist/*.zip
+            desktop/dist/*.exe
+            desktop/dist/latest*.yml
+
+      - name: Upload to the GitHub release
+        if: inputs.tag_name != ''
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ inputs.tag_name }}
+          files: |
+            desktop/dist/*.AppImage
+            desktop/dist/*.deb
+            desktop/dist/*.rpm
+            desktop/dist/*.dmg
+            desktop/dist/*.zip
+            desktop/dist/*.exe

@@ -1,0 +1,31 @@
+{
+  "name": "@zashboard/desktop",
+  "version": "3.19.0",
+  "private": true,
+  "description": "zashboard desktop shell — the dashboard plus a bundled mihomo kernel",
+  "homepage": "https://github.com/Zephyruso/zashboard",
+  "license": "MIT",
+  "author": "zashboard contributors",
+  "type": "module",
+  "main": "out/main/index.cjs",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "copy:renderer": "node scripts/copy-renderer.mjs",
+    "dev": "node scripts/dev.mjs",
+    "ensure:electron": "node scripts/ensure-electron.mjs",
+    "fetch:mihomo": "node scripts/fetch-mihomo.mjs",
+    "package": "electron-builder",
+    "sync:version": "node scripts/sync-version.mjs",
+    "type-check": "tsc --noEmit -p tsconfig.json"
+  },
+  "devDependencies": {
+    "@types/node": "^26.1.2",
+    "electron": "^43.3.0",
+    "electron-builder": "^26.15.3",
+    "esbuild": "^0.28.1",
+    "typescript": "~6.0.3",
+    "yaml": "^2.9.0"
+  },
+  "desktopName": "zashboard.desktop",
+  "productName": "zashboard"
+}

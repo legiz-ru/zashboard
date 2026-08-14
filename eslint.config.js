@@ -10,7 +10,15 @@ export default [
 
   {
     name: 'app/files-to-ignore',
-    ignores: ['**/dist/**', '**/dist-ssr/**', '**/coverage/**'],
+    ignores: [
+      '**/dist/**',
+      '**/dist-ssr/**',
+      '**/coverage/**',
+      // Build output and staged assets of the Electron shell.
+      'desktop/out/**',
+      'desktop/renderer/**',
+      'desktop/resources/**',
+    ],
   },
 
   // 视图层不得自行判断后端类型,也不得直接调 api 层。
@@ -60,5 +68,15 @@ export default [
       ],
     },
   }),
+  // electron-builder loads its hooks through require(), so those files are CJS
+  // by necessity. Placed last so it wins over the shared TS config above.
+  {
+    name: 'app/desktop-build-hooks',
+    files: ['**/*.cjs'],
+    rules: {
+      '@typescript-eslint/no-require-imports': 'off',
+    },
+  },
+
   skipFormatting,
 ]

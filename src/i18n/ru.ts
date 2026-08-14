@@ -571,6 +571,7 @@ const ru: LANG_MESSAGE = {
   settingsMenuProxies: 'Прокси',
   settingsMenuConnections: 'Подключения',
   settingsMenuOverview: 'Обзор',
+  settingsMenuDesktop: 'Десктоп',
   ports: 'Порты',
   actions: 'Действия',
   showAllPreset: 'Показать все',
@@ -630,6 +631,29 @@ const ru: LANG_MESSAGE = {
   folder_preview: 'Автоматически подобранные группы',
   folder_no_matches: 'Нет подходящих групп',
   folder_delete_confirm: 'Удалить папку «{name}»?',
+
+  // Настройки десктопной оболочки (сборка Electron)
+  desktopSettings: 'Десктопное приложение',
+  kernelControl: 'Управление ядром',
+  kernelStopped: 'Ядро остановлено',
+  kernelStarting: 'Ядро запускается…',
+  kernelRunning: 'Ядро работает',
+  kernelErrored: 'Ошибка ядра',
+  startCore: 'Запустить ядро',
+  stopCore: 'Остановить ядро',
+  elevated: 'с правами администратора',
+  elevateKernel: 'Запускать ядро от администратора',
+  elevateKernelDesc:
+    'Запрашивает права администратора при каждом запуске ядра. Нужно для режима TUN; если отказаться, ядро всё равно запустится без них.',
+  kernelVersion: 'Версия ядра',
+  bundledKernel: 'в комплекте: {version}',
+  systemProxy: 'Системный прокси',
+  systemProxyDesc: 'Направлять системный трафик через ядро на порту {port}.',
+  launchAtLogin: 'Запуск при входе в систему',
+  minimizeToTray: 'Закрывать в трей',
+  openFolders: 'Папки',
+  openConfigFolder: 'Открыть папку конфигурации',
+  openLogsFolder: 'Открыть папку логов',
 }
 
 export default ru

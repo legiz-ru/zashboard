@@ -49,7 +49,9 @@ jobs:
         env:
           FONT: ${{ matrix.font.key }}
         run: |
-          pnpm i
+          # Filtered so the desktop workspace (electron + electron-builder) is
+          # not installed for a web-only build.
+          pnpm i --filter zashboard...
           pnpm run build
           echo 'board.zash.run.place' > ./dist/CNAME
 
@@ -85,7 +87,7 @@ jobs:
         env:
           FONT: ${{ matrix.font.key }}
         run: |
-          pnpm i
+          pnpm i --filter zashboard...
           pnpm run build
           zip -r dist${{ matrix.font.suffix }}.zip dist
 
@@ -94,6 +96,17 @@ jobs:
         with:
           files: dist${{ matrix.font.suffix }}.zip
           tag_name: ${{ needs.release-please.outputs.tag_name }}
+
+  # Desktop installers (dashboard + bundled mihomo) for win/mac/linux, attached
+  # to the same release as the web bundles.
+  release-desktop:
+    needs: release-please
+    if: ${{ needs.release-please.outputs.release_created }}
+    permissions:
+      contents: write
+    uses: ./.github/workflows/desktop.yml
+    with:
+      tag_name: ${{ needs.release-please.outputs.tag_name }}
 
   release-image:
     needs: release-please

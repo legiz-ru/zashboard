@@ -1,5 +1,16 @@
+# The dashboard itself lives at the repo root; `desktop` is the Electron shell
+# that bundles the built dashboard together with a mihomo kernel. Keeping it as
+# a separate workspace project means the (large) electron toolchain is only
+# installed when the desktop build asks for it — the web/docker jobs install
+# with `--filter zashboard...` and never pull it in.
+packages:
+  - .
+  - desktop
+
 minimumReleaseAge: 10080
 
 allowBuilds:
   '@bufbuild/buf': true
   esbuild: true
+  electron: true
+  electron-winstaller: true

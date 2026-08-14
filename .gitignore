@@ -29,3 +29,12 @@ coverage
 *.sw?
 
 *.tsbuildinfo
+
+# Desktop shell build artifacts: bundled main/preload, the staged dashboard and
+# the downloaded mihomo kernel are all produced by `desktop/scripts`.
+desktop/out/
+desktop/renderer/
+desktop/resources/mihomo
+desktop/resources/mihomo.exe
+desktop/resources/wintun.dll
+desktop/resources/.mihomo-target

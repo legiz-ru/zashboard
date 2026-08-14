@@ -396,5 +396,14 @@ export const settingsMenuOrder = useStorage<SETTINGS_MENU_KEY[]>(
   SETTINGS_CATEGORIES.map((category) => category.key),
 )
 
+// 已保存的顺序来自旧版本时会缺少新增的分类，补到末尾，保留用户已有的排序。
+const missingCategories = SETTINGS_CATEGORIES.map((category) => category.key).filter(
+  (key) => !settingsMenuOrder.value.includes(key),
+)
+
+if (missingCategories.length) {
+  settingsMenuOrder.value = [...settingsMenuOrder.value, ...missingCategories]
+}
+
 // settings page two columns mode
 export const settingsPageTwoColumns = useStorage<boolean>('config/settings-page-two-columns', true)

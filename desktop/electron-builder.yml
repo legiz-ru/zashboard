@@ -1,0 +1,115 @@
+appId: zashboard.desktop
+productName: zashboard
+# Explicit, filesystem-safe executable name: derived from the package name it
+# would become "@zashboarddesktop", which the AppImage builder rejects.
+executableName: zashboard
+copyright: Copyright © zashboard contributors
+# Re-stage the arch-correct mihomo before EACH arch is packed — one run builds
+# both x64 and arm64 from a single host. See scripts/before-pack.cjs.
+beforePack: scripts/before-pack.cjs
+# No auto-update channel: without this, electron-builder tries to auto-detect a
+# GitHub publish provider and fails before it ever reaches the packing step.
+publish: null
+
+directories:
+  output: dist
+  buildResources: build
+
+files:
+  - 'out/**/*'
+  - 'package.json'
+
+asar: true
+
+# The dashboard, the kernel and the seed config all live outside the asar: the
+# kernel must be a real, executable on-disk file, and serving the renderer from
+# a plain directory keeps asset resolution independent of asar internals.
+extraResources:
+  - from: renderer
+    to: renderer
+  - from: resources/default-config.yaml
+    to: default-config.yaml
+  - from: resources/tray.png
+    to: tray.png
+
+mac:
+  icon: build/icon.png
+  category: public.app-category.utilities
+  # Unsigned build — a signed one would additionally need network entitlements.
+  identity: null
+  hardenedRuntime: false
+  extraResources:
+    - from: resources/mihomo
+      to: mihomo
+  target:
+    - target: dmg
+      arch:
+        - x64
+        - arm64
+    - target: zip
+      arch:
+        - x64
+        - arm64
+  artifactName: ${productName}-${version}-mac-${arch}.${ext}
+
+win:
+  icon: build/icon.png
+  extraResources:
+    - from: resources/mihomo.exe
+      to: mihomo.exe
+    # mihomo's Windows TUN backend loads this next to the kernel. Only usable
+    # when the app runs elevated; harmless otherwise.
+    - from: resources/wintun.dll
+      to: wintun.dll
+  target:
+    - target: nsis
+      arch:
+        - x64
+        - arm64
+    - target: zip
+      arch:
+        - x64
+        - arm64
+  artifactName: ${productName}-${version}-win-${arch}.${ext}
+
+nsis:
+  oneClick: false
+  perMachine: false
+  allowToChangeInstallationDirectory: true
+  shortcutName: zashboard
+
+linux:
+  icon: build/icon.png
+  category: Network
+  synopsis: Dashboard for the mihomo kernel, with the kernel bundled
+  maintainer: zashboard contributors <noreply@zash.run.place>
+  # Electron uses desktopName as the app_id / WM_CLASS; without syncing it the
+  # desktop environment does not link the running window to the launcher entry.
+  syncDesktopName: true
+  desktop:
+    entry:
+      Keywords: mihomo;clash;proxy;dashboard;
+  extraResources:
+    - from: resources/mihomo
+      to: mihomo
+  target:
+    - target: AppImage
+      arch:
+        - x64
+        - arm64
+    - target: deb
+      arch:
+        - x64
+        - arm64
+    - target: rpm
+      arch:
+        - x64
+        - arm64
+  artifactName: ${productName}-${version}-linux-${arch}.${ext}
+
+# fpm-based targets need a lowercase package identifier; it must not be derived
+# from productName.
+deb:
+  packageName: zashboard
+rpm:
+  packageName: zashboard

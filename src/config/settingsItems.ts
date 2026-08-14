@@ -106,6 +106,21 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
       },
     ],
   },
+  // Desktop shell (Electron build only). The order here is the order rendered:
+  // kernel control, then the privileged-launch toggle, then the kernel version.
+  {
+    key: SETTINGS_MENU_KEY.desktop,
+    label: 'desktopSettings',
+    items: [
+      { key: `${SETTINGS_MENU_KEY.desktop}.kernelControl`, label: 'kernelControl' },
+      { key: `${SETTINGS_MENU_KEY.desktop}.elevateKernel`, label: 'elevateKernel' },
+      { key: `${SETTINGS_MENU_KEY.desktop}.kernelVersion`, label: 'kernelVersion' },
+      { key: `${SETTINGS_MENU_KEY.desktop}.systemProxy`, label: 'systemProxy' },
+      { key: `${SETTINGS_MENU_KEY.desktop}.launchAtLogin`, label: 'launchAtLogin' },
+      { key: `${SETTINGS_MENU_KEY.desktop}.minimizeToTray`, label: 'minimizeToTray' },
+      { key: `${SETTINGS_MENU_KEY.desktop}.openFolders`, label: 'openFolders' },
+    ],
+  },
   {
     key: SETTINGS_MENU_KEY.overview,
     label: 'overviewSettings',
@@ -228,6 +243,8 @@ export const BACKEND_ITEM_KEYS = keyMapByLabel(SETTINGS_MENU_KEY.backend)
 export const PROXIES_ITEM_KEYS = keyMapByLabel(SETTINGS_MENU_KEY.proxies)
 /** Key map for connections settings. */
 export const CONNECTIONS_ITEM_KEYS = keyMapByLabel(SETTINGS_MENU_KEY.connections)
+/** Key map for the desktop shell settings. */
+export const DESKTOP_ITEM_KEYS = keyMapByLabel(SETTINGS_MENU_KEY.desktop)
 
 function keyMapByLabel(categoryKey: SETTINGS_MENU_KEY): Record<string, string> {
   const category = SETTINGS_CATEGORIES.find((c) => c.key === categoryKey)
