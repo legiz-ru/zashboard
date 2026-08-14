@@ -101,6 +101,7 @@
 import SettingsCtrl from '@/components/controls/SettingsCtrl.vue'
 import BackendSettings from '@/components/settings/backend/BackendSettings.vue'
 import ConnectionsSettings from '@/components/settings/connections/ConnectionsSettings.vue'
+import DesktopSettings from '@/components/settings/desktop/DesktopSettings.vue'
 import ZashboardSettings from '@/components/settings/general/ZashboardSettings.vue'
 import OverviewSettings from '@/components/settings/overview/OverviewSettings.vue'
 import ProxiesSettings from '@/components/settings/proxies/ProxiesSettings.vue'
@@ -113,12 +114,14 @@ import {
   isSettingVisible,
   settingsEditMode,
 } from '@/composables/settings'
+import { isDesktop } from '@/composables/desktop'
 import { SETTINGS_MENU_KEY } from '@/constant'
 import { isPWA } from '@/helper/utils'
 import { settingsMenuOrder, settingsPageTwoColumns } from '@/store/settings'
 import {
   ArrowPathIcon,
   ArrowsRightLeftIcon,
+  ComputerDesktopIcon,
   CubeTransparentIcon,
   GlobeAltIcon,
   HomeIcon,
@@ -196,6 +199,16 @@ const menuItems = computed<MenuItem[]>(() => {
       },
     ],
   ])
+
+  // 桌面端专属分类：浏览器里没有 Electron 桥接，直接不注册。
+  if (isDesktop) {
+    itemsMap.set(SETTINGS_MENU_KEY.desktop, {
+      key: SETTINGS_MENU_KEY.desktop,
+      label: 'desktopSettings',
+      icon: ComputerDesktopIcon,
+      component: DesktopSettings,
+    })
+  }
 
   // 根据 settingsMenuOrder 排序，并过滤隐藏的项
   return settingsMenuOrder.value

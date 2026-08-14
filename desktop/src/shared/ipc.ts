@@ -31,6 +31,8 @@ export type KernelState = {
   secret: string
   /** mihomo's mixed (http + socks) proxy port, used by the system-proxy toggle. */
   mixedPort: number
+  /** True while the kernel runs with administrator/root privileges. */
+  elevated: boolean
   pid?: number
   /** Populated when status is `errored`. */
   error?: string
@@ -43,6 +45,11 @@ export type KernelLogLine = {
 }
 
 export type DesktopSettings = {
+  /**
+   * Ask for administrator/root rights when starting the kernel. Needed for TUN
+   * mode; takes effect the next time the kernel starts.
+   */
+  elevateKernel: boolean
   /** Turn the OS proxy on whenever the kernel is running. */
   systemProxy: boolean
   /** Close/minimize hides to the tray instead of quitting. */

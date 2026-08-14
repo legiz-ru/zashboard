@@ -66,6 +66,9 @@ What the app does on top of the web dashboard:
   the proxies view instead of the setup page;
 - toggles the **system proxy** (Windows / macOS / GNOME-based Linux) from the
   tray or the Kernel menu;
+- adds a **Desktop** section to the dashboard's settings page — kernel control,
+  privileged launch, kernel version, system proxy, launch at login and the data
+  folders;
 - keeps running in the tray when the window is closed.
 
 Your config lives in the app's data directory (`%APPDATA%\zashboard`,
@@ -76,8 +79,24 @@ and `external-controller-cors` on each start, and fills in `mixed-port` if it is
 missing. Use **Open config folder** in the tray menu to get there. Kernel output
 is mirrored to `logs/kernel.log`.
 
-TUN mode needs elevated privileges, which the app does not request; run it as
-administrator/root if you want it.
+### Running the kernel as administrator
+
+TUN mode needs a privileged kernel. **Settings → Desktop → Run kernel as
+administrator** turns that on: the kernel is then restarted through the OS
+authorization prompt (UAC on Windows, the authorization dialog on macOS,
+pkexec on Linux). Declining the prompt — or having no elevation agent
+available — starts the kernel unprivileged instead, so you are never left
+without a proxy.
+
+Because a privileged process cannot be signalled by an unprivileged parent, the
+kernel is not elevated on its own: it is wrapped in a watcher running at the
+same privilege level that shuts it down when the app quits, when you stop the
+kernel from the UI, or if the app is force-killed. That keeps a single
+authorization prompt per kernel start instead of one per action, and never
+leaves a root-owned proxy running after the app is gone.
+
+Launching the whole app as administrator/root also works — the kernel inherits
+those rights and no prompt is shown.
 
 ### Building it yourself
 

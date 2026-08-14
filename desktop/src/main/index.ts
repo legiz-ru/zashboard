@@ -19,6 +19,8 @@ import { createTray } from './tray'
 const PREFERRED_API_PORT = 9090
 /** mihomo's conventional mixed proxy port, used when the config omits one. */
 const DEFAULT_MIXED_PORT = 7890
+/** Shown in the confirmation dialog and inside the OS authorization prompt. */
+const ELEVATION_PROMPT = 'zashboard needs administrator rights to run the mihomo kernel.'
 
 // Without this the app name comes from the package name (`@zashboard/desktop`)
 // and userData lands in a nested `@zashboard/desktop` directory.
@@ -79,6 +81,26 @@ const loadSecret = (userData: string): string => {
   }
 
   return secret
+}
+
+/**
+ * Ask before triggering the OS authorization dialog. The prompt itself carries
+ * no context on Windows/Linux, so this is where the user learns which app is
+ * asking and why — and gets a way out that still leaves them with a proxy.
+ */
+const confirmElevation = async (): Promise<boolean> => {
+  const { response } = await dialog.showMessageBox({
+    type: 'question',
+    buttons: ['Continue', 'Start without privileges'],
+    defaultId: 0,
+    cancelId: 1,
+    title: 'zashboard',
+    message: ELEVATION_PROMPT,
+    detail:
+      'Administrator rights are required for TUN mode. Without them the kernel still runs, but only as a local proxy.',
+  })
+
+  return response === 0
 }
 
 const applySystemProxy = async (enabled: boolean): Promise<void> => {
@@ -291,6 +313,14 @@ const boot = async (): Promise<void> => {
     externalController: `127.0.0.1:${apiPort}`,
     secret,
     defaultMixedPort: DEFAULT_MIXED_PORT,
+    stopFile: join(userData, 'kernel.stop'),
+    logFile: join(paths.logsDir, 'kernel.log'),
+    scriptDir: userData,
+    // Read at every start, so flipping the setting takes effect on the next
+    // kernel restart without rebuilding the supervisor.
+    shouldElevate: () => settings?.get().elevateKernel ?? false,
+    confirmElevation,
+    elevationPrompt: ELEVATION_PROMPT,
   })
 
   kernel.on('log', (line) => {
@@ -332,6 +362,7 @@ const boot = async (): Promise<void> => {
       externalController: `127.0.0.1:${apiPort}`,
       secret,
       mixedPort: DEFAULT_MIXED_PORT,
+      elevated: false,
     },
     settings: settings?.get() ?? desktopSettings,
   }))

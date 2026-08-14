@@ -1,4 +1,4 @@
-appId: zashboard.app
+appId: zashboard.desktop
 productName: zashboard
 # Explicit, filesystem-safe executable name: derived from the package name it
 # would become "@zashboarddesktop", which the AppImage builder rejects.

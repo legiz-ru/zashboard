@@ -2,6 +2,7 @@ import { readFileSync, writeFileSync } from 'node:fs'
 import type { DesktopSettings } from '../shared/ipc'
 
 export const DEFAULT_SETTINGS: DesktopSettings = {
+  elevateKernel: false,
   systemProxy: false,
   minimizeToTray: true,
   launchAtLogin: false,
@@ -14,6 +15,7 @@ const coerce = (raw: unknown): DesktopSettings => {
     typeof value[key] === 'boolean' ? (value[key] as boolean) : (DEFAULT_SETTINGS[key] as boolean)
 
   return {
+    elevateKernel: bool('elevateKernel'),
     systemProxy: bool('systemProxy'),
     minimizeToTray: bool('minimizeToTray'),
     launchAtLogin: bool('launchAtLogin'),

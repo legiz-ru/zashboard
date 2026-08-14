@@ -318,6 +318,8 @@ export enum SETTINGS_MENU_KEY {
   proxies = 'proxySettings',
   connections = 'connectionSettings',
   overview = 'overviewSettings',
+  // Only rendered by the Electron desktop build; see composables/desktop.ts.
+  desktop = 'desktopSettings',
 }
 
 export enum OVERVIEW_CARD {

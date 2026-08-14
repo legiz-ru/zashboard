@@ -558,6 +558,7 @@ const zhTW: LANG_MESSAGE = {
   settingsMenuProxies: '代理',
   settingsMenuConnections: '連接',
   settingsMenuOverview: '概覽',
+  settingsMenuDesktop: '桌面',
   ports: '端口',
   actions: '操作',
   showAllPreset: '全部顯示',
@@ -616,6 +617,29 @@ const zhTW: LANG_MESSAGE = {
   folder_preview: '自動匹配的代理組',
   folder_no_matches: '沒有符合的代理組',
   folder_delete_confirm: '確認刪除資料夾「{name}」？',
+
+  // 桌面端（Electron 建置）
+  desktopSettings: '桌面應用程式',
+  kernelControl: '核心管理',
+  kernelStopped: '核心已停止',
+  kernelStarting: '核心啟動中…',
+  kernelRunning: '核心執行中',
+  kernelErrored: '核心錯誤',
+  startCore: '啟動核心',
+  stopCore: '停止核心',
+  elevated: '已提權',
+  elevateKernel: '以系統管理員身分啟動核心',
+  elevateKernelDesc:
+    '每次啟動核心時要求系統管理員權限。TUN 模式需要它；拒絕後核心仍會以一般權限啟動。',
+  kernelVersion: '核心版本',
+  bundledKernel: '內建：{version}',
+  systemProxy: '系統代理',
+  systemProxyDesc: '將系統流量經由核心的 {port} 連接埠轉送。',
+  launchAtLogin: '開機自動啟動',
+  minimizeToTray: '關閉時最小化至系統匣',
+  openFolders: '資料夾',
+  openConfigFolder: '開啟設定資料夾',
+  openLogsFolder: '開啟日誌資料夾',
 }
 
 export default zhTW

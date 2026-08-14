@@ -18,6 +18,8 @@ declare type DesktopKernelState = {
   externalController: string
   secret: string
   mixedPort: number
+  /** True while the kernel runs with administrator/root privileges. */
+  elevated: boolean
   pid?: number
   error?: string
 }
@@ -29,6 +31,8 @@ declare type DesktopKernelLogLine = {
 }
 
 declare type DesktopSettings = {
+  /** Ask for administrator/root rights when starting the kernel (TUN mode). */
+  elevateKernel: boolean
   systemProxy: boolean
   minimizeToTray: boolean
   launchAtLogin: boolean

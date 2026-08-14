@@ -568,6 +568,7 @@ const en = {
   settingsMenuProxies: 'Proxies',
   settingsMenuConnections: 'Connections',
   settingsMenuOverview: 'Overview',
+  settingsMenuDesktop: 'Desktop',
   ports: 'Ports',
   actions: 'Actions',
   showAllPreset: 'Show all',
@@ -627,6 +628,29 @@ const en = {
   folder_preview: 'Auto-matched groups',
   folder_no_matches: 'No matched groups',
   folder_delete_confirm: 'Delete folder "{name}"?',
+
+  // Desktop shell (Electron build)
+  desktopSettings: 'Desktop app',
+  kernelControl: 'Kernel control',
+  kernelStopped: 'Kernel stopped',
+  kernelStarting: 'Kernel starting…',
+  kernelRunning: 'Kernel running',
+  kernelErrored: 'Kernel error',
+  startCore: 'Start core',
+  stopCore: 'Stop core',
+  elevated: 'elevated',
+  elevateKernel: 'Run kernel as administrator',
+  elevateKernelDesc:
+    'Asks for administrator rights every time the kernel starts. Required for TUN mode; the kernel still starts without them if you decline.',
+  kernelVersion: 'Kernel version',
+  bundledKernel: 'bundled: {version}',
+  systemProxy: 'System proxy',
+  systemProxyDesc: 'Route system traffic through the kernel on port {port}.',
+  launchAtLogin: 'Launch at login',
+  minimizeToTray: 'Close to tray',
+  openFolders: 'Folders',
+  openConfigFolder: 'Open config folder',
+  openLogsFolder: 'Open logs folder',
 }
 
 export type LANG_MESSAGE = typeof en

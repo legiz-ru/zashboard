@@ -42,7 +42,9 @@ export const createTray = (iconPath: string, handlers: TrayHandlers) => {
   tray.on('double-click', handlers.show)
 
   const render = (view: TrayView): void => {
-    const status = STATUS_LABEL[view.kernel.status]
+    const status = view.kernel.elevated
+      ? `${STATUS_LABEL[view.kernel.status]} (elevated)`
+      : STATUS_LABEL[view.kernel.status]
 
     tray.setToolTip(`zashboard — ${status}`)
     tray.setContextMenu(

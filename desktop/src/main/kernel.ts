@@ -4,6 +4,7 @@ import { EventEmitter } from 'node:events'
 import { readFile, writeFile } from 'node:fs/promises'
 import type { KernelLogLine, KernelState } from '../shared/ipc'
 import { applyRuntimeConfig } from './config'
+import { isElevated, requestElevatedStop, spawnElevatedKernel } from './elevate'
 
 export type KernelOptions = {
   binaryPath: string
@@ -12,6 +13,21 @@ export type KernelOptions = {
   externalController: string
   secret: string
   defaultMixedPort: number
+  /** Flag file the privileged watcher polls; see elevate.ts. */
+  stopFile: string
+  /** Where an elevated kernel's output is appended (it cannot be piped to us). */
+  logFile: string
+  /** User-owned directory the generated watcher script is written to. */
+  scriptDir: string
+  /** Read at every start: whether the user asked for a privileged kernel. */
+  shouldElevate: () => boolean
+  /**
+   * Confirmation shown before the OS authorization prompt. Returning false
+   * starts the kernel unprivileged instead.
+   */
+  confirmElevation: () => Promise<boolean>
+  /** Text shown inside the OS authorization prompt. */
+  elevationPrompt: string
   /** How long to wait for the REST API to answer before declaring a failure. */
   startTimeoutMs?: number
   /** Consecutive crash restarts before the supervisor gives up. */
@@ -52,6 +68,7 @@ export class Kernel extends EventEmitter<KernelEvents> {
   private restartCount = 0
   private restartTimer: NodeJS.Timeout | undefined
   private stableTimer: NodeJS.Timeout | undefined
+  private healthTimer: NodeJS.Timeout | undefined
   private binaryPath: string
   private readonly startTimeoutMs: number
   private readonly maxRestarts: number
@@ -67,6 +84,7 @@ export class Kernel extends EventEmitter<KernelEvents> {
       externalController: options.externalController,
       secret: options.secret,
       mixedPort: options.defaultMixedPort,
+      elevated: false,
     }
   }
 
@@ -85,7 +103,7 @@ export class Kernel extends EventEmitter<KernelEvents> {
   }
 
   async start(): Promise<void> {
-    if (this.child) return
+    if (this.child || this.state.elevated) return
 
     this.clearRestartTimer()
     this.intentionalStop = false
@@ -94,6 +112,8 @@ export class Kernel extends EventEmitter<KernelEvents> {
     const mixedPort = await this.writeRuntimeConfig()
 
     this.setState({ mixedPort })
+
+    if (await this.startElevated()) return
 
     const child = spawn(
       this.binaryPath,
@@ -147,9 +167,99 @@ export class Kernel extends EventEmitter<KernelEvents> {
     this.stableTimer.unref?.()
   }
 
+  /**
+   * Try to bring the kernel up with administrator/root privileges (the mode TUN
+   * needs). Returns true when the privileged kernel is running; false means the
+   * caller should fall back to a normal spawn — a declined prompt or a desktop
+   * without an elevation agent must not leave the user with no proxy at all.
+   */
+  private async startElevated(): Promise<boolean> {
+    if (!this.options.shouldElevate()) return false
+    // Already privileged (the user launched the app elevated): a plain spawn
+    // inherits those rights, so prompting again would be noise.
+    if (await isElevated()) return false
+    if (!(await this.options.confirmElevation())) return false
+
+    const launched = await spawnElevatedKernel({
+      binary: this.binaryPath,
+      args: ['-d', this.options.homeDir, '-f', this.options.configPath],
+      stopFile: this.options.stopFile,
+      logFile: this.options.logFile,
+      scriptDir: this.options.scriptDir,
+      parentPid: process.pid,
+      prompt: this.options.elevationPrompt,
+    })
+
+    if (!launched) {
+      this.emit('log', {
+        stream: 'stderr',
+        line: '[app] elevation was refused or unavailable — starting the kernel unprivileged',
+        ts: Date.now(),
+      })
+
+      return false
+    }
+
+    this.setState({ elevated: true })
+
+    try {
+      await this.waitForApi()
+    } catch (error) {
+      requestElevatedStop(this.options.stopFile)
+      this.setState({
+        status: 'errored',
+        elevated: false,
+        error: error instanceof Error ? error.message : String(error),
+      })
+
+      return true
+    }
+
+    this.setState({ status: 'running', pid: undefined, error: undefined })
+    // An elevated kernel is not our child, so there is no 'exit' event to react
+    // to; poll the API instead so a crash still surfaces in the UI.
+    this.healthTimer = setInterval(() => void this.checkElevatedHealth(), 5_000)
+    this.healthTimer.unref?.()
+
+    return true
+  }
+
+  private async checkElevatedHealth(): Promise<void> {
+    if (!this.state.elevated || this.state.status !== 'running') return
+    if (await this.apiAnswers()) return
+
+    this.clearHealthTimer()
+    this.setState({
+      status: 'errored',
+      elevated: false,
+      error: 'the privileged mihomo process is no longer responding',
+    })
+  }
+
+  /** Stop a privileged kernel through its watcher and wait for the API to go. */
+  private async stopElevated(): Promise<void> {
+    requestElevatedStop(this.options.stopFile)
+
+    // The watcher polls once a second; give it a bounded window to react.
+    const deadline = Date.now() + 10_000
+
+    while (Date.now() < deadline) {
+      if (!(await this.apiAnswers())) break
+      await new Promise((resolve) => setTimeout(resolve, 300))
+    }
+
+    this.clearHealthTimer()
+    this.setState({ status: 'stopped', pid: undefined, elevated: false })
+  }
+
   async stop(): Promise<void> {
     this.clearRestartTimer()
     this.clearStableTimer()
+
+    if (this.state.elevated) {
+      await this.stopElevated()
+      return
+    }
 
     const child = this.child
 
@@ -216,23 +326,30 @@ export class Kernel extends EventEmitter<KernelEvents> {
     return mixedPort
   }
 
+  /** Whether the kernel's REST API is currently answering. */
+  private async apiAnswers(): Promise<boolean> {
+    try {
+      const response = await fetch(`${this.endpoint.url}/version`, {
+        headers: { Authorization: `Bearer ${this.state.secret}` },
+      })
+
+      return response.ok
+    } catch {
+      return false
+    }
+  }
+
   private async waitForApi(): Promise<void> {
     const deadline = Date.now() + this.startTimeoutMs
 
     while (Date.now() < deadline) {
-      if (!this.child) {
+      // An elevated kernel is not our child, so its absence proves nothing —
+      // only the unprivileged path can shortcut on a dead process.
+      if (!this.state.elevated && !this.child) {
         throw new Error(this.state.error ?? 'mihomo exited before its API came up')
       }
 
-      try {
-        const response = await fetch(`${this.endpoint.url}/version`, {
-          headers: { Authorization: `Bearer ${this.state.secret}` },
-        })
-
-        if (response.ok) return
-      } catch {
-        // Not listening yet — keep polling until the deadline.
-      }
+      if (await this.apiAnswers()) return
 
       await new Promise((resolve) => setTimeout(resolve, 200))
     }
@@ -269,6 +386,11 @@ export class Kernel extends EventEmitter<KernelEvents> {
   private clearStableTimer(): void {
     if (this.stableTimer) clearTimeout(this.stableTimer)
     this.stableTimer = undefined
+  }
+
+  private clearHealthTimer(): void {
+    if (this.healthTimer) clearInterval(this.healthTimer)
+    this.healthTimer = undefined
   }
 
   private emitLines(stream: 'stdout' | 'stderr', chunk: Buffer): void {
