@@ -91,23 +91,36 @@ const stageKernel = async () => {
 }
 
 /**
- * mihomo's Windows TUN backend loads wintun.dll from next to the kernel. It is
- * only usable when the app runs elevated, so a failure here is a warning, not a
- * build breaker.
+ * mihomo's Windows TUN backend loads wintun.dll from next to the kernel.
+ *
+ * This is not optional: electron-builder's Windows extraResources names the
+ * file explicitly, so a missing dll fails the pack anyway — better to fail here
+ * with a message that says what actually went wrong, and after a retry, since
+ * the download comes from a third-party host.
  */
 const stageWintun = async () => {
   const cpu = WINTUN_ARCH[arch]
 
-  if (!cpu) return
+  if (!cpu) throw new Error(`no wintun build for ${arch}`)
 
-  try {
-    const buffer = await download(`https://www.wintun.net/builds/wintun-${WINTUN_VERSION}.zip`)
-    const dll = await extractZipEntry(buffer, `wintun/bin/${cpu}/wintun.dll`)
+  const url = `https://www.wintun.net/builds/wintun-${WINTUN_VERSION}.zip`
 
-    writeFileSync(join(resourcesDir, 'wintun.dll'), dll)
-    console.log('[fetch-mihomo] staged: wintun.dll')
-  } catch (error) {
-    console.warn(`[fetch-mihomo] wintun.dll unavailable (TUN mode will not work): ${error.message}`)
+  for (let attempt = 1; ; attempt++) {
+    try {
+      const dll = await extractZipEntry(await download(url), `wintun/bin/${cpu}/wintun.dll`)
+
+      writeFileSync(join(resourcesDir, 'wintun.dll'), dll)
+      console.log('[fetch-mihomo] staged: wintun.dll')
+
+      return
+    } catch (error) {
+      if (attempt >= 3) {
+        throw new Error(`could not stage wintun.dll from ${url}: ${error.message}`)
+      }
+
+      console.warn(`[fetch-mihomo] wintun.dll attempt ${attempt} failed: ${error.message}`)
+      await new Promise((resolve) => setTimeout(resolve, attempt * 2000))
+    }
   }
 }
 

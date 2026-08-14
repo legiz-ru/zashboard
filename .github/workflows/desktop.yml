@@ -1,9 +1,12 @@
 name: Desktop
 
 # Builds the Electron desktop app (dashboard + bundled mihomo kernel) for
-# Windows, macOS and Linux. Called by the release pipeline once release-please
-# cuts a tag, and runnable on its own for a test build.
+# Windows, macOS and Linux. Runs when a release is published, when the release
+# pipeline calls it after release-please cuts a tag, and on demand for a test
+# build.
 on:
+  release:
+    types: [published]
   workflow_dispatch:
     inputs:
       tag_name:
@@ -19,10 +22,22 @@ on:
 permissions:
   contents: write
 
+# release-please's release can reach this workflow through both the `release`
+# event and the pipeline's workflow_call, so builds are keyed on the tag: two
+# runs for the same release would otherwise race to upload the same filenames.
+concurrency:
+  group: desktop-${{ inputs.tag_name || github.event.release.tag_name || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   build-desktop:
     name: ${{ matrix.platform }}
     runs-on: ${{ matrix.os }}
+    env:
+      # The tag to attach the installers to, whichever way this run started.
+      # Empty for a plain workflow_dispatch: the build then only produces
+      # workflow artifacts.
+      RELEASE_TAG: ${{ inputs.tag_name || github.event.release.tag_name }}
     strategy:
       fail-fast: false
       matrix:
@@ -93,10 +108,10 @@ jobs:
             desktop/dist/latest*.yml
 
       - name: Upload to the GitHub release
-        if: inputs.tag_name != ''
+        if: env.RELEASE_TAG != ''
         uses: softprops/action-gh-release@v3
         with:
-          tag_name: ${{ inputs.tag_name }}
+          tag_name: ${{ env.RELEASE_TAG }}
           files: |
             desktop/dist/*.AppImage
             desktop/dist/*.deb
