@@ -69,6 +69,8 @@ const api = {
     onChange: (handler: (snapshot: ProfilesSnapshot) => void) =>
       subscribe<ProfilesSnapshot>(IPC.onProfiles, handler),
   },
+  /** The config the kernel is actually running, with the injected keys. */
+  runtimeConfig: () => ipcRenderer.invoke(IPC.runtimeConfig) as Promise<string>,
   tun: {
     status: () => ipcRenderer.invoke(IPC.tunStatus) as Promise<TunStatus>,
     enable: (stack: TunStack) => ipcRenderer.invoke(IPC.tunEnable, stack) as Promise<TunStatus>,

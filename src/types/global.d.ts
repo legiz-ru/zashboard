@@ -135,6 +135,7 @@ declare type ZashboardDesktopApi = {
     switch: (source: DesktopKernelSource, tag: string) => Promise<DesktopSettings>
     useBundled: () => Promise<DesktopSettings>
   }
+  runtimeConfig: () => Promise<string>
   tun: {
     status: () => Promise<DesktopTunStatus>
     enable: (stack: DesktopTunStack) => Promise<DesktopTunStatus>

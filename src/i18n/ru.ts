@@ -709,6 +709,13 @@ const ru: LANG_MESSAGE = {
   hotkey_modeDirect: 'Режим: прямой',
   minimize: 'Свернуть',
   maximize: 'Развернуть',
+
+  runtimeConfig: 'Рабочий конфиг ядра',
+  runtimeConfigDesc:
+    'Только для чтения: файл, с которым запущено ядро — активный профиль плюс внедрённые external-controller, secret и mixed-port.',
+  show: 'Показать',
+  noActiveProfile:
+    'Ни один профиль не активен — ядро работает на конфиге по умолчанию, в нём нет прокси.',
 }
 
 export default ru

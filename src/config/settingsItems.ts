@@ -121,6 +121,7 @@ export const SETTINGS_CATEGORIES: SettingsCategory[] = [
       { key: `${SETTINGS_MENU_KEY.desktop}.systemProxy`, label: 'systemProxy' },
       { key: `${SETTINGS_MENU_KEY.desktop}.launchAtLogin`, label: 'launchAtLogin' },
       { key: `${SETTINGS_MENU_KEY.desktop}.minimizeToTray`, label: 'minimizeToTray' },
+      { key: `${SETTINGS_MENU_KEY.desktop}.runtimeConfig`, label: 'runtimeConfig' },
       { key: `${SETTINGS_MENU_KEY.desktop}.openFolders`, label: 'openFolders' },
     ],
   },
