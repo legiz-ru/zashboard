@@ -3,7 +3,9 @@
   "version": "3.19.0",
   "private": true,
   "description": "zashboard desktop shell — the dashboard plus a bundled mihomo kernel",
+  "homepage": "https://github.com/Zephyruso/zashboard",
   "license": "MIT",
+  "author": "zashboard contributors",
   "type": "module",
   "main": "out/main/index.cjs",
   "scripts": {
@@ -24,5 +26,6 @@
     "typescript": "~6.0.3",
     "yaml": "^2.9.0"
   },
+  "desktopName": "zashboard.desktop",
   "productName": "zashboard"
 }

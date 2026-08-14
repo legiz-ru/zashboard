@@ -1,4 +1,4 @@
-appId: place.run.zash.zashboard
+appId: zashboard.app
 productName: zashboard
 # Explicit, filesystem-safe executable name: derived from the package name it
 # would become "@zashboarddesktop", which the AppImage builder rejects.
@@ -83,6 +83,9 @@ linux:
   category: Network
   synopsis: Dashboard for the mihomo kernel, with the kernel bundled
   maintainer: zashboard contributors <noreply@zash.run.place>
+  # Electron uses desktopName as the app_id / WM_CLASS; without syncing it the
+  # desktop environment does not link the running window to the launcher entry.
+  syncDesktopName: true
   desktop:
     entry:
       Keywords: mihomo;clash;proxy;dashboard;
